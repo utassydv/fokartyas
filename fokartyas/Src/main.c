@@ -67,7 +67,7 @@ UART_HandleTypeDef huart3;
 /* Private variables ---------------------------------------------------------*/
 uint32_t counterpres=0;
 uint32_t counterprev=0;
-uint32_t speed=0;
+int32_t speed=0;
 uint8_t timespeed = 0;
 uint8_t measurespeed = 0;
 
@@ -230,7 +230,7 @@ while (1)
 		speed= counterpres - counterprev;
 
 		measurespeed = 0;
-	}
+}
 
 
 
@@ -944,7 +944,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if(htim->Instance == TIM4)
   {
 	  timespeed++;
-	  if(timespeed == 10) //10*10ms-kent sebesseg meres
+	  if(timespeed == 1) //x*10ms-kent sebesseg meres
 	  {
 		  measurespeed = 1;
 		  timespeed = 0;
