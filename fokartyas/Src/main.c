@@ -65,6 +65,12 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+uint32_t counterpres=0;
+uint32_t counterprev=0;
+uint32_t speed=0;
+uint8_t timespeed = 0;
+uint8_t measurespeed = 0;
+
 uint8_t RxBuff;
 uint8_t count;    //vonal db szám
 uint32_t tav;
@@ -109,10 +115,6 @@ uint32_t kormanykesesszamlalo=0;
 __IO uint32_t uwIC2Value = 0;
 /* Duty Cycle Value */
 __IO uint32_t  uwDutyCycle = 0;
-
-
-
-
 
 
 /* USER CODE END PV */
@@ -192,7 +194,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);
- // HAL_TIM_PWM_Start(, TIM_CHANNEL_1);
+  HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);
   HAL_UART_Receive_IT(&huart4, &RxBuff, 1);
 
 
@@ -221,6 +223,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 while (1)
 {
+	if (measurespeed == 1)
+	{
+		counterprev = counterpres;
+		counterpres = TIM2->CNT;
+		speed= counterpres - counterprev;
+
+		measurespeed = 0;
+	}
+
+
+
 //	char TxData[16];
 //	snprintf(TxData, 16, "bluetooth\n"); //"2,150000'\0'"
 ////bluetooth
@@ -514,9 +527,9 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 0;
+  htim2.Init.Period = 0xFFFFFFFF;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  sConfig.EncoderMode = TIM_ENCODERMODE_TI1;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
@@ -930,6 +943,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
    */
   if(htim->Instance == TIM4)
   {
+	  timespeed++;
+	  if(timespeed == 10) //10*10ms-kent sebesseg meres
+	  {
+		  measurespeed = 1;
+		  timespeed = 0;
+	  }
+
+
 	  if(/*count==0*/0)
 	  {
 		  if(sztave == 0)
