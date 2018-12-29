@@ -42,6 +42,8 @@
 
 /* USER CODE BEGIN Includes */
 
+#include <string.h>
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -219,7 +221,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 while (1)
 {
-
+//	char TxData[16];
+//	snprintf(TxData, 16, "bluetooth\n"); //"2,150000'\0'"
+////bluetooth
+//	HAL_UART_Transmit_IT(&huart2, (uint8_t *)TxData, (strlen(TxData)+1)); //melyik, mit, mennyi, mennyi ido
 
 //UART ERTELMEZES
 	//Egy tombbe toltes
@@ -677,7 +682,7 @@ static void MX_USART2_UART_Init(void)
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.Mode = UART_MODE_TX;
   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart2) != HAL_OK)
@@ -829,15 +834,15 @@ int32_t szabPD(int32_t elozohibajel, int32_t hibajel, uint8_t contstate, uint32_
 
 	switch(contstate){
 	case 0:
-		if(lassitunke==1 && elkenkkeses<61) //LASSÍTÁSI IDŐ
+		if(lassitunke==1 && elkenkkeses<61) //LASS�?T�?SI ID�?
 		{
 
 			//p=pgyors+(((plassu-pgyors)/70)*elkenkkeses); //
 			//d=dgyors+(((dlassu-dgyors)/70)*elkenkkeses);
-			//if (elkenkkeses<61)							//FEKEZÉS IDŐ
+			//if (elkenkkeses<61)							//FEKEZÉS ID�?
 			p=pgyors;
 			d=dgyors;
-			vmehet=1050/*+(((1305-1050)/60)*elkenkkeses)*/; //FÉKEZÉS ERŐ
+			vmehet=1050/*+(((1305-1050)/60)*elkenkkeses)*/; //FÉKEZÉS ER�?
 
 
 		}
@@ -882,7 +887,7 @@ int32_t szabPD(int32_t elozohibajel, int32_t hibajel, uint8_t contstate, uint32_
 int16_t toPWM(int32_t jel)
 {
 
-	int16_t pwm=1500+((20800000/25598)*(jel))/26000; //KORMÁNY
+	int16_t pwm=1500+((20800000/25598)*(jel))/26000; //KORM�?NY
 
 	if(pwm<1100) pwm=1100;
 	if(pwm>1900) pwm=1900;
@@ -981,7 +986,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			lelassitunke=0;
 		}
 
-		if (state==1 && szaggatott==3)						//ha gyors és x vonal, után ne keresünk többet, UGYAN AZ MINT AZ ELŐZŐ!!!
+		if (state==1 && szaggatott==3)						//ha gyors és x vonal, után ne keresünk többet, UGYAN AZ MINT AZ EL�?Z�?!!!
 		{
 			szaggatasutanvaras++;
 			if(szaggatasutanvaras==250)						//x*10ms után keressük a fék jelet
