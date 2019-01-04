@@ -234,10 +234,11 @@ while (1)
 
 
 
-//	char TxData[16];
-//	snprintf(TxData, 16, "bluetooth\n"); //"2,150000'\0'"
+	char TxData[16];
+	snprintf(TxData, 16, "bluetooth\n"); //"2,150000'\0'"
 ////bluetooth
-//	HAL_UART_Transmit_IT(&huart2, (uint8_t *)TxData, (strlen(TxData)+1)); //melyik, mit, mennyi, mennyi ido
+	HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
+	HAL_Delay(100);
 
 //UART ERTELMEZES
 	//Egy tombbe toltes
