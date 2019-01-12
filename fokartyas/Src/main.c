@@ -70,17 +70,17 @@ uint32_t counterpres=0;
 uint32_t counterprev=0;
 int32_t speed=0;
 
-uint8_t timespeed = 0;
+uint16_t timespeed = 0;
 uint8_t flagspeed = 0;
-uint8_t timevonalszam = 0;
+uint16_t timevonalszam = 0;
 uint8_t flagvonalszam = 0;
-uint8_t timebeav = 0;
+uint16_t timebeav = 0;
 uint8_t flagbeav = 0;
-uint8_t timebluetooth = 0;
+uint16_t timebluetooth = 0;
 uint8_t flagbluetooth = 0;
-uint8_t timeallapotgep = 0;
+uint16_t timeallapotgep = 0;
 uint8_t flagallapotgep = 0;
-uint8_t timeuartproc = 0;
+uint16_t timeuartproc = 0;
 uint8_t flaguartproc = 0;
 
 uint32_t cntbeav = 0;
@@ -149,7 +149,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 void speedpos(void);
 void vonalszamlalo(void);
-void idozito(uint8_t ido, uint8_t *idocount, uint8_t *flag);
+void idozito(uint16_t ido, uint16_t *idocount, uint8_t *flag);
 void uartprocess(void);
 void allapotgep(void);
 int16_t toPWM(int32_t jel);
@@ -160,6 +160,8 @@ void gyors(void);
 void fekez(void);
 void control(void);
 void bluetoothTX(void);
+void bluetoothVSZ(void);
+void bluetoothDRIVE(void);
 uint8_t engedelyezo(uint32_t pwminput);
 
 /* USER CODE END PFP */
@@ -250,7 +252,9 @@ while (1)
 
 
 
-	bluetoothTX();
+	//bluetoothTX();
+	//bluetoothVSZ();
+	bluetoothDRIVE();
 
 
 }
@@ -831,7 +835,7 @@ uint8_t engedelyezo(uint32_t pwminput)
 }
 
 
-void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag)
+void idozito( uint16_t ido, uint16_t *idocount, uint8_t *flag)
 {
 	  *idocount = *idocount +1;
 	  if(*idocount == ido) //x*1ms-kent sebesseg meres
@@ -867,7 +871,35 @@ void bluetoothTX(void)
 	if (flagbluetooth == 1)
 	{
 		char TxData[16];
-		snprintf(TxData, 16, "bluetooth\n"); //"2,150000'\0'"
+		snprintf(TxData, 16, "bluetooth\n");
+		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
+
+	}
+	flagbluetooth = 0;
+}
+
+void bluetoothVSZ(void)
+{
+	if (flagbluetooth == 1)
+	{
+
+		char TxData[16];
+		snprintf(TxData, 16, "%u,%lu\n", count, tav); //"2,150000'\0'"
+		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
+
+	}
+	flagbluetooth = 0;
+}
+
+void bluetoothDRIVE(void)
+{
+	if (flagbluetooth == 1)
+	{
+
+		char TxData[16];
+		//snprintf(TxData, 16, "%u,%u,%u,%u,%u,%i,%i,%u,%u,%i,%i\n", state, count, egyvonalszam, haromvonalszam, tav, hiba, beavatkozo, pos, counterpres, speed, v); //"2,150000'\0'"
+		snprintf(TxData, 16, "%u,%u\n", state, count);
+
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 	}
