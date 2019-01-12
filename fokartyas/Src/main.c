@@ -69,7 +69,9 @@ uint32_t counterpres=0;
 uint32_t counterprev=0;
 int32_t speed=0;
 uint8_t timespeed = 0;
-uint8_t measurespeed = 0;
+uint8_t flagspeed = 0;
+uint8_t timevonalszam = 0;
+uint8_t flagvonalszam = 0;
 
 uint8_t RxBuff;
 uint8_t count;    //vonal db szám
@@ -104,7 +106,8 @@ int32_t elozohiba=0;
 int32_t beavatkozo=0;
 uint8_t lelassitunke=0;
 
-uint32_t haromvonalszam=0;
+uint32_t egyvonalszam = 0;
+uint32_t haromvonalszam = 0;
 uint32_t szaggatott=0;
 uint32_t szaggatasutanvaras=0;
 uint32_t kormanykesesszamlalo=0;
@@ -141,6 +144,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 /* Private function prototypes -----------------------------------------------*/
 
 void speedpos(void);
+void vonalszamlalo(void);
 void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag);
 int16_t toPWM(int32_t jel);
 int32_t szabPD(int32_t elozohibajel, int32_t hibajel, uint8_t contstate, uint32_t elkenkkeses,uint8_t lassitunke);
@@ -207,7 +211,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 while (1)
 {
-	speedpos();		//sebesseg es pozicio meres
+	speedpos();			//sebesseg es pozicio meres
+	vonalszamlalo(); 	//vonalszam figyeles
 
 	////bluetooth
 	char TxData[16];
@@ -908,16 +913,27 @@ void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag)
 	  }
 }
 
-void speedpos(void)			//sebesseg es pozicio merese
+void speedpos(void)				//sebesseg es pozicio merese
 {
-if (measurespeed == 1)
-	{
-		counterprev = counterpres;
-		counterpres = TIM2->CNT;
-		speed= counterpres - counterprev;
-		measurespeed = 0;
-	}
+	if (flagspeed == 1)
+		{
+			counterprev = counterpres;
+			counterpres = TIM2->CNT;
+			speed= counterpres - counterprev;
+			flagspeed = 0;
+		}
 }
+
+void vonalszamlalo(void)	//vonalfigyelo
+{
+	if (flagvonalszam == 1)
+			{
+				if(count == 1) egyvonalszam++;
+				if(count == 3) haromvonalszam++;
+				flagvonalszam = 0;
+			}
+}
+
 
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -928,8 +944,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if(htim->Instance == TIM4)	//1ms
   {
 
-	  idozito( 10, &timespeed, &measurespeed); //sebesseg meres (10msként) (ido, szamlalo, flag)
+	  idozito( 10, &timespeed, &flagspeed); 				//idozites sebesseg meres 	(ido, szamlalo, flag)
 
+	  idozito( 10, &timevonalszam, &flagvonalszam); 		//idozites vonalszamlalas 	(ido, szamlalo, flag)
 
 
 
