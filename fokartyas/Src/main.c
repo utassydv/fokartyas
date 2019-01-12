@@ -65,6 +65,7 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+
 uint32_t counterpres=0;
 uint32_t counterprev=0;
 int32_t speed=0;
@@ -88,19 +89,12 @@ uint8_t state = 0;
 uint8_t RxBuff;
 uint8_t count;    //vonal db szám
 uint32_t tav;
-uint32_t sztav;
-uint8_t sztave;
-
 int16_t pos;
 
-int16_t vmehet;
-uint16_t elopos;
 uint8_t szaml=0;
 uint8_t olveleje=0;
-uint8_t olvvege=0;
 uint8_t feldvege=0;
 char posarray[64];
-
 uint8_t data[64];
 
 
@@ -121,19 +115,12 @@ uint16_t vfek	=	1050;
 int32_t hiba=0;
 int32_t elozohiba=0;
 int32_t beavatkozo=0;
-uint8_t lelassitunke=0;
 
 uint32_t egyvonalszam = 0;
 uint32_t haromvonalszam = 0;
-uint32_t szaggatott=0;
-uint32_t szaggatasutanvaras=0;
-uint32_t kormanykesesszamlalo=0;
 
 
-
-/* Captured Value */
 __IO uint32_t uwIC2Value = 0;
-/* Duty Cycle Value */
 __IO uint32_t  uwDutyCycle = 0;
 
 
@@ -172,10 +159,8 @@ void lassu(void);
 void gyors(void);
 void fekez(void);
 void control(void);
-void allapotvalto(void);
 void bluetoothTX(void);
 uint8_t engedelyezo(uint32_t pwminput);
-
 
 /* USER CODE END PFP */
 
@@ -835,11 +820,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELY
 
 }
 
-void allapotvalto(void)
-{
-	if(state==0) state=1;
-	else state=0;
-}
+
 
 uint8_t engedelyezo(uint32_t pwminput)
 {
@@ -1034,86 +1015,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  idozito( 10, &timebeav, &flagbeav);					//idozites beavatkzosas		(ido(ms), szamlalo, flag)
 
-	  idozito( 10, &timebluetooth, &flagbluetooth);			//idozites bluetooth(ido	(ms), szamlalo, flag)
+	  idozito( 1000, &timebluetooth, &flagbluetooth);		//idozites bluetooth(ido	(ms), szamlalo, flag)
 
 	  idozito( 10, &timeuartproc, &flaguartproc); 			//idozites uart circ buff feldolg 	(ido(ms), szamlalo, flag)
-
-
-
-
-
-//	  if(/*count==0*/0)
-//	  {
-//		  if(sztave == 0)
-//		  {
-//			  sztav = elotav;
-//			  sztave=1;
-//		  }
-//			hiba = toerror(sztav);
-//
-//			lelassitunke=0;
-//			kormanykesesszamlalo++;
-//
-//			beavatkozo= szabPD(hiba, hiba, state,kormanykesesszamlalo,lelassitunke);
-//			elozohiba=hiba;
-//			pos = toPWM(beavatkozo);
-//			v=1500;
-//
-//			if(uwDutyCycle > 160)
-//			{
-//			//pos=1500;
-//			v=vmehet;
-//			//v=1612;
-//			}
-//	  }
-//
-//
-//	  else
-//	  {
-//		  sztave=0;
-//		if(count == 1) haromvonalszam=0;
-//		if(count == 3) haromvonalszam++;
-//		if(haromvonalszam==3 && state ==0) szaggatott++;	//x*10ms kell hogy szaggatotnak mondjuk vlmit
-//		if(haromvonalszam==10 && state==1) 					//x*10msonként nézzük a 3vonalat
-//			{
-//			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
-//			state=0;
-//			szaggatott =0;
-//			lelassitunke=1;
-//			kormanykesesszamlalo=0;
-//			}
-//
-//		if(state == 0 && haromvonalszam==10)
-//		{
-//			szaggatasutanvaras++;
-//						if(szaggatasutanvaras==350)						//x*10ms után keressük a fék jelet
-//						{
-//							szaggatasutanvaras=0;
-//							haromvonalszam=0;
-//						}
-//		}
-//
-//		if(szaggatott==3)									//x szaggatott vonal esetén kezdünk el gyorsítani
-//		{
-//			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
-//			state=1;
-//			lelassitunke=0;
-//		}
-//
-//		if (state==1 && szaggatott==3)						//ha gyors és x vonal, után ne keresünk többet, UGYAN AZ MINT AZ EL�?Z�?!!!
-//		{
-//			szaggatasutanvaras++;
-//			if(szaggatasutanvaras==250)						//x*10ms után keressük a fék jelet
-//			{
-//				szaggatasutanvaras=0;
-//				szaggatott=0;
-//			}
-//
-//	  	}
-
-
-
-
   }
 
 }
