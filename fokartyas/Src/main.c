@@ -191,32 +191,18 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM13_Init();
   MX_TIM4_Init();
+
+
+
+
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
-  HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);
-  HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);
-  HAL_UART_Receive_IT(&huart4, &RxBuff, 1);
-
-
-
-	if(HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK)
-	{
-	/* Starting Error */
-	Error_Handler();
-	}
-
-	/*##-5- Start the Input Capture in interrupt mode ##########################*/
-	if(HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2) != HAL_OK)
-	{
-	/* Starting Error */
-	Error_Handler();
-	}
-
-	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
-
-	HAL_TIM_Base_Start_IT(&htim4);
-
-
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);			//PWM Motor
+  HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);		//PWM Szervo
+  HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);	//Inkrementalis ado
+  HAL_UART_Receive_IT(&huart4, &RxBuff, 1);			//Vonalszenzor1 kommunikacio
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1);		//Taviranyito CH1
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2);		//Taviranyito CH2
+  HAL_TIM_Base_Start_IT(&htim4);					//Not used???
   /* USER CODE END 2 */
 
   /* Infinite loop */
