@@ -68,10 +68,22 @@ UART_HandleTypeDef huart3;
 uint32_t counterpres=0;
 uint32_t counterprev=0;
 int32_t speed=0;
+
 uint8_t timespeed = 0;
 uint8_t flagspeed = 0;
 uint8_t timevonalszam = 0;
 uint8_t flagvonalszam = 0;
+uint8_t timebeav = 0;
+uint8_t flagbeav = 0;
+uint8_t timebluetooth = 0;
+uint8_t flagbluetooth = 0;
+uint8_t timeallapotgep = 0;
+uint8_t flagallapotgep = 0;
+uint8_t timeuartproc = 0;
+uint8_t flaguartproc = 0;
+
+uint32_t cntbeav = 0;
+uint8_t state = 0;
 
 uint8_t RxBuff;
 uint8_t count;    //vonal db szám
@@ -79,9 +91,8 @@ uint32_t tav;
 uint32_t sztav;
 uint8_t sztave;
 
-uint32_t elotav;
 int16_t pos;
-int16_t v;
+
 int16_t vmehet;
 uint16_t elopos;
 uint8_t szaml=0;
@@ -93,13 +104,19 @@ char posarray[64];
 uint8_t data[64];
 
 
-float plassu;
-float dlassu;
-float pgyors;
-float dgyors;
-//uint16_t vlassu;
-//uint16_t vgyors;
-uint8_t state=0;
+float p			=	2.5f;
+float d			=	10.0f;
+int16_t v 		=	1500;
+
+float plassu	=	2.5f;
+float dlassu	=	10.0f;
+uint16_t vlassu	=	1625;
+
+float pgyors	=	0.25f;
+float dgyors	=	5.0f;
+uint16_t vgyors	=	1710;
+uint16_t vfek	=	1050;
+
 
 int32_t hiba=0;
 int32_t elozohiba=0;
@@ -145,11 +162,20 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 void speedpos(void);
 void vonalszamlalo(void);
-void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag);
+void idozito(uint8_t ido, uint8_t *idocount, uint8_t *flag);
+void uartprocess(void);
+void allapotgep(void);
 int16_t toPWM(int32_t jel);
-int32_t szabPD(int32_t elozohibajel, int32_t hibajel, uint8_t contstate, uint32_t elkenkkeses,uint8_t lassitunke);
+int32_t szabPD(int32_t elozohibajel, int32_t hibajel);
 int32_t toerror(uint32_t tavolsag);
+void lassu(void);
+void gyors(void);
+void fekez(void);
+void control(void);
 void allapotvalto(void);
+void bluetoothTX(void);
+uint8_t engedelyezo(uint32_t pwminput);
+
 
 /* USER CODE END PFP */
 
@@ -212,74 +238,35 @@ int main(void)
 while (1)
 {
 	speedpos();			//sebesseg es pozicio meres
+
 	vonalszamlalo(); 	//vonalszam figyeles
 
-	////bluetooth
-	char TxData[16];
-	snprintf(TxData, 16, "bluetooth\n"); //"2,150000'\0'"
-	HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
-	HAL_Delay(100);
+	uartprocess(); 		//UART feldolgozasa
 
-//UART ERTELMEZES
-	//Egy tombbe toltes
-	uint8_t x=0;
+	allapotgep();		//state megadasa
 
-	while(olveleje != feldvege)
+	if (flagbeav == 1)
 	{
-		if(olveleje == 63)
+		hiba 		= 	toerror(tav);
+		beavatkozo	= 	szabPD(elozohiba, hiba);
+		elozohiba	=	hiba;
+		pos 		= 	toPWM(beavatkozo);
+
+		if( engedelyezo(uwDutyCycle) == 0)
 		{
-			olveleje=0;
+			pos		=	1500;
+			v		=   1500;
 		}
-		else
-	    {
-			olveleje++;
-	    }
-		posarray[x++]= data[olveleje];
+
+		control();
+		flagbeav = 0;
 	}
-	olveleje =feldvege;
 
 
 
-//	while( data[olveleje] != '\0')
-//	{
-//		if(x==7)
-//		{
-//			posarray[x++]='\0';
-//			break;
-//		}
-//		if (olveleje == 63)
-//		{
-//			posarray[x++]= data[olveleje];
-//			olveleje=0;
-//		}
-//		else
-//		{
-//			posarray[x++]= data[olveleje++];
-//		}
-//	}
 
-	//tomb szetbontas
-    sscanf(posarray, "%d,%d\0", &count, &tav); // "1,15315'\0'"
+	bluetoothTX();
 
-
-    	plassu=2.5f; 			//2.5  // 2.6
-        dlassu=10.0f;  		//7.0  //
-
-        pgyors=0.25f; 		  //0.3
-        dgyors=5.0f;
-
-    //vlassu=1612;
-    //vgyors=1620;
-
-    //
-
-
-
-//    if (haromvonalszam==10)
-//    {
-//    	allapotvalto();
-//    }
-//    if(haromvonalszam>400) haromvonalszam=0;
 
 }
 
@@ -776,7 +763,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   /* Prevent unused argument(s) compilation warning */
   UNUSED(huart);
 
-//Vonalszenzor1 UART adatainak circ bufferbe toltese
+  //Vonalszenzor1 UART adatainak circ bufferbe toltese
   data[szaml]=RxBuff;
   if(RxBuff == '\0')
   {
@@ -808,56 +795,9 @@ int32_t toerror(uint32_t dist)
 	return tavolsag;
 }
 
-int32_t szabPD(int32_t elozohibajel, int32_t hibajel, uint8_t contstate, uint32_t elkenkkeses, uint8_t lassitunke)
+int32_t szabPD(int32_t elozohibajel, int32_t hibajel)
 {
-	float p, d;
 	int32_t beavatkozo=0;
-
-	switch(contstate){
-	case 0:
-		if(lassitunke==1 && elkenkkeses<61) //LASS�?T�?SI ID�?
-		{
-
-			//p=pgyors+(((plassu-pgyors)/70)*elkenkkeses); //
-			//d=dgyors+(((dlassu-dgyors)/70)*elkenkkeses);
-			//if (elkenkkeses<61)							//FEKEZÉS ID�?
-			p=pgyors;
-			d=dgyors;
-			vmehet=1050/*+(((1305-1050)/60)*elkenkkeses)*/; //FÉKEZÉS ER�?
-
-
-		}
-		else if(lassitunke==1 && count==1)
-		{
-			p=plassu;
-			d=dlassu;
-			vmehet=1625;
-		}
-		else if(lassitunke==0 && count==1)
-		{
-			p=plassu;
-			d=dlassu;
-			vmehet=1625;
-		}
-		else
-		{
-			p=plassu;
-			d=dlassu;
-			vmehet=1625;	//SEBESSEG
-		}
-
-		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
-		break;
-	case 1:
-		p=pgyors;
-		d=dgyors;
-		vmehet=1710;
-		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
-		break;
-
-	default:
-		break;
-	}
 
 	beavatkozo= (p*(float)hibajel) + d*(((float)hibajel- (float)elozohibajel));
 
@@ -876,7 +816,7 @@ int16_t toPWM(int32_t jel)
 	return pwm;
 }
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELYEZO JEL
 {
   if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
   {
@@ -885,7 +825,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
     if (uwIC2Value != 0)
     {
-      /* Duty cycle computation */
       uwDutyCycle = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
     }
     else
@@ -902,6 +841,14 @@ void allapotvalto(void)
 	else state=0;
 }
 
+uint8_t engedelyezo(uint32_t pwminput)
+{
+	if (pwminput>160)
+		return 1;
+	else
+		return 0;
+}
+
 
 void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag)
 {
@@ -916,25 +863,160 @@ void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag)
 void speedpos(void)				//sebesseg es pozicio merese
 {
 	if (flagspeed == 1)
-		{
-			counterprev = counterpres;
-			counterpres = TIM2->CNT;
-			speed= counterpres - counterprev;
-			flagspeed = 0;
-		}
+	{
+		counterprev = counterpres;
+		counterpres = TIM2->CNT;
+		speed= counterpres - counterprev;
+		flagspeed = 0;
+	}
 }
 
 void vonalszamlalo(void)	//vonalfigyelo
 {
 	if (flagvonalszam == 1)
-			{
-				if(count == 1) egyvonalszam++;
-				if(count == 3) haromvonalszam++;
-				flagvonalszam = 0;
-			}
+	{
+		if(count == 1) egyvonalszam++;
+		if(count == 3) haromvonalszam++;
+		flagvonalszam = 0;
+	}
 }
 
+void bluetoothTX(void)
+{
+	if (flagbluetooth == 1)
+	{
+		char TxData[16];
+		snprintf(TxData, 16, "bluetooth\n"); //"2,150000'\0'"
+		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
+	}
+	flagbluetooth = 0;
+}
+
+void uartprocess(void)
+{
+	if (flaguartproc == 1)
+	{
+		//UART ERTELMEZES
+		//Egy tombbe toltes
+		uint8_t x=0;
+		while(olveleje != feldvege)
+		{
+			if(olveleje == 63)
+			{
+				olveleje=0;
+			}
+			else
+			{
+				olveleje++;
+			}
+			posarray[x++]= data[olveleje];
+		}
+		olveleje =feldvege;
+
+		//tomb szetbontas
+		 sscanf(posarray, "%d,%d\0", &count, &tav); // "1,15315'\0'"
+
+		 flaguartproc = 0;
+	}
+}
+
+void allapotgep(void)
+{
+	if (flagallapotgep == 1) {
+		switch(state) {
+			case 0: 						// lassu, ha 3 vonal -> state 1
+				lassu();
+				if(haromvonalszam == 3) {
+					state = 1;
+					egyvonalszam   = 0;
+					haromvonalszam = 0;
+				}
+				break;
+
+			case 1: 						// gyorsit 1, ha 1 vonal -> state 2
+				if(egyvonalszam == 3) {
+					state = 2;
+					egyvonalszam   = 0;
+					haromvonalszam = 0;
+				}
+				break;
+
+			case 2: 						// gyorsit 2, ha 3 vonal -> state 3, gyorsit
+				if(haromvonalszam == 3) {
+					state = 3;
+					egyvonalszam   = 0;
+					haromvonalszam = 0;
+					gyors();
+				}
+				break;
+
+			case 3: 						// gyors eleje, 200ms-t var -> state 3
+				if(++cntbeav > 200) {
+					cntbeav = 0;
+					state = 4;
+				}
+				break;
+
+			case 4: 						// gyors allapot, ha 3 vonal -> fekez, state 5
+				if(haromvonalszam == 10) {
+					fekez();
+					state = 5;
+				}
+				break;
+
+			case 5: 						// fekezes eleje, var 500ms-ot, state 6, lassu
+				if(++cntbeav > 500) {
+					state = 6;
+					cntbeav = 0;
+					lassu();
+				}
+				break;
+
+			case 6: 						// 1 vonal -> state 0, lassu
+				if(egyvonalszam == 10)
+				{
+					state = 0;
+				}
+				break;
+
+			default:						//default: lassu
+				state = 0;
+				break;
+		}
+	}
+
+	flagallapotgep = 0;
+}
+
+void gyors(void)
+{
+	p= pgyors;
+	d= dgyors;
+	v= vgyors;
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+}
+
+void fekez(void)
+{
+	p= plassu;
+	d= dlassu;
+	v= vfek;
+}
+
+void lassu(void)
+{
+	p= plassu;
+	d= dlassu;
+	v= vlassu;
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
+
+void control(void)
+{
+	htim13.Instance->CCR1 	= pos;
+	htim3.Instance->CCR3 	= v;
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -944,9 +1026,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if(htim->Instance == TIM4)	//1ms
   {
 
-	  idozito( 10, &timespeed, &flagspeed); 				//idozites sebesseg meres 	(ido, szamlalo, flag)
+	  idozito( 10, &timespeed, &flagspeed); 				//idozites sebesseg meres 	(ido(ms), szamlalo, flag)
 
-	  idozito( 10, &timevonalszam, &flagvonalszam); 		//idozites vonalszamlalas 	(ido, szamlalo, flag)
+	  idozito( 10, &timevonalszam, &flagvonalszam); 		//idozites vonalszamlalas 	(ido(ms), szamlalo, flag)
+
+	  idozito( 10, &timeallapotgep, &flagallapotgep);		//idozites allapotgep		(ido(ms), szamlalo, flag)
+
+	  idozito( 10, &timebeav, &flagbeav);					//idozites beavatkzosas		(ido(ms), szamlalo, flag)
+
+	  idozito( 10, &timebluetooth, &flagbluetooth);			//idozites bluetooth(ido	(ms), szamlalo, flag)
+
+	  idozito( 10, &timeuartproc, &flaguartproc); 			//idozites uart circ buff feldolg 	(ido(ms), szamlalo, flag)
+
 
 
 
@@ -1020,23 +1111,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //
 //	  	}
 
-	  	hiba = toerror(tav);
-	  	kormanykesesszamlalo++;
-		beavatkozo= szabPD(elozohiba, hiba, state, kormanykesesszamlalo,lelassitunke);
-		elozohiba=hiba;
-		pos = toPWM(beavatkozo);
-		v=1500;
 
-		if(uwDutyCycle > 160)
-		{
-		//pos=1500;
-		v=vmehet;
-		//v=1612;
-		}
-		elotav=tav;
 
-		htim13.Instance->CCR1 = pos;
-		htim3.Instance->CCR3 = v;
+
   }
 
 }
