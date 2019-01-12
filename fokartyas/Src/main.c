@@ -140,6 +140,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
+void speedpos(void);
 void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag);
 int16_t toPWM(int32_t jel);
 int32_t szabPD(int32_t elozohibajel, int32_t hibajel, uint8_t contstate, uint32_t elkenkkeses,uint8_t lassitunke);
@@ -206,14 +207,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 while (1)
 {
-	//Sebesseg meres
-	if (measurespeed == 1)
-	{
-		counterprev = counterpres;
-		counterpres = TIM2->CNT;
-		speed= counterpres - counterprev;
-		measurespeed = 0;
-	}
+	speedpos();		//sebesseg es pozicio meres
 
 	////bluetooth
 	char TxData[16];
@@ -913,6 +907,18 @@ void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag)
 		  *idocount = 0;
 	  }
 }
+
+void speedpos(void)			//sebesseg es pozicio merese
+{
+if (measurespeed == 1)
+	{
+		counterprev = counterpres;
+		counterpres = TIM2->CNT;
+		speed= counterpres - counterprev;
+		measurespeed = 0;
+	}
+}
+
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
