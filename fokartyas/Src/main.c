@@ -10,7 +10,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * COPYRIGHT(c) 2018 STMicroelectronics
+  * COPYRIGHT(c) 2019 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -140,6 +140,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
+void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag);
 int16_t toPWM(int32_t jel);
 int32_t szabPD(int32_t elozohibajel, int32_t hibajel, uint8_t contstate, uint32_t elkenkkeses,uint8_t lassitunke);
 int32_t toerror(uint32_t tavolsag);
@@ -191,10 +192,6 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM13_Init();
   MX_TIM4_Init();
-
-
-
-
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);			//PWM Motor
   HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);		//PWM Szervo
@@ -202,27 +199,25 @@ int main(void)
   HAL_UART_Receive_IT(&huart4, &RxBuff, 1);			//Vonalszenzor1 kommunikacio
   HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1);		//Taviranyito CH1
   HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2);		//Taviranyito CH2
-  HAL_TIM_Base_Start_IT(&htim4);					//Not used???
+  HAL_TIM_Base_Start_IT(&htim4);					//Idozitesekhez (1ms)
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 while (1)
 {
+	//Sebesseg meres
 	if (measurespeed == 1)
 	{
 		counterprev = counterpres;
 		counterpres = TIM2->CNT;
 		speed= counterpres - counterprev;
-
 		measurespeed = 0;
-}
+	}
 
-
-
+	////bluetooth
 	char TxData[16];
 	snprintf(TxData, 16, "bluetooth\n"); //"2,150000'\0'"
-////bluetooth
 	HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 	HAL_Delay(100);
 
@@ -598,7 +593,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 83;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 10000;
+  htim4.Init.Period = 1000;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
   {
@@ -782,6 +777,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   /* Prevent unused argument(s) compilation warning */
   UNUSED(huart);
 
+//Vonalszenzor1 UART adatainak circ bufferbe toltese
   data[szaml]=RxBuff;
   if(RxBuff == '\0')
   {
@@ -797,26 +793,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	  szaml++;
   }
 
-
-
-//  if (szaml == 63) //
-//  {
-//	  szaml = 0;
-//	  if(strcmp(RxBuff, '\0') == 0)
-//	    	  {
-//	    		  feldvege=63;
-//	    	  }
-//  }
-//  else
-//  {
-//	  data[szaml++]=RxBuff;
-//	  if(strcmp(RxBuff, '\0') == 0)
-//	    	  {
-//	    		  feldvege=szaml - 1;
-//	    	  }
-//  }
   HAL_UART_Receive_IT(&huart4, &RxBuff, 1);
 }
+
+
+
+
 
 int32_t toerror(uint32_t dist)
 {
@@ -921,89 +903,99 @@ void allapotvalto(void)
 	else state=0;
 }
 
+
+void idozito( uint8_t ido, uint8_t *idocount, uint8_t *flag)
+{
+	  *idocount = *idocount +1;
+	  if(*idocount == ido) //x*1ms-kent sebesseg meres
+	  {
+		  *flag = 1;
+		  *idocount = 0;
+	  }
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  /* Prevent unused argument(s) compilation warning */
+
   UNUSED(htim);
-  /* NOTE : This function Should not be modified, when the callback is needed,
-            the __HAL_TIM_PeriodElapsedCallback could be implemented in the user file
-   */
-  if(htim->Instance == TIM4)
+
+  if(htim->Instance == TIM4)	//1ms
   {
-	  timespeed++;
-	  if(timespeed == 1) //x*10ms-kent sebesseg meres
-	  {
-		  measurespeed = 1;
-		  timespeed = 0;
-	  }
+
+	  idozito( 10, &timespeed, &measurespeed); //sebesseg meres (10msként) (ido, szamlalo, flag)
 
 
-	  if(/*count==0*/0)
-	  {
-		  if(sztave == 0)
-		  {
-			  sztav = elotav;
-			  sztave=1;
-		  }
-			hiba = toerror(sztav);
 
-			lelassitunke=0;
-			kormanykesesszamlalo++;
 
-			beavatkozo= szabPD(hiba, hiba, state,kormanykesesszamlalo,lelassitunke);
-			elozohiba=hiba;
-			pos = toPWM(beavatkozo);
-			v=1500;
 
-			if(uwDutyCycle > 160)
-			{
-			//pos=1500;
-			v=vmehet;
-			//v=1612;
-			}
-	  }
-	  else
-	  {
-		  sztave=0;
-		if(count == 1) haromvonalszam=0;
-		if(count == 3) haromvonalszam++;
-		if(haromvonalszam==3 && state ==0) szaggatott++;	//x*10ms kell hogy szaggatotnak mondjuk vlmit
-		if(haromvonalszam==10 && state==1) 					//x*10msonként nézzük a 3vonalat
-			{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
-			state=0;
-			szaggatott =0;
-			lelassitunke=1;
-			kormanykesesszamlalo=0;
-			}
-
-		if(state == 0 && haromvonalszam==10)
-		{
-			szaggatasutanvaras++;
-						if(szaggatasutanvaras==350)						//x*10ms után keressük a fék jelet
-						{
-							szaggatasutanvaras=0;
-							haromvonalszam=0;
-						}
-		}
-
-		if(szaggatott==3)									//x szaggatott vonal esetén kezdünk el gyorsítani
-		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
-			state=1;
-			lelassitunke=0;
-		}
-
-		if (state==1 && szaggatott==3)						//ha gyors és x vonal, után ne keresünk többet, UGYAN AZ MINT AZ EL�?Z�?!!!
-		{
-			szaggatasutanvaras++;
-			if(szaggatasutanvaras==250)						//x*10ms után keressük a fék jelet
-			{
-				szaggatasutanvaras=0;
-				szaggatott=0;
-			}
-
-	  	}
+//	  if(/*count==0*/0)
+//	  {
+//		  if(sztave == 0)
+//		  {
+//			  sztav = elotav;
+//			  sztave=1;
+//		  }
+//			hiba = toerror(sztav);
+//
+//			lelassitunke=0;
+//			kormanykesesszamlalo++;
+//
+//			beavatkozo= szabPD(hiba, hiba, state,kormanykesesszamlalo,lelassitunke);
+//			elozohiba=hiba;
+//			pos = toPWM(beavatkozo);
+//			v=1500;
+//
+//			if(uwDutyCycle > 160)
+//			{
+//			//pos=1500;
+//			v=vmehet;
+//			//v=1612;
+//			}
+//	  }
+//
+//
+//	  else
+//	  {
+//		  sztave=0;
+//		if(count == 1) haromvonalszam=0;
+//		if(count == 3) haromvonalszam++;
+//		if(haromvonalszam==3 && state ==0) szaggatott++;	//x*10ms kell hogy szaggatotnak mondjuk vlmit
+//		if(haromvonalszam==10 && state==1) 					//x*10msonként nézzük a 3vonalat
+//			{
+//			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+//			state=0;
+//			szaggatott =0;
+//			lelassitunke=1;
+//			kormanykesesszamlalo=0;
+//			}
+//
+//		if(state == 0 && haromvonalszam==10)
+//		{
+//			szaggatasutanvaras++;
+//						if(szaggatasutanvaras==350)						//x*10ms után keressük a fék jelet
+//						{
+//							szaggatasutanvaras=0;
+//							haromvonalszam=0;
+//						}
+//		}
+//
+//		if(szaggatott==3)									//x szaggatott vonal esetén kezdünk el gyorsítani
+//		{
+//			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+//			state=1;
+//			lelassitunke=0;
+//		}
+//
+//		if (state==1 && szaggatott==3)						//ha gyors és x vonal, után ne keresünk többet, UGYAN AZ MINT AZ EL�?Z�?!!!
+//		{
+//			szaggatasutanvaras++;
+//			if(szaggatasutanvaras==250)						//x*10ms után keressük a fék jelet
+//			{
+//				szaggatasutanvaras=0;
+//				szaggatott=0;
+//			}
+//
+//	  	}
 
 	  	hiba = toerror(tav);
 	  	kormanykesesszamlalo++;
@@ -1022,8 +1014,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 		htim13.Instance->CCR1 = pos;
 		htim3.Instance->CCR3 = v;
-	  }
   }
+
 }
 
 
