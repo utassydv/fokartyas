@@ -910,6 +910,8 @@ void speedpos(void)				//sebesseg es pozicio merese
 		speed= counterpres - counterprev;
 		flagspeed = 0;
 	}
+
+
 }
 
 void vonalszamlalo(void)	//vonalfigyelo
@@ -1017,31 +1019,31 @@ void allapotgep(void)
 			case 0: 						// lassu, ha 3 vonal -> state 1
 				lassu();
 				if(haromvonalszam == 3) {
-					state = 1;
 					egyvonalszam   = 0;
 					haromvonalszam = 0;
+					state = 1;
 				}
 				break;
 
 			case 1: 						// gyorsit 1, ha 1 vonal -> state 2
 				if(egyvonalszam == 3) {
-					state = 2;
 					egyvonalszam   = 0;
 					haromvonalszam = 0;
+					state = 2;
 				}
 				break;
 
 			case 2: 						// gyorsit 2, ha 3 vonal -> state 3, gyorsit
 				if(haromvonalszam == 3) {
-					state = 3;
 					egyvonalszam   = 0;
 					haromvonalszam = 0;
-					lassu();
+					state = 3;
+					lassu(); //gyors();
 				}
 				break;
 
 			case 3: 						// gyors eleje, 200ms-t var -> state 3
-				if(++cntbeav > 200) {
+				if(++cntbeav > 20) {
 					cntbeav = 0;
 					state = 4;
 				}
@@ -1055,7 +1057,7 @@ void allapotgep(void)
 				break;
 
 			case 5: 						// fekezes eleje, var 500ms-ot, state 6, lassu
-				if(++cntbeav > 500) {
+				if(++cntbeav > 50) {
 					state = 6;
 					cntbeav = 0;
 					lassu();
@@ -1065,6 +1067,7 @@ void allapotgep(void)
 			case 6: 						// 1 vonal -> state 0, lassu
 				if(egyvonalszam == 10)
 				{
+					haromvonalszam = 0;
 					state = 0;
 				}
 				break;

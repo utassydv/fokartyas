@@ -5950,7 +5950,7 @@ OUTPUT(fokartyas.elf elf32-littlearm)
  .debug_macro   0x000234ce      0x36c Src/stm32f4xx_it.o
  .debug_macro   0x0002383a      0x368 Src/system_stm32f4xx.o
 
-.debug_line     0x00000000     0xd571
+.debug_line     0x00000000     0xd577
  .debug_line    0x00000000      0x9c7 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
  .debug_line    0x000009c7      0xc76 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.o
  .debug_line    0x0000163d      0xa22 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
@@ -5963,11 +5963,11 @@ OUTPUT(fokartyas.elf elf32-littlearm)
  .debug_line    0x00007690     0x185c Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
  .debug_line    0x00008eec      0xda2 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
  .debug_line    0x00009c8e     0x10f2 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
- .debug_line    0x0000ad80      0xc86 Src/main.o
- .debug_line    0x0000ba06      0x9e1 Src/stm32f4xx_hal_msp.o
- .debug_line    0x0000c3e7      0x8fd Src/stm32f4xx_it.o
- .debug_line    0x0000cce4      0x80e Src/system_stm32f4xx.o
- .debug_line    0x0000d4f2       0x7f startup/startup_stm32f446xx.o
+ .debug_line    0x0000ad80      0xc8c Src/main.o
+ .debug_line    0x0000ba0c      0x9e1 Src/stm32f4xx_hal_msp.o
+ .debug_line    0x0000c3ed      0x8fd Src/stm32f4xx_it.o
+ .debug_line    0x0000ccea      0x80e Src/system_stm32f4xx.o
+ .debug_line    0x0000d4f8       0x7f startup/startup_stm32f446xx.o
 
 .debug_str      0x00000000    0xd1f91
  .debug_str     0x00000000    0xcd5fe Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
