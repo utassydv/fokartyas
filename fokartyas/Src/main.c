@@ -171,6 +171,7 @@ void bluetoothDRIVE(void);
 uint8_t engedelyezo(uint32_t pwminput);
 void vszRx(void);
 void vszdebugTx(void);
+void velocity(int16_t sebesseg);
 
 /* USER CODE END PFP */
 
@@ -221,6 +222,7 @@ int main(void)
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);			//PWM Motor
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);			//PWM Motor
   HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);		//PWM Szervo elso
   HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		//PWM Szervo hatso
   HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);	//Inkrementalis ado
@@ -247,6 +249,9 @@ while (1)
 
 	if (flagbeav == 1)
 	{
+		velocity(100);
+
+
 		hiba 		= 	toerror(tav);
 		beavatkozo	= 	szabPD(elozohiba, hiba);
 		elozohiba	=	hiba;
@@ -533,9 +538,9 @@ static void MX_TIM3_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 83;
-  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 17999;
+  htim3.Init.Prescaler = 1;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
+  htim3.Init.Period = 1049;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {
@@ -561,10 +566,15 @@ static void MX_TIM3_Init(void)
   }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 1500;
+  sConfigOC.Pulse = 525;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -1108,7 +1118,7 @@ void control(void)
 {
 	htim13.Instance->CCR1 	= pos; 		//elso szervo
 	htim14.Instance->CCR1 	= posh; 	//hatso szervo
-	htim3.Instance->CCR3 	= v;		//motor
+	//htim3.Instance->CCR3 	= v;		//motor
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -1132,6 +1142,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  idozito( 10, &timeuartproc, &flaguartproc); 			//idozites uart circ buff feldolg 	(ido(ms), szamlalo, flag)
   }
 
+}
+
+void velocity(int16_t sebesseg)
+{
+	uint16_t csat1;
+	uint16_t csat2;
+
+	if(sebesseg > 524) 		sebesseg = 524;
+	if(sebesseg < -523) 	sebesseg = -523;
+
+	csat1 = 525 + sebesseg;
+	csat2 = 525 - sebesseg;
+
+	htim3.Instance->CCR3 	= csat1;
+	htim3.Instance->CCR4 	= csat2;
 }
 
 
