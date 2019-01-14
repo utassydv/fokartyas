@@ -66,6 +66,8 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+
+
 float p			=	2.5f;
 float d			=	10.0f;
 int16_t v 		=	1500;
@@ -85,18 +87,18 @@ uint32_t counterpres=0;
 uint32_t counterprev=0;
 int32_t speed=0;
 
-uint16_t timespeed = 0;
-uint8_t flagspeed = 0;
-uint16_t timevonalszam = 0;
-uint8_t flagvonalszam = 0;
-uint16_t timebeav = 0;
-uint8_t flagbeav = 0;
-uint16_t timebluetooth = 0;
-uint8_t flagbluetooth = 0;
-uint16_t timeallapotgep = 0;
-uint8_t flagallapotgep = 0;
-uint16_t timeuartproc = 0;
-uint8_t flaguartproc = 0;
+uint16_t 	timespeed 			= 0;
+uint8_t 	flagspeed 			= 0;
+uint16_t 	timevonalszam 		= 0;
+uint8_t 	flagvonalszam 		= 0;
+uint16_t 	timebeav 			= 0;
+uint8_t 	flagbeav			= 0;
+uint16_t 	timebluetooth 		= 0;
+uint8_t 	flagbluetooth 		= 0;
+uint16_t 	timeallapotgep 		= 0;
+uint8_t 	flagallapotgep 		= 0;
+uint16_t 	timeuartproc 		= 0;
+uint8_t 	flaguartproc 		= 0;
 
 uint32_t cntbeav = 0;
 uint8_t state = 0;
@@ -123,6 +125,8 @@ uint32_t haromvonalszam = 0;
 
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
+
+char TxDatak[200];
 
 
 /* USER CODE END PV */
@@ -165,6 +169,8 @@ void bluetoothTX(void);
 void bluetoothVSZ(void);
 void bluetoothDRIVE(void);
 uint8_t engedelyezo(uint32_t pwminput);
+void vszRx(void);
+void vszdebugTx(void);
 
 /* USER CODE END PFP */
 
@@ -218,10 +224,13 @@ int main(void)
   HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);		//PWM Szervo elso
   HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		//PWM Szervo hatso
   HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);	//Inkrementalis ado
-  HAL_UART_Receive_IT(&huart4, &RxBuff, 1);			//Vonalszenzor1 kommunikacio
   HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1);		//Taviranyito CH1
   HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2);		//Taviranyito CH2
   HAL_TIM_Base_Start_IT(&htim4);					//Idozitesekhez (1ms)
+
+  HAL_UART_Receive_IT(&huart4, &RxBuff, 1);			//Vonalszenzor1 kommunikacio
+ //HAL_UART_Receive_IT(&huart4, (uint8_t*)TxDatak, 200);			//Vonalszenzordebug kommunikacio
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -259,8 +268,8 @@ while (1)
 
 
 	//bluetoothTX();
-	//bluetoothVSZ();
-	bluetoothDRIVE();
+	bluetoothVSZ();
+	//bluetoothDRIVE();
 
 
 }
@@ -791,27 +800,34 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   /* Prevent unused argument(s) compilation warning */
   UNUSED(huart);
-
-  //Vonalszenzor1 UART adatainak circ bufferbe toltese
-  data[szaml]=RxBuff;
-  if(RxBuff == '\0')
-  {
-	  feldvege=szaml;
-  }
-
-  if(szaml == 63)
-  {
-	  szaml=0;
-  }
-  else
-  {
-	  szaml++;
-  }
-
-  HAL_UART_Receive_IT(&huart4, &RxBuff, 1);
+  vszRx();
+  //vszdebugTx();
 }
 
+void vszdebugTx(void)
+{
+	HAL_UART_Transmit(&huart2, (uint8_t *)TxDatak, strlen(TxDatak)+1 , HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
+	HAL_UART_Receive_IT(&huart4, (uint8_t*)TxDatak, 200);
+}
 
+void vszRx(void) 				//Vonalszenzor1 UART adatainak circ bufferbe toltese
+{
+	    data[szaml]=RxBuff;
+	    if(RxBuff == '\0')
+	    {
+	  	  feldvege=szaml;
+	    }
+
+	    if(szaml == 63)
+	    {
+	  	  szaml=0;
+	    }
+	    else
+	    {
+	  	  szaml++;
+	    }
+	    HAL_UART_Receive_IT(&huart4, &RxBuff, 1);
+}
 
 
 
@@ -920,16 +936,36 @@ void bluetoothTX(void)
 
 void bluetoothVSZ(void)
 {
+
 	if (flagbluetooth == 1)
 	{
+		uint8_t adcMeasures[32];
 
-		char TxData[16];
-		snprintf(TxData, 16, "%u,%lu\n", count, tav); //"2,150000'\0'"
-		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
+		for(int i=0; i<32; i++)
+		{
+			adcMeasures[i]=100;
+		}
+
+
+		char TxDatak[200];
+		snprintf(TxDatak,200,"%u,",adcMeasures[0] );
+
+		for(int i=1; i<32; i++)
+		{
+			char TxBuf[5];
+			snprintf(TxBuf,5,"%u,", adcMeasures[i]);
+			strcat(TxDatak, TxBuf);
+		}
+		strcat(TxDatak, "\n");
+
+		HAL_UART_Transmit(&huart2, (uint8_t *)TxDatak, strlen(TxDatak)+1 , HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
+
+
 
 	}
 	flagbluetooth = 0;
 }
+
 
 void bluetoothDRIVE(void)
 {
@@ -1088,7 +1124,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  idozito( 10, &timebeav, &flagbeav);					//idozites beavatkzosas		(ido(ms), szamlalo, flag)
 
-	  idozito( 10, &timebluetooth, &flagbluetooth);		//idozites bluetooth(ido	(ms), szamlalo, flag)
+	  idozito( 500, &timebluetooth, &flagbluetooth);		//idozites bluetooth(ido	(ms), szamlalo, flag)
 
 	  idozito( 10, &timeuartproc, &flaguartproc); 			//idozites uart circ buff feldolg 	(ido(ms), szamlalo, flag)
   }
