@@ -123,8 +123,10 @@ int32_t beavatkozo=0;
 uint32_t egyvonalszam = 0;
 uint32_t haromvonalszam = 0;
 
-uint8_t txdata[16];
-uint8_t rxdata[16];
+uint8_t txdata1[2];
+uint8_t rxdata1[2];
+uint8_t txdata2[2];
+uint8_t rxdata2[2];
 
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
@@ -158,7 +160,6 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
-void speedpos(void);
 void vonalszamlalo(void);
 void idozito(uint16_t ido, uint16_t *idocount, uint8_t *flag);
 void uartprocess(void);
@@ -244,15 +245,42 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  	 txdata[16]		=0b0000111100000000;
-  	 rxdata[16] 	=0b0000000000000000;
-  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-  	 HAL_SPI_TransmitReceive(&hspi2, txdata, rxdata, 16, HAL_MAX_DELAY);
-  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+
+//Giroszkop elesztes who_am_i//////////////////
+  	 txdata1[0]		=	0b10001111;
+  	 txdata1[1]		=	0b00000000;
+  	 rxdata1[0] 	=	0b00000000;
+  	 rxdata1[1] 	=	0b00000000;
+
+  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CS
+  	 HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 2, HAL_MAX_DELAY);
+  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CD
+
+////z elfordulas kiolvasas//////////////////
+//	 txdata1[0]		=	0b10100110; //h26
+//	 txdata1[1]		=	0b00000000;
+//	 rxdata1[0] 	=	0b00000000;
+//	 rxdata1[1] 	=	0b00000000;
+//
+//	 txdata2[0]		=	0b10100111; //h27
+//	 txdata2[1]		=	0b00000000;
+//	 rxdata2[0] 	=	0b00000000;
+//	 rxdata2[1] 	=	0b00000000;
+//
+//		 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CS
+//  	 HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 2, HAL_MAX_DELAY);
+//  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CD
+//
+//  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CS
+//  	 HAL_SPI_TransmitReceive(&hspi2, txdata2, rxdata2, 2, HAL_MAX_DELAY);
+//  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CD
+
+
+
+
+ //////////////////////////////////////////////
 while (1)
 {
-	//speedpos();			//sebesseg es pozicio meres
-
 	vonalszamlalo(); 	//vonalszam figyeles
 
 	uartprocess(); 		//UART feldolgozasa
@@ -970,13 +998,6 @@ void idozito( uint16_t ido, uint16_t *idocount, uint8_t *flag)
 	  }
 }
 
-void speedpos(void)				//sebesseg es pozicio merese
-{
-		counterprev = counterpres;
-		counterpres = TIM2->CNT;
-		speed= counterpres - counterprev;
-
-}
 
 void vonalszamlalo(void)	//vonalfigyelo
 {

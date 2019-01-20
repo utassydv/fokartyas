@@ -1,4 +1,4 @@
-Src/stm32f4xx_it.o: ../Src/stm32f4xx_it.c \
+Src/tracking.o: ../Src/tracking.c C:/fokartyasz/fokartyas/Inc/tracking.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  C:/fokartyasz/fokartyas/Inc/stm32f4xx_hal_conf.h \
  C:/fokartyasz/fokartyas/Inc/main.h \
@@ -31,9 +31,9 @@ Src/stm32f4xx_it.o: ../Src/stm32f4xx_it.c \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
- C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- C:/fokartyasz/fokartyas/Inc/stm32f4xx_it.h \
- C:/fokartyasz/fokartyas/Inc/tracking.h
+ C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+
+C:/fokartyasz/fokartyas/Inc/tracking.h:
 
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 
@@ -100,7 +100,3 @@ C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-
-C:/fokartyasz/fokartyas/Inc/stm32f4xx_it.h:
-
-C:/fokartyasz/fokartyas/Inc/tracking.h:

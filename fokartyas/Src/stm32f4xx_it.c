@@ -36,9 +36,7 @@
 #include "stm32f4xx_it.h"
 
 /* USER CODE BEGIN 0 */
-extern int32_t counterpres;
-extern int32_t counterprev;
-extern int32_t speed;
+#include "tracking.h"
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -261,9 +259,7 @@ void USART2_IRQHandler(void)
 void TIM5_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM5_IRQn 0 */
-	counterprev = counterpres;
-	counterpres = TIM2->CNT;
-	speed= counterpres - counterprev;
+	speedpos();
   /* USER CODE END TIM5_IRQn 0 */
   HAL_TIM_IRQHandler(&htim5);
   /* USER CODE BEGIN TIM5_IRQn 1 */
