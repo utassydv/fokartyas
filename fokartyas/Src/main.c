@@ -76,13 +76,13 @@ int16_t v 		=	1500;
 float plassu	=	2.5f;
 float dlassu	=	10.0f;
 uint16_t vlassu	=	400;
-float scalelassu=	0;
+float scalelassu=	0.7;
 
 float pgyors	=	0.25f;
 float dgyors	=	5.0f;
 uint16_t vgyors	=	400;
 uint16_t vfek	=	1050;
-float scalegyors=	0;
+float scalegyors=	1;
 
 int32_t counterpres=0;
 int32_t counterprev=0;
@@ -109,6 +109,12 @@ uint8_t count;    //vonal db szám
 uint32_t tav;
 int16_t pos;
 int16_t posh;
+const uint16_t pwmmide	=	1500;
+const uint16_t pwmmidh 	=	1500;
+const uint16_t rangee 	=	400;
+const uint16_t rangeh	=	400;
+uint8_t flaggyors;
+uint8_t flaglassu;
 
 uint8_t szaml=0;
 uint8_t olveleje=0;
@@ -294,8 +300,7 @@ while (1)
 		hiba 		= 	toerror(tav);
 		beavatkozo	= 	szabPD(elozohiba, hiba);
 		elozohiba	=	hiba;
-		pos 		= 	toPWM(beavatkozo);
-		posh		=	1500;
+		toPWM(beavatkozo);
 
 		if( engedelyezo(uwDutyCycle) == 0)
 		{
@@ -949,13 +954,29 @@ int32_t szabPD(int32_t elozohibajel, int32_t hibajel)
 
 int16_t toPWM(int32_t jel)
 {
+//ELSO
+	int16_t pwme=pwmmide+jel*(rangee/12799); //KORM�?NY
+	if(pwme<pwmmide-rangee) pwme=pwmmide-rangee;
+	if(pwme>pwmmide+rangee) pwme=pwmmide+rangee;
 
-	int16_t pwm=1500+((20800000/25598)*(jel))/26000; //KORM�?NY
+	pos		=	pwme;
+//HATSO
+	int16_t pwmh;
+	if (flaglassu == 1)
+	{
+		pwmh=pwmmidh+scalelassu*jel*(rangeh/12799); //KORM�?NY
+		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
+		if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
+	}
+	if (flaggyors == 1)
+	{
+		pwmh=pwmmidh-scalegyors*jel*(rangeh/12799); //KORM�?NY
+		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
+		if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
+	}
+	posh	=	pwmh;
 
-	if(pwm<1100) pwm=1100;
-	if(pwm>1900) pwm=1900;
-
-	return pwm;
+	return pwme;
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELYEZO JEL
@@ -1171,6 +1192,8 @@ void allapotgep(void)
 
 void gyors(void)
 {
+	flaggyors = 1;
+	flaglassu = 0;
 	p= pgyors;
 	d= dgyors;
 	v= vgyors;
@@ -1186,22 +1209,23 @@ void fekez(void)
 
 void lassu(void)
 {
+	flaglassu = 1;
+	flaggyors = 0;
 	p= plassu;
 	d= dlassu;
 	v= vlassu;
+
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
 void control(void)
 {
-	htim13.Instance->CCR1 	= 1500;//pos; 		//elso szervo
-	htim14.Instance->CCR1 	= 1500;//posh; 	//hatso szervo
+	htim13.Instance->CCR1 	= pos; 		//elso szervo
+	htim14.Instance->CCR1 	= posh; 	//hatso szervo
 
-	velocity(v);
+	velocity(v);						//motor
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
-
-	//htim3.Instance->CCR3 	= v;		//motor de ezt mar nem igy kell!!!
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
