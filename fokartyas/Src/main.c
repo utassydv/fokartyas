@@ -59,6 +59,7 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim5;
+TIM_HandleTypeDef htim10;
 TIM_HandleTypeDef htim13;
 TIM_HandleTypeDef htim14;
 
@@ -172,6 +173,7 @@ static void MX_TIM4_Init(void);
 static void MX_TIM14_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_TIM5_Init(void);
+static void MX_TIM10_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                                 
@@ -250,9 +252,11 @@ int main(void)
   MX_TIM14_Init();
   MX_SPI2_Init();
   MX_TIM5_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);			//PWM Motor
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);			//PWM Motor
+  HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);		//PWM Szervo elso
   HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);		//PWM Szervo elso
   HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		//PWM Szervo hatso
   HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);	//Inkrementalis ado
@@ -704,6 +708,40 @@ static void MX_TIM5_Init(void)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
+
+}
+
+/* TIM10 init function */
+static void MX_TIM10_Init(void)
+{
+
+  TIM_OC_InitTypeDef sConfigOC;
+
+  htim10.Instance = TIM10;
+  htim10.Init.Prescaler = 83;
+  htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim10.Init.Period = 3999;
+  htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  if (HAL_TIM_PWM_Init(&htim10) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 1500;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim10, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  HAL_TIM_MspPostInit(&htim10);
 
 }
 
@@ -1277,6 +1315,7 @@ void control(void)
 {
 //	htim13.Instance->CCR1 	= pos; 		//elso szervo
 //	htim14.Instance->CCR1 	= posh; 	//hatso szervo
+	htim10.Instance->CCR1 	= pos; 		//elso szervo
 
 	htim13.Instance->CCR1 	= pwmmide; 		//elso szervo
 	htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
