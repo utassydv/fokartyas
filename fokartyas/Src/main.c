@@ -43,6 +43,7 @@
 /* USER CODE BEGIN Includes */
 
 #include <string.h>
+#include <math.h>
 
 /* USER CODE END Includes */
 
@@ -71,18 +72,18 @@ UART_HandleTypeDef huart3;
 
 float p			=	2.5f;
 float d			=	10.0f;
-int16_t v 		=	1500;
+float v 		=	0.0f;
 
 float plassu	=	2.5f;
 float dlassu	=	10.0f;
-uint16_t vlassu	=	400;
-float scalelassu=	0.7;
+float vlassu	=	2.5f;
+float scalelassu=	0.7f;
 
 float pgyors	=	0.25f;
 float dgyors	=	5.0f;
-uint16_t vgyors	=	400;
-uint16_t vfek	=	1050;
-float scalegyors=	1;
+float vgyors	=	2.0f;
+float vfek		=	0.0f;
+float scalegyors=	1.0f;
 
 int32_t counterpres=0;
 int32_t counterprev=0;
@@ -109,8 +110,8 @@ uint8_t count;    //vonal db szám
 uint32_t tav;
 int16_t pos;
 int16_t posh;
-const uint16_t pwmmide	=	1500;
-const uint16_t pwmmidh 	=	1500;
+const uint16_t pwmmide	=	1555;
+const uint16_t pwmmidh 	=	1415;
 const uint16_t rangee 	=	400;
 const uint16_t rangeh	=	400;
 uint8_t flaggyors;
@@ -129,16 +130,28 @@ int32_t beavatkozo=0;
 uint32_t egyvonalszam = 0;
 uint32_t haromvonalszam = 0;
 
-uint8_t txdata1[2];
-uint8_t rxdata1[2];
-uint8_t txdata2[2];
-uint8_t rxdata2[2];
+uint8_t txdata1[3];
+uint8_t rxdata1[3];
+
 
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
 
+const float T		= 0.8;
+const float Tcl		= 0.4;
+const float zd		=-1.25;
+int16_t epres		=0;
+int16_t upres		=0;
+int16_t uprev		=0;
+int16_t u1pres		=0;
+int16_t u2pres		=0;
+int16_t u2prev		=0;
+
+
 
 char TxDatak[200];
+
+extern float szogseb;
 
 
 /* USER CODE END PV */
@@ -184,6 +197,10 @@ uint8_t engedelyezo(uint32_t pwminput);
 void vszRx(void);
 void vszdebugTx(void);
 void velocity(int16_t sebesseg);
+void szabvPI(float T, float Tcl, int16_t* epres,int16_t* upres,int16_t* uprev,int16_t* u1pres,int16_t* u2pres,int16_t* u2prev,float zd);
+uint32_t toinkrspeed(float sebesseg);
+void toverror(uint32_t kivantspeed);
+void beavatkozas(void);
 
 /* USER CODE END PFP */
 
@@ -245,22 +262,25 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim5);					//Idozitesekhez (1ms)
 
   HAL_UART_Receive_IT(&huart4, &RxBuff, 1);			//Vonalszenzor1 kommunikacio
- //HAL_UART_Receive_IT(&huart4, (uint8_t*)TxDatak, 200);			//Vonalszenzordebug kommunikacio
+
+  //enablegyro();
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-//Giroszkop elesztes who_am_i//////////////////
-  	 txdata1[0]		=	0b10001111;
-  	 txdata1[1]		=	0b00000000;
-  	 rxdata1[0] 	=	0b00000000;
-  	 rxdata1[1] 	=	0b00000000;
-
-  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CS
-  	 HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 2, HAL_MAX_DELAY);
-  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CD
+////Giroszkop elesztes who_am_i//////////////////
+//  	 txdata1[0]		=	0b10001111;
+//  	 txdata1[1]		=	0b00000000;
+//  	 rxdata1[0] 	=	0b00000000;
+//  	 rxdata1[1] 	=	0b00000000;
+//
+//  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); //CD
+//  	 HAL_Delay(1);
+//  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CS
+//  	 HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 2, HAL_MAX_DELAY);
+//  	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); //CD
 
 ////z elfordulas kiolvasas//////////////////
 //	 txdata1[0]		=	0b10100110; //h26
@@ -294,27 +314,7 @@ while (1)
 
 	allapotgep();		//state megadasa
 
-	if (flagbeav == 1)
-	{
-
-		hiba 		= 	toerror(tav);
-		beavatkozo	= 	szabPD(elozohiba, hiba);
-		elozohiba	=	hiba;
-		toPWM(beavatkozo);
-
-		if( engedelyezo(uwDutyCycle) == 0)
-		{
-			pos		=	1500;
-			posh	=	1500;
-			v		=   0;
-		}
-
-		control();
-		flagbeav = 0;
-	}
-
-
-
+	beavatkozas();
 
 	//bluetoothTX();
 	//bluetoothVSZ();
@@ -347,7 +347,7 @@ void SystemClock_Config(void)
     */
   __HAL_RCC_PWR_CLK_ENABLE();
 
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
@@ -356,9 +356,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = 16;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 168;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -372,10 +372,10 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -401,7 +401,7 @@ static void MX_ADC1_Init(void)
     /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
     */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
@@ -653,7 +653,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 83;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 1000;
+  htim4.Init.Period = 999;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
   {
@@ -685,7 +685,7 @@ static void MX_TIM5_Init(void)
   htim5.Instance = TIM5;
   htim5.Init.Prescaler = 83;
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim5.Init.Period = 1000;
+  htim5.Init.Period = 9999;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim5) != HAL_OK)
   {
@@ -931,6 +931,58 @@ void vszRx(void) 				//Vonalszenzor1 UART adatainak circ bufferbe toltese
 	    HAL_UART_Receive_IT(&huart4, &RxBuff, 1);
 }
 
+void beavatkozas(void)
+{
+	if (flagbeav == 1)
+		{
+
+			hiba 		= 	toerror(tav);
+			beavatkozo	= 	szabPD(elozohiba, hiba);
+			elozohiba	=	hiba;
+			toPWM(beavatkozo);
+			count=0;
+
+
+			toverror(toinkrspeed(v));
+			szabvPI(T, Tcl ,&epres, &upres, &uprev, &u1pres, &u2pres, &u2prev, zd);
+
+			if( engedelyezo(uwDutyCycle) == 0)
+			{
+				pos		=	1500;
+				posh	=	1500;
+				upres		=   0;
+			}
+
+			control();
+			flagbeav = 0;
+		}
+}
+
+uint32_t toinkrspeed(float sebesseg)
+{
+	return sebesseg*(float)1407;
+}
+
+toverror(uint32_t kivantspeed)
+{
+	epres=kivantspeed-speed;
+}
+
+void szabvPI(float T, float Tcl, int16_t* epres,int16_t* upres,int16_t* uprev,int16_t* u1pres,int16_t* u2pres,int16_t* u2prev,float zd)
+{
+	float Kc =1-pow(2.7182,-T/Tcl);
+	*u2pres	=	(zd)*(*u2prev)+(1-zd)*(*uprev);
+	*u1pres	=	(Kc)*(*epres);
+//	*upres	=	-36983+7202*log(*u1pres+*u2pres);
+//	*upres 	=	180+(*u1pres+*u2pres)/15;
+//	*upres 	=	169.845*pow(2.7183,0.000138845*(*u1pres+*u2pres));
+	*upres 	=	136.8+0.04*(*u1pres+*u2pres);
+
+	*uprev=*upres;
+	*u2prev=*u2pres;
+}
+
+
 
 
 int32_t toerror(uint32_t dist)
@@ -951,6 +1003,8 @@ int32_t szabPD(int32_t elozohibajel, int32_t hibajel)
 
 	return beavatkozo;
 }
+
+
 
 int16_t toPWM(int32_t jel)
 {
@@ -1086,7 +1140,8 @@ void bluetoothDRIVE(void)
 //		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 		//sebesseg
-		snprintf(TxData, 20, "%ld,%ld,%u\n",speed,v,uwDutyCycle);
+		int32_t szogsebki=szogseb*1000;
+		snprintf(TxData, 20, "%ld,%ld,%ld\n",szogsebki,speed,counterpres);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 	}
@@ -1197,7 +1252,7 @@ void gyors(void)
 	p= pgyors;
 	d= dgyors;
 	v= vgyors;
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
 void fekez(void)
@@ -1215,15 +1270,18 @@ void lassu(void)
 	d= dlassu;
 	v= vlassu;
 
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
 void control(void)
 {
-	htim13.Instance->CCR1 	= pos; 		//elso szervo
-	htim14.Instance->CCR1 	= posh; 	//hatso szervo
+//	htim13.Instance->CCR1 	= pos; 		//elso szervo
+//	htim14.Instance->CCR1 	= posh; 	//hatso szervo
 
-	velocity(v);						//motor
+	htim13.Instance->CCR1 	= pwmmide; 		//elso szervo
+	htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
+
+	velocity(upres);						//motor
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
 }
