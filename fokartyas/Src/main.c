@@ -77,7 +77,7 @@ float v 		=	0.0f;
 
 float plassu	=	2.5f;
 float dlassu	=	10.0f;
-float vlassu	=	2.5f;
+float vlassu	=	1.0f;
 float scalelassu=	0.7f;
 
 float pgyors	=	0.25f;
@@ -138,17 +138,14 @@ uint8_t rxdata1[3];
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
 
-const float T		= 0.8;
-const float Tcl		= 0.4;
-const float zd		=-1.25;
-int16_t epres		=0;
-int16_t upres		=0;
-int16_t uprev		=0;
-int16_t u1pres		=0;
-int16_t u2pres		=0;
-int16_t u2prev		=0;
-
-
+float upres = 0.0f;
+float u2prev = 0.0f;
+float uprev = 0.0f;
+float u2 = 0.0f;
+float u = 0.0f;
+#define KC		(1.2f)
+#define ZD		(0.98)
+#define UMAX	(10000)
 
 char TxDatak[200];
 
@@ -199,8 +196,8 @@ uint8_t engedelyezo(uint32_t pwminput);
 void vszRx(void);
 void vszdebugTx(void);
 void velocity(int16_t sebesseg);
-void szabvPI(float T, float Tcl, int16_t* epres,int16_t* upres,int16_t* uprev,int16_t* u1pres,int16_t* u2pres,int16_t* u2prev,float zd);
-uint32_t toinkrspeed(float sebesseg);
+float szabvPI(float err);
+float toinkrspeed(float sebesseg);
 void toverror(uint32_t kivantspeed);
 void beavatkozas(void);
 
@@ -969,6 +966,7 @@ void vszRx(void) 				//Vonalszenzor1 UART adatainak circ bufferbe toltese
 	    HAL_UART_Receive_IT(&huart4, &RxBuff, 1);
 }
 
+float epres = 0.0f;
 void beavatkozas(void)
 {
 	if (flagbeav == 1)
@@ -981,14 +979,16 @@ void beavatkozas(void)
 			count=0;
 
 
-			toverror(toinkrspeed(v));
-			szabvPI(T, Tcl ,&epres, &upres, &uprev, &u1pres, &u2pres, &u2prev, zd);
+			epres = toinkrspeed(v) - speed;
+			upres = 136.8 + 0.04*szabvPI(epres);
 
 			if( engedelyezo(uwDutyCycle) == 0)
 			{
 				pos		=	1500;
 				posh	=	1500;
 				upres		=   0;
+				u2prev = 0.0f;
+				uprev = 0.0f;
 			}
 
 			control();
@@ -996,28 +996,27 @@ void beavatkozas(void)
 		}
 }
 
-uint32_t toinkrspeed(float sebesseg)
+float toinkrspeed(float sebesseg)
 {
 	return sebesseg*(float)1407;
 }
 
-toverror(uint32_t kivantspeed)
-{
-	epres=kivantspeed-speed;
-}
 
-void szabvPI(float T, float Tcl, int16_t* epres,int16_t* upres,int16_t* uprev,int16_t* u1pres,int16_t* u2pres,int16_t* u2prev,float zd)
+float szabvPI(float err)
 {
-	float Kc =1-pow(2.7182,-T/Tcl);
-	*u2pres	=	(zd)*(*u2prev)+(1-zd)*(*uprev);
-	*u1pres	=	(Kc)*(*epres);
-//	*upres	=	-36983+7202*log(*u1pres+*u2pres);
-//	*upres 	=	180+(*u1pres+*u2pres)/15;
-//	*upres 	=	169.845*pow(2.7183,0.000138845*(*u1pres+*u2pres));
-	*upres 	=	136.8+0.04*(*u1pres+*u2pres);
+	float u2, u1, u;
+	u2 = ZD*u2prev + (1-ZD)*uprev;
+	u1 = KC*err;
 
-	*uprev=*upres;
-	*u2prev=*u2pres;
+	u = u1 + u2;
+
+	u = (u > UMAX) ? UMAX : u;
+	u = (u < -UMAX) ? -UMAX : u;
+
+	uprev = u;
+	u2prev = u2;
+
+	return u;
 }
 
 
@@ -1172,14 +1171,15 @@ void bluetoothDRIVE(void)
 	if (flagbluetooth == 1)
 	{
 
-		char TxData[20];
+		char TxData[100];
 //		//sebesseg
 //		snprintf(TxData, 20, "%ld,%ld\n",counterpres, speed);
 //		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 		//sebesseg
-		int32_t szogsebki=szogseb*1000;
-		snprintf(TxData, 20, "%ld,%ld,%ld\n",szogsebki,speed,counterpres);
+
+
+		snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 	}
