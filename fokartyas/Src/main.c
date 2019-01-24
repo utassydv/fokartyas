@@ -113,7 +113,7 @@ int16_t pos;
 int16_t posh;
 const uint16_t pwmmide	=	1555;
 const uint16_t pwmmidh 	=	1415;
-const uint16_t rangee 	=	400;
+const uint16_t rangee 	=	345;
 const uint16_t rangeh	=	400;
 uint8_t flaggyors;
 uint8_t flaglassu;
@@ -311,7 +311,6 @@ while (1)
 	vonalszamlalo(); 	//vonalszam figyeles
 
 	uartprocess(); 		//UART feldolgozasa
-	count=1;
 
 	allapotgep();		//state megadasa
 
@@ -976,7 +975,6 @@ void beavatkozas(void)
 			beavatkozo	= 	szabPD(elozohiba, hiba);
 			elozohiba	=	hiba;
 			toPWM(beavatkozo);
-			count=0;
 
 
 			epres = toinkrspeed(v) - speed;
@@ -984,8 +982,6 @@ void beavatkozas(void)
 
 			if( engedelyezo(uwDutyCycle) == 0)
 			{
-				pos		=	1500;
-				posh	=	1500;
 				upres		=   0;
 				u2prev = 0.0f;
 				uprev = 0.0f;
@@ -1046,7 +1042,7 @@ int32_t szabPD(int32_t elozohibajel, int32_t hibajel)
 int16_t toPWM(int32_t jel)
 {
 //ELSO
-	int16_t pwme=pwmmide+jel*(rangee/12799); //KORM�?NY
+	int16_t pwme=pwmmide+jel*((rangee*100000)/12799)/100000; //KORM�?NY
 	if(pwme<pwmmide-rangee) pwme=pwmmide-rangee;
 	if(pwme>pwmmide+rangee) pwme=pwmmide+rangee;
 
@@ -1055,13 +1051,13 @@ int16_t toPWM(int32_t jel)
 	int16_t pwmh;
 	if (flaglassu == 1)
 	{
-		pwmh=pwmmidh+scalelassu*jel*(rangeh/12799); //KORM�?NY
+		pwmh=pwmmidh+scalelassu*jel*(rangeh*100000/12799)/100000; //KORM�?NY
 		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
 		if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
 	}
 	if (flaggyors == 1)
 	{
-		pwmh=pwmmidh-scalegyors*jel*(rangeh/12799); //KORM�?NY
+		pwmh=pwmmidh-scalegyors*jel*(rangeh*1000000/12799)/100000; //KORM�?NY
 		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
 		if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
 	}
@@ -1178,8 +1174,8 @@ void bluetoothDRIVE(void)
 
 		//sebesseg
 
-
-		snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
+		snprintf(TxData, 100, "%u,%u,%u\n",count,state,tav);
+		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 	}
@@ -1313,12 +1309,12 @@ void lassu(void)
 
 void control(void)
 {
-//	htim13.Instance->CCR1 	= pos; 		//elso szervo
-//	htim14.Instance->CCR1 	= posh; 	//hatso szervo
-	htim10.Instance->CCR1 	= pos; 		//elso szervo
+	htim13.Instance->CCR1 	= pos; 		//elso szervo
+	htim14.Instance->CCR1 	= posh; 	//hatso szervo
+	htim10.Instance->CCR1 	= pos; 		//szenzor szervo
 
-	htim13.Instance->CCR1 	= pwmmide; 		//elso szervo
-	htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
+//	htim13.Instance->CCR1 	= pwmmide; 		//elso szervo
+//	htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
 
 	velocity(upres);						//motor
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
