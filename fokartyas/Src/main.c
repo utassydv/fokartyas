@@ -72,17 +72,17 @@ UART_HandleTypeDef huart3;
 
 
 float p			=	2.5f;
-float d			=	20.0f;
+float d			=	10.0f;
 float v 		=	0.0f;
 
 float plassu	=	2.5f;
 float dlassu	=	10.0f;
-float vlassu	=	1.0f;
+float vlassu	=	1.5f;
 float scalelassu=	0.7f;
 
 float pgyors	=	0.25f;
-float dgyors	=	10.0f;
-float vgyors	=	1.5f;
+float dgyors	=	5.0f;
+float vgyors	=	3.0f;
 float vfek		=	0.0f;
 float scalegyors=	1.0f;
 
@@ -152,7 +152,7 @@ char TxDatak[200];
 extern float szogseb;
 
 int32_t startposition;
-uint32_t length = 0;
+uint32_t hossz = 0;
 uint8_t flagharom = 0;
 
 
@@ -315,8 +315,6 @@ int main(void)
 while (1)
 {
 	vonalszamlalo(); 	//vonalszam figyeles
-
-
 
 	uartprocess(); 		//UART feldolgozasa
 
@@ -1122,29 +1120,25 @@ void vonalszamlalo(void)	//vonalfigyelo
 
 uint8_t egyutanharomhossz(void)   //csak biztosan egy vonal esetén hívható meg
 {
-	if (flagvonalszam == 1)
-	{
 		if(count == 3 && flagharom == 0)
 		{
 			startposition = counterpres;
 			flagharom = 1;
 		}
+
 		if (count==1 && startposition != 0)
 		{
-			length = counterpres - startposition;
+			hossz = counterpres - startposition;
 			startposition = 0;
+			return hossz;
 		}
-
-		flagvonalszam = 0;
-		return length;
-	}
-	return 0;
+		return 0;
 }
 
 uint8_t haromutanegyhossz(void)   //csak biztosan egy vonal esetén hívható meg
 {
-	if (flagvonalszam == 1)
-	{
+
+
 		if(count == 1 && flagharom == 1)
 		{
 			startposition = counterpres;
@@ -1152,12 +1146,10 @@ uint8_t haromutanegyhossz(void)   //csak biztosan egy vonal esetén hívható me
 		}
 		if (count==3 && startposition != 0)
 		{
-			length = counterpres - startposition;
+			hossz = counterpres - startposition;
 			startposition = 0;
+			return hossz;
 		}
-		flagvonalszam = 0;
-		return length;
-	}
 	return 0;
 }
 
@@ -1219,7 +1211,7 @@ void bluetoothDRIVE(void)
 		//sebesseg
 		uint32_t szogsebki=szogseb*1000;
 
-		snprintf(TxData, 100, "%u,%u,%u,%u,%u,%d\n",state,count,counterpres, startposition, length, flagharom);
+		snprintf(TxData, 100, "%u,%u,%u,%u,%u,%d\n",state,count,counterpres, startposition, hossz, flagharom);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
@@ -1263,24 +1255,24 @@ void allapotgep(void)
 			case 0:
 				lassu();
 				egyutanharomhossz();
-				if(length > 7000 && length < 16000)
+				if(hossz > 5000 && hossz < 18000 )
 				{
 					state = 1;
-					length = 0;
+					hossz = 0;
 				}
 				break;
 
 			case 1:
 				haromutanegyhossz();
-				if(length > 7000 && length < 16000) {
+				if(hossz > 5000 && hossz < 20000) {
 					state = 2;
-					length = 0;
+					startposition = counterpres;
+					hossz = 0;
 					gyors();
 				}
 				break;
 
 			case 2:
-				startposition = counterpres;
 				if (counterpres - startposition > 280000) //14000 x 2(m)
 				{
 					haromvonalszam = 0;
@@ -1309,7 +1301,7 @@ void allapotgep(void)
 				break;
 
 			case 5:
-				if(counterpres - startposition > 280000)
+				if(counterpres - startposition > 280000)//2m
 				{
 					lassu() ;
 					egyvonalszam = 0;
@@ -1324,9 +1316,13 @@ void allapotgep(void)
 				}
 				break;
 			case 7:
-				if(counterpres - startposition > 2800) // 30cm-en belül
+				if(counterpres - startposition > 28000) // 2ű0cm-en belül
 				{
-					if (egyvonalszam >= 6) state = 0;
+					if (egyvonalszam >= 4)
+					{
+						hossz = 0;
+						state = 0;
+					}
 					else
 					{
 						egyvonalszam = 0;
