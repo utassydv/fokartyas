@@ -33,7 +33,7 @@ void speedpos(void)				//sebesseg es pozicio merese
 
 void enablegyro(void)
 {
-	enabledata[1]	= 0b00010001;
+	enabledata[0]	= 0b00010001; //00010000 0x10
 	enabledata[1]	= 0b01000000;
 
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
@@ -45,7 +45,7 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 {
 	uint16_t adat;
 
-	txdata1[0]		=	0b10100110; //h26
+	txdata1[0]		=	0b10100110; //h26 0x11
 	txdata1[1]		=	0b00000000;
 	txdata1[2]		=	0b00000000;
 

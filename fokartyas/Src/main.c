@@ -72,7 +72,7 @@ UART_HandleTypeDef huart3;
 
 
 float p			=	2.5f;
-float d			=	10.0f;
+float d			=	20.0f;
 float v 		=	0.0f;
 
 float plassu	=	2.5f;
@@ -81,8 +81,8 @@ float vlassu	=	1.0f;
 float scalelassu=	0.7f;
 
 float pgyors	=	0.25f;
-float dgyors	=	5.0f;
-float vgyors	=	2.0f;
+float dgyors	=	10.0f;
+float vgyors	=	1.5f;
 float vfek		=	0.0f;
 float scalegyors=	1.0f;
 
@@ -111,8 +111,8 @@ uint8_t count;    //vonal db szám
 uint32_t tav;
 int16_t pos;
 int16_t posh;
-const uint16_t pwmmide	=	1555;
-const uint16_t pwmmidh 	=	1415;
+const uint16_t pwmmide	=	1500;
+const uint16_t pwmmidh 	=	1500;
 const uint16_t rangee 	=	345;
 const uint16_t rangeh	=	400;
 uint8_t flaggyors;
@@ -145,11 +145,15 @@ float u2 = 0.0f;
 float u = 0.0f;
 #define KC		(1.2f)
 #define ZD		(0.98)
-#define UMAX	(10000)
+#define UMAX	(5000)
 
 char TxDatak[200];
 
 extern float szogseb;
+
+int32_t startposition;
+uint32_t length = 0;
+uint8_t flagharom = 0;
 
 
 /* USER CODE END PV */
@@ -200,6 +204,8 @@ float szabvPI(float err);
 float toinkrspeed(float sebesseg);
 void toverror(uint32_t kivantspeed);
 void beavatkozas(void);
+uint8_t egyutanharomhossz(void);
+uint8_t haromutanegyhossz(void);
 
 /* USER CODE END PFP */
 
@@ -264,7 +270,7 @@ int main(void)
 
   HAL_UART_Receive_IT(&huart4, &RxBuff, 1);			//Vonalszenzor1 kommunikacio
 
-  //enablegyro();
+  enablegyro();
 
   /* USER CODE END 2 */
 
@@ -309,6 +315,8 @@ int main(void)
 while (1)
 {
 	vonalszamlalo(); 	//vonalszam figyeles
+
+
 
 	uartprocess(); 		//UART feldolgozasa
 
@@ -685,7 +693,7 @@ static void MX_TIM5_Init(void)
   htim5.Instance = TIM5;
   htim5.Init.Prescaler = 83;
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim5.Init.Period = 9999;
+  htim5.Init.Period = 4999;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim5) != HAL_OK)
   {
@@ -980,12 +988,7 @@ void beavatkozas(void)
 			epres = toinkrspeed(v) - speed;
 			upres = 136.8 + 0.04*szabvPI(epres);
 
-			if( engedelyezo(uwDutyCycle) == 0)
-			{
-				upres		=   0;
-				u2prev = 0.0f;
-				uprev = 0.0f;
-			}
+
 
 			control();
 			flagbeav = 0;
@@ -994,7 +997,7 @@ void beavatkozas(void)
 
 float toinkrspeed(float sebesseg)
 {
-	return sebesseg*(float)1407;
+	return sebesseg*(float)700;
 }
 
 
@@ -1117,6 +1120,47 @@ void vonalszamlalo(void)	//vonalfigyelo
 	}
 }
 
+uint8_t egyutanharomhossz(void)   //csak biztosan egy vonal esetén hívható meg
+{
+	if (flagvonalszam == 1)
+	{
+		if(count == 3 && flagharom == 0)
+		{
+			startposition = counterpres;
+			flagharom = 1;
+		}
+		if (count==1 && startposition != 0)
+		{
+			length = counterpres - startposition;
+			startposition = 0;
+		}
+
+		flagvonalszam = 0;
+		return length;
+	}
+	return 0;
+}
+
+uint8_t haromutanegyhossz(void)   //csak biztosan egy vonal esetén hívható meg
+{
+	if (flagvonalszam == 1)
+	{
+		if(count == 1 && flagharom == 1)
+		{
+			startposition = counterpres;
+			flagharom = 0;
+		}
+		if (count==3 && startposition != 0)
+		{
+			length = counterpres - startposition;
+			startposition = 0;
+		}
+		flagvonalszam = 0;
+		return length;
+	}
+	return 0;
+}
+
 void bluetoothTX(void)
 {
 	if (flagbluetooth == 1)
@@ -1173,8 +1217,9 @@ void bluetoothDRIVE(void)
 //		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 		//sebesseg
+		uint32_t szogsebki=szogseb*1000;
 
-		snprintf(TxData, 100, "%u,%u,%u\n",count,state,tav);
+		snprintf(TxData, 100, "%u,%u,%u,%u,%u,%d\n",state,count,counterpres, startposition, length, flagharom);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
@@ -1213,64 +1258,84 @@ void uartprocess(void)
 void allapotgep(void)
 {
 	if (flagallapotgep == 1) {
-		switch(state) {
-			case 0: 						// lassu, ha 3 vonal -> state 1
+		switch(state) {// lassu, ha 3 vonal -> state 1
+
+			case 0:
 				lassu();
-				if(haromvonalszam == 3) {
-					egyvonalszam   = 0;
-					haromvonalszam = 0;
+				egyutanharomhossz();
+				if(length > 7000 && length < 16000)
+				{
 					state = 1;
+					length = 0;
 				}
 				break;
 
-			case 1: 						// gyorsit 1, ha 1 vonal -> state 2
-				if(egyvonalszam == 3) {
-					egyvonalszam   = 0;
-					haromvonalszam = 0;
+			case 1:
+				haromutanegyhossz();
+				if(length > 7000 && length < 16000) {
 					state = 2;
+					length = 0;
+					gyors();
 				}
 				break;
 
-			case 2: 						// gyorsit 2, ha 3 vonal -> state 3, gyorsit
-				if(haromvonalszam == 3) {
-					egyvonalszam   = 0;
+			case 2:
+				startposition = counterpres;
+				if (counterpres - startposition > 280000) //14000 x 2(m)
+				{
 					haromvonalszam = 0;
 					state = 3;
-					lassu(); //gyors();
 				}
 				break;
 
-			case 3: 						// gyors eleje, 200ms-t var -> state 3
-				if(++cntbeav > 20) {
-					cntbeav = 0;
+			case 3:
+				if(count == 3)
+				{
+					startposition = counterpres;
 					state = 4;
 				}
 				break;
 
-			case 4: 						// gyors allapot, ha 3 vonal -> fekez, state 5
-				if(haromvonalszam == 10) {
-					fekez();
-					state = 5;
-				}
-				break;
-
-			case 5: 						// fekezes eleje, var 500ms-ot, state 6, lassu
-				if(++cntbeav > 50) {
-					state = 6;
-					cntbeav = 0;
-					lassu();
-				}
-				break;
-
-			case 6: 						// 1 vonal -> state 0, lassu
-				if(egyvonalszam == 10)
+			case 4:
+				if(counterpres - startposition > 42000) // 30cm-en belül
 				{
-					haromvonalszam = 0;
-					state = 0;
+					if (haromvonalszam >= 6) state = 5;
+					else
+					{
+						haromvonalszam = 0;
+						state = 3;
+					}
 				}
 				break;
 
-			default:						//default: lassu
+			case 5:
+				if(counterpres - startposition > 280000)
+				{
+					lassu() ;
+					egyvonalszam = 0;
+					state = 6;
+				}
+				break;
+			case 6:
+				if(count == 1)
+				{
+					startposition = counterpres;
+					state = 7;
+				}
+				break;
+			case 7:
+				if(counterpres - startposition > 2800) // 30cm-en belül
+				{
+					if (egyvonalszam >= 6) state = 0;
+					else
+					{
+						egyvonalszam = 0;
+						state = 6;
+					}
+				}
+				break;
+
+			default:
 				state = 0;
 				break;
 		}
@@ -1286,7 +1351,7 @@ void gyors(void)
 	p= pgyors;
 	d= dgyors;
 	v= vgyors;
-	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
 void fekez(void)
@@ -1304,17 +1369,28 @@ void lassu(void)
 	d= dlassu;
 	v= vlassu;
 
-	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
 void control(void)
 {
-	htim13.Instance->CCR1 	= pos; 		//elso szervo
-	htim14.Instance->CCR1 	= posh; 	//hatso szervo
-	htim10.Instance->CCR1 	= pos; 		//szenzor szervo
+	if( engedelyezo(uwDutyCycle) == 0)
+				{
+//					htim13.Instance->CCR1 	= pwmmide; 		//elso szervo
+//					htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
 
-//	htim13.Instance->CCR1 	= pwmmide; 		//elso szervo
-//	htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
+
+					upres		=   0;
+					u2prev = 0.0f;
+					uprev = 0.0f;
+				}
+
+	htim13.Instance->CCR1 	= pos; 		//elso szervo
+	htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
+	htim10.Instance->CCR1 	= 1500; 	//szenzor szervo
+
+//	htim13.Instance->CCR1 	= 1500; 		//elso szervo
+//	htim14.Instance->CCR1 	= 1500; 	//hatso szervo
 
 	velocity(upres);						//motor
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
@@ -1329,17 +1405,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if(htim->Instance == TIM4)	//1ms
   {
 
-	  idozito( 10, &timespeed, &flagspeed); 				//idozites sebesseg meres 	(ido(ms), szamlalo, flag)
+	  idozito( 5, &timespeed, &flagspeed); 				//idozites sebesseg meres 	(ido(ms), szamlalo, flag)
 
-	  idozito( 10, &timebluetooth, &flagbluetooth);		//idozites bluetooth(ido	(ms), szamlalo, flag)
+	  idozito( 5, &timebluetooth, &flagbluetooth);		//idozites bluetooth(ido	(ms), szamlalo, flag)
 
-	  idozito( 10, &timevonalszam, &flagvonalszam); 		//idozites vonalszamlalas 	(ido(ms), szamlalo, flag)
+	  idozito( 5, &timevonalszam, &flagvonalszam); 		//idozites vonalszamlalas 	(ido(ms), szamlalo, flag)
 
-	  idozito( 10, &timeallapotgep, &flagallapotgep);		//idozites allapotgep		(ido(ms), szamlalo, flag)
+	  idozito( 5, &timeallapotgep, &flagallapotgep);		//idozites allapotgep		(ido(ms), szamlalo, flag)
 
-	  idozito( 10, &timebeav, &flagbeav);					//idozites beavatkzosas		(ido(ms), szamlalo, flag)
+	  idozito( 5, &timebeav, &flagbeav);					//idozites beavatkzosas		(ido(ms), szamlalo, flag)
 
-	  idozito( 10, &timeuartproc, &flaguartproc); 			//idozites uart circ buff feldolg 	(ido(ms), szamlalo, flag)
+	  idozito( 5, &timeuartproc, &flaguartproc); 			//idozites uart circ buff feldolg 	(ido(ms), szamlalo, flag)
   }
 
 }
