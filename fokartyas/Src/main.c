@@ -44,6 +44,7 @@
 
 #include <string.h>
 #include <math.h>
+#include "tracking.h"
 
 /* USER CODE END Includes */
 
@@ -75,14 +76,14 @@ float p			=	2.5f;
 float d			=	10.0f;
 float v 		=	0.0f;
 
-float plassu	=	2.5f;
+float plassu	=	2.7f;
 float dlassu	=	10.0f;
 float vlassu	=	1.5f;
 float scalelassu=	0.7f;
 
-float pgyors	=	0.25f;
+float pgyors	=	0.8f;
 float dgyors	=	5.0f;
-float vgyors	=	3.0f;
+float vgyors	=	2.5f;
 float vfek		=	0.0f;
 float scalegyors=	1.0f;
 
@@ -102,6 +103,10 @@ uint16_t 	timeallapotgep 		= 0;
 uint8_t 	flagallapotgep 		= 0;
 uint16_t 	timeuartproc 		= 0;
 uint8_t 	flaguartproc 		= 0;
+uint16_t 	timeangle 			= 0;
+uint8_t 	flagangle			= 0;
+uint16_t 	timeangleoffset 	= 0;
+uint8_t 	flagangleoffset		= 0;
 
 uint32_t cntbeav = 0;
 uint8_t state = 0;
@@ -143,7 +148,7 @@ float u2prev = 0.0f;
 float uprev = 0.0f;
 float u2 = 0.0f;
 float u = 0.0f;
-#define KC		(1.2f)
+#define KC		(4.0f)
 #define ZD		(0.98)
 #define UMAX	(5000)
 
@@ -154,6 +159,7 @@ extern float szogseb;
 int32_t startposition;
 uint32_t hossz = 0;
 uint8_t flagharom = 0;
+extern float offsetszog;
 
 
 /* USER CODE END PV */
@@ -314,6 +320,7 @@ int main(void)
  //////////////////////////////////////////////
 while (1)
 {
+	gyro();
 	vonalszamlalo(); 	//vonalszam figyeles
 
 	uartprocess(); 		//UART feldolgozasa
@@ -467,7 +474,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -1209,9 +1216,10 @@ void bluetoothDRIVE(void)
 //		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 		//sebesseg
-		uint32_t szogsebki=szogseb*1000;
+		int32_t szogsebki=szogseb;
+		int32_t offsetszogki=offsetszog;
 
-		snprintf(TxData, 100, "%u,%u,%u,%u,%u,%d\n",state,count,counterpres, startposition, hossz, flagharom);
+		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
@@ -1407,11 +1415,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  idozito( 5, &timevonalszam, &flagvonalszam); 		//idozites vonalszamlalas 	(ido(ms), szamlalo, flag)
 
-	  idozito( 5, &timeallapotgep, &flagallapotgep);		//idozites allapotgep		(ido(ms), szamlalo, flag)
+	  idozito( 5, &timeallapotgep, &flagallapotgep);	//idozites allapotgep		(ido(ms), szamlalo, flag)
 
-	  idozito( 5, &timebeav, &flagbeav);					//idozites beavatkzosas		(ido(ms), szamlalo, flag)
+	  idozito( 5, &timebeav, &flagbeav);				//idozites beavatkzosas		(ido(ms), szamlalo, flag)
 
-	  idozito( 5, &timeuartproc, &flaguartproc); 			//idozites uart circ buff feldolg 	(ido(ms), szamlalo, flag)
+	  idozito( 5, &timeuartproc, &flaguartproc); 		//idozites uart circ buff feldolg 	(ido(ms), szamlalo, flag)
+
+	  idozito( 5, &timeangle, &flagangle); 				//szogseb meres 	(ido(ms), szamlalo, flag)
+
+	  idozito( 1, &timeangleoffset, &flagangleoffset);
+
   }
 
 }

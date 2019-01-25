@@ -20,6 +20,13 @@ uint8_t enabledata[2];
 uint8_t cplflag	=	0;
 float szogseb;
 
+extern uint8_t flagangle;
+extern uint8_t flagangleoffset;
+uint16_t offsetcnt = 0;
+
+float offsetszog;
+
+
 
 
 
@@ -41,28 +48,63 @@ void enablegyro(void)
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 			//CD
 }
 
-void angle(void)				//z elfordulas kiolvasas//////////////////
+void gyrooffset(void)
 {
-	uint16_t adat;
+	if (flagangleoffset == 1)
+	{
+		int16_t adat;
 
-	txdata1[0]		=	0b10100110; //h26 0x11
-	txdata1[1]		=	0b00000000;
-	txdata1[2]		=	0b00000000;
-
-
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
-	HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 3, HAL_MAX_DELAY);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 				//CD
+		txdata1[0]		=	0b10100110; //h26 0x11
+		txdata1[1]		=	0b00000000;
+		txdata1[2]		=	0b00000000;
 
 
-	adat 	= rxdata1[2] << 8;
-	adat 	|=  rxdata1[1];
-	szogseb	= (float)adat*8.75;
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
+		HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 3, HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 				//CD
+
+
+		adat 	= rxdata1[2] << 8;
+		adat 	|=  rxdata1[1];
+		szogseb	= (float)adat*8.75f;
+
+		offsetszog = 0.001f*szogseb+0.999f*offsetszog;
+
+		offsetcnt++;
+		flagangleoffset = 0;
+	}
 }
 
-void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+void angle(void)				//z elfordulas kiolvasas//////////////////
 {
-  cplflag=1;
+	if (flagangle == 1) {
+		int16_t adat;
+
+		txdata1[0]		=	0b10100110; //h26 0x11
+		txdata1[1]		=	0b00000000;
+		txdata1[2]		=	0b00000000;
+
+
+
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
+		HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 3, HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 				//CD
+
+
+		adat 	= rxdata1[2] << 8;
+		adat 	|=  rxdata1[1];
+		szogseb	= (float)adat*8.75-offsetszog;
+		flagangle = 0;
+
+	}
+}
+
+void gyro(void)
+{
+	if (offsetcnt < 1000)
+	{
+		gyrooffset();
+	}
+	else angle();
 }
 

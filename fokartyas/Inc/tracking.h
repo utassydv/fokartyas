@@ -11,5 +11,6 @@
 void speedpos(void);
 void angle(void);
 void enablegyro(void);
+void gyro(void);
 
 #endif /* TRACKING_H_ */
