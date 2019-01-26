@@ -87,6 +87,8 @@ float vgyors	=	2.5f;
 float vfek		=	0.0f;
 float scalegyors=	1.0f;
 
+float vsavvalt 	=	1.0f;
+
 int32_t counterpres=0;
 int32_t counterprev=0;
 int32_t speed=0;
@@ -108,14 +110,17 @@ uint8_t 	flagangle			= 0;
 uint16_t 	timeangleoffset 	= 0;
 uint8_t 	flagangleoffset		= 0;
 
-uint32_t cntbeav = 0;
-uint8_t state = 0;
+uint32_t cntbeav 				= 0;
+uint8_t state 					= 0;
+uint8_t statelab 				= 0;
 
 uint8_t RxBuff;
 uint8_t count;    //vonal db szám
 uint32_t tav;
 int16_t pos;
 int16_t posh;
+int16_t posvalte = 1700;
+int16_t posvalth = 1850;
 const uint16_t pwmmide	=	1500;
 const uint16_t pwmmidh 	=	1500;
 const uint16_t rangee 	=	345;
@@ -133,6 +138,8 @@ int32_t hiba=0;
 int32_t elozohiba=0;
 int32_t beavatkozo=0;
 
+
+uint32_t nullavonalszam = 0;
 uint32_t egyvonalszam = 0;
 uint32_t haromvonalszam = 0;
 
@@ -159,7 +166,20 @@ extern float szogseb;
 int32_t startposition;
 uint32_t hossz = 0;
 uint8_t flagharom = 0;
+uint8_t flagketto = 0;
 extern float offsetszog;
+
+
+typedef struct pont2D {
+    int32_t x, y;
+} pont2D;
+
+pont2D endlocation = { 0 , 0 };
+
+int32_t currentX = 0;
+int32_t currentY = 0;
+
+uint8_t flagsavvaltas = 0;
 
 
 /* USER CODE END PV */
@@ -192,10 +212,12 @@ void vonalszamlalo(void);
 void idozito(uint16_t ido, uint16_t *idocount, uint8_t *flag);
 void uartprocess(void);
 void allapotgep(void);
+void allapotgeplab(void);
 int16_t toPWM(int32_t jel);
 int32_t szabPD(int32_t elozohibajel, int32_t hibajel);
 int32_t toerror(uint32_t tavolsag);
 void lassu(void);
+void labyrinth(void);
 void gyors(void);
 void fekez(void);
 void control(void);
@@ -208,10 +230,15 @@ void vszdebugTx(void);
 void velocity(int16_t sebesseg);
 float szabvPI(float err);
 float toinkrspeed(float sebesseg);
-void toverror(uint32_t kivantspeed);
 void beavatkozas(void);
 uint8_t egyutanharomhossz(void);
 uint8_t haromutanegyhossz(void);
+
+void savelocation(pont2D location);
+uint8_t egyutankettohossz(void);
+uint8_t kettoutanegyhossz(void);
+
+void savvaltas(void);
 
 /* USER CODE END PFP */
 
@@ -325,7 +352,7 @@ while (1)
 
 	uartprocess(); 		//UART feldolgozasa
 
-	allapotgep();		//state megadasa
+	allapotgeplab();		//state megadasa
 
 	beavatkozas();
 
@@ -1119,6 +1146,7 @@ void vonalszamlalo(void)	//vonalfigyelo
 {
 	if (flagvonalszam == 1)
 	{
+		if(count == 0) nullavonalszam++;
 		if(count == 1) egyvonalszam++;
 		if(count == 3) haromvonalszam++;
 		flagvonalszam = 0;
@@ -1142,10 +1170,26 @@ uint8_t egyutanharomhossz(void)   //csak biztosan egy vonal esetén hívható me
 		return 0;
 }
 
+uint8_t egyutankettohossz(void)
+{
+		if(count == 2 && flagketto == 0)
+		{
+			startposition = counterpres;
+			flagketto = 1;
+		}
+
+		if (count==1 && startposition != 0)
+		{
+			hossz = counterpres - startposition;
+			startposition = 0;
+			return hossz;
+		}
+		return 0;
+}
+
+
 uint8_t haromutanegyhossz(void)   //csak biztosan egy vonal esetén hívható meg
 {
-
-
 		if(count == 1 && flagharom == 1)
 		{
 			startposition = counterpres;
@@ -1157,6 +1201,22 @@ uint8_t haromutanegyhossz(void)   //csak biztosan egy vonal esetén hívható me
 			startposition = 0;
 			return hossz;
 		}
+	return 0;
+}
+
+uint8_t kettoutanegyhossz(void)
+{
+	if(count == 1 && flagketto == 1)
+	{
+		startposition = counterpres;
+		flagketto = 0;
+	}
+	if (count==2 && startposition != 0)
+	{
+		hossz = counterpres - startposition;
+		startposition = 0;
+		return hossz;
+	}
 	return 0;
 }
 
@@ -1218,8 +1278,11 @@ void bluetoothDRIVE(void)
 		//sebesseg
 		int32_t szogsebki=szogseb;
 		int32_t offsetszogki=offsetszog;
+		int32_t currentXki =currentX;
+		int32_t currentYki =currentY;
 
-		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
+//		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
+		snprintf(TxData, 100, "%d,%d\n",currentXki, currentYki);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
@@ -1255,10 +1318,91 @@ void uartprocess(void)
 	}
 }
 
+void savelocation(pont2D location)
+{
+	location.x = currentX;
+	location.y = currentY;
+}
+
+
+
+
+
+void allapotgeplab(void)
+{
+	if (flagallapotgep == 1)
+	{
+		switch(statelab)
+		{
+			case 0:
+				labyrinth();
+				egyutankettohossz();
+				if(hossz > 13000 && hossz < 30000 ) //leghosszabb sávváltót lát
+				{
+					statelab = 1;
+					hossz = 0;
+				}
+				else if(hossz > 5000 && hossz < 13000 ) //legrovidebb
+				{
+					statelab = 2;
+					hossz = 0;
+				}
+
+				break;
+
+
+			case 1:
+				kettoutanegyhossz();
+				if(hossz > 13000 && hossz < 30000) //leghosszabb savvalto lyukat lat
+				{
+					hossz = 0;
+					nullavonalszam = 0;
+					statelab = 3;
+				}
+				break;
+
+			case 2:
+				kettoutanegyhossz();
+				if(hossz > 5000 && hossz < 13000) //legrovidebb savvalto lyukat lat
+				{
+					savelocation(endlocation);
+					statelab = 0;
+				}
+				break;
+
+			case 3:
+				flagsavvaltas = 1;
+				savvaltas();
+				if(nullavonalszam >= 20)			//amig el nem hagyjuk a vonalat
+				{
+					egyvonalszam = 0;
+					statelab = 4;
+				}
+				break;
+
+			case 4:
+				if(egyvonalszam >= 4)			//amíg meg nem jövünk a vonalra
+				{
+					flagsavvaltas = 0;
+					lassu();
+					statelab = 0;
+				}
+				break;
+
+			default:
+				statelab = 0;
+				break;
+		}
+	flagallapotgep = 0;
+	}
+}
+
 void allapotgep(void)
 {
-	if (flagallapotgep == 1) {
-		switch(state) {// lassu, ha 3 vonal -> state 1
+	if (flagallapotgep == 1)
+	{
+		switch(state)
+		{// lassu, ha 3 vonal -> state 1
 
 			case 0:
 				lassu();
@@ -1343,9 +1487,8 @@ void allapotgep(void)
 				state = 0;
 				break;
 		}
-	}
-
 	flagallapotgep = 0;
+	}
 }
 
 void gyors(void)
@@ -1376,22 +1519,38 @@ void lassu(void)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
+void labyrinth(void)
+{
+	lassu();
+}
+
+void savvaltas()
+{
+	v = vsavvalt;
+}
+
 void control(void)
 {
 	if( engedelyezo(uwDutyCycle) == 0)
 				{
-//					htim13.Instance->CCR1 	= pwmmide; 		//elso szervo
-//					htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
-
-
 					upres		=   0;
 					u2prev = 0.0f;
 					uprev = 0.0f;
 				}
 
+	if(flagsavvaltas == 0)
+	{
 	htim13.Instance->CCR1 	= pos; 		//elso szervo
 	htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
+
 	htim10.Instance->CCR1 	= 1500; 	//szenzor szervo
+	}
+	if(flagsavvaltas == 1)
+	{
+	htim13.Instance->CCR1 	= posvalte; 		//elso szervo
+	htim14.Instance->CCR1 	= posvalth; 	//hatso szervo
+	htim10.Instance->CCR1 	= 1500; 	//szenzor szervo
+	}
 
 //	htim13.Instance->CCR1 	= 1500; 		//elso szervo
 //	htim14.Instance->CCR1 	= 1500; 	//hatso szervo

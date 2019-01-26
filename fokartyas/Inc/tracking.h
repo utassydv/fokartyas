@@ -13,4 +13,8 @@ void angle(void);
 void enablegyro(void);
 void gyro(void);
 
+void poz(void);
+float deltax(int vpalya, float vszog);
+float deltay(int vpalya, float vszog);
+
 #endif /* TRACKING_H_ */

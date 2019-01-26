@@ -6,6 +6,7 @@
  */
 #include "tracking.h"
 #include "stm32f4xx_hal.h"
+#include "math.h"
 
 extern SPI_HandleTypeDef hspi2;
 
@@ -24,11 +25,11 @@ extern uint8_t flagangle;
 extern uint8_t flagangleoffset;
 uint16_t offsetcnt = 0;
 
+extern int32_t currentX;
+extern int32_t currentY;
+
+
 float offsetszog;
-
-
-
-
 
 
 void speedpos(void)				//sebesseg es pozicio merese
@@ -106,5 +107,30 @@ void gyro(void)
 		gyrooffset();
 	}
 	else angle();
+	poz();
+}
+
+void poz(void)
+{
+	currentX = currentX + deltax(speed,szogseb);
+	currentY = currentY + deltay(speed,szogseb);
+}
+
+float deltax(int vpalya, float vszog)
+{
+	float valto=M_PI/180;
+	float uthossz=(((float)vpalya)*200)/140;
+	float szog=((vszog/1000)*200)*valto;
+	float szin=(float)sin((double)szog);
+	return uthossz*szin;
+}
+
+float deltay(int vpalya, float vszog)
+{
+	float valto=M_PI/180;
+	float uthossz=(((float)vpalya)*200)/140;
+	float szog=((vszog/1000)*200)*valto;
+	float kosz=(float)cos((double)szog);
+	return uthossz*kosz;
 }
 
