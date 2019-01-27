@@ -5,12 +5,23 @@
  *      Author: utassyd
  */
 
+#include <stdint.h>
 #include "stm32f4xx_hal.h"
 #include "controlSTEERING.h"
+#include "communicationvsz.h"
 
 
 float p			=	2.5f;
 float d			=	10.0f;
+
+float plassu	=	2.7f;
+float dlassu	=	10.0f;
+float scalelassu=	0.7f;
+
+float pgyors	=	0.8f;
+float dgyors	=	5.0f;
+float scalegyors=	1.0f;
+
 
 const uint16_t pwmmide	=	1500;
 const uint16_t pwmmidh 	=	1500;
@@ -24,18 +35,14 @@ const int16_t posvalth = 1850;
 uint8_t flaggyors;
 uint8_t flaglassu;
 
-float plassu	=	2.7f;
-float dlassu	=	10.0f;
-float vlassu	=	1.5f;
-float scalelassu=	0.7f;
 
-float pgyors	=	0.8f;
-float dgyors	=	5.0f;
-float vgyors	=	2.5f;
-float vfek		=	0.0f;
-float scalegyors=	1.0f;
 
-float vsavvalt 	=	1.0f;
+int32_t hiba		= 0;
+int32_t elozohiba	= 0;
+int32_t beavatkozo	= 0;
+
+
+
 
 int32_t toerror(uint32_t dist)
 {
@@ -84,3 +91,123 @@ int16_t toPWM(int32_t jel)
 
 	return pwme;
 }
+
+void toservo(void)
+{
+	hiba 		= 	toerror(GETtav());
+	beavatkozo	= 	szabPD(elozohiba, hiba);
+	elozohiba	=	hiba;
+	toPWM(beavatkozo);
+}
+
+float GETp(void)
+{
+	return p;
+}
+void SETp(float ertek)
+{
+	p = ertek;
+}
+
+float GETd(void)
+{
+	return d;
+}
+
+void SETd(float ertek)
+{
+	d = ertek;
+}
+
+
+
+float GETplassu(void)
+{
+	return plassu;
+}
+void SETplassu(float ertek)
+{
+	plassu = ertek;
+}
+
+float GETdlassu(void)
+{
+	return dlassu;
+}
+void SETdlassu(float ertek)
+{
+	dlassu = ertek;
+}
+
+
+
+float GETpgyors(void)
+{
+	return pgyors;
+}
+void SETpgyors(float ertek)
+{
+	pgyors = ertek;
+}
+
+float GETdgyors(void)
+{
+	return dgyors;
+}
+void SETdgyors(float ertek)
+{
+	dgyors = ertek;
+}
+
+
+uint16_t GETpwmmide(void)
+{
+	return pwmmide;
+}
+
+uint16_t GETpwmmidh(void)
+{
+	return pwmmidh;
+}
+
+int16_t GETpos(void)
+{
+	return pos;
+}
+
+void SETpos(int16_t ertek)
+{
+	pos = ertek;
+}
+
+int16_t GETposh(void)
+{
+	return posh;
+}
+
+void SETposh(int16_t ertek)
+{
+	posh = ertek;
+}
+
+uint8_t GETflaglassu(void)
+{
+	return flaglassu;
+}
+
+void SETflaglassu(uint8_t ertek)
+{
+	flaglassu = ertek;
+}
+
+uint8_t GETflaggyors(void)
+{
+	return flaggyors;
+}
+
+void SETflaggyors(uint8_t ertek)
+{
+	flaggyors = ertek;
+}
+
+

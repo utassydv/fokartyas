@@ -4,15 +4,14 @@
  *  Created on: 20 Jan 2019
  *      Author: utassyd
  */
+#include <stdint.h>
 #include "tracking.h"
 #include "stm32f4xx_hal.h"
 #include "math.h"
 
+
 extern SPI_HandleTypeDef hspi2;
 
-int32_t counterpres	= 0;
-int32_t counterprev	= 0;
-int32_t speed		= 0;
 
 uint8_t txdata1[3];
 uint8_t rxdata1[3];
@@ -21,35 +20,36 @@ uint8_t enabledata[2];
 uint16_t offsetcnt = 0;
 uint16_t offsetlimit = 1000;
 float offsetszog;
-
 float szogseb;
+
+
+int32_t counterpres	= 0;
+int32_t counterprev	= 0;
+int32_t speed		= 0;
+
+
+int32_t currentX = 0;
+int32_t currentY = 0;
+
+
 
 extern uint8_t flagangle;
 extern uint8_t flagangleoffset;
 
-
-extern int32_t currentX;
-extern int32_t currentY;
-
-
-void trackingInit()
+void trackingInit(void)
 {
+	//Z tengely koruli szogsebesseg olvasasara
 	txdata1[0]		=	0b10100110; //OUTZ_L_G (26h)
 	txdata1[1]		=	0b00000000;
 	txdata1[2]		=	0b00000000;
 
+	//giroszkor engedelyezese
 	enabledata[0]	= 0b00010001; //CTRL2_G (11h)
 	enabledata[1]	= 0b01000000; //104Hz..
+
+	enablegyro();
 }
 
-
-//SEBBESSEG ES POZICIO MERESE
-void speedpos(void)
-{
-	counterprev = counterpres;
-	counterpres = TIM2->CNT;
-	speed= counterpres - counterprev;
-}
 
 //GIROSZKOP ENGEDELYEZESE, CTRL2_G (11h)
 void enablegyro(void)
@@ -123,7 +123,6 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 }
 
 
-
 void poz(void)
 {
 	currentX = currentX + deltax(speed,szogseb);
@@ -147,6 +146,54 @@ float deltay(int vpalya, float vszog)
 	float kosz=(float)cos((double)szog);
 	return uthossz*kosz;
 }
+
+
+//SEBBESSEG ES POZICIO MERESE
+void speedpos(void)
+{
+	counterprev = counterpres;
+	counterpres = TIM2->CNT;
+	speed= counterpres - counterprev;
+}
+
+void savelocation(pont2D location)
+{
+	location.x = currentX;
+	location.y = currentY;
+}
+
+float GETszogseb(void)
+{
+	return szogseb;
+}
+
+int32_t GETcurrentX(void)
+{
+	return currentX;
+}
+
+int32_t GETcurrentY(void)
+{
+	return currentY;
+}
+
+int32_t GETcounterpres(void)
+{
+	return counterpres;
+}
+
+int32_t GETcounterprev(void)
+{
+	return counterprev;
+}
+
+int32_t GETspeed(void)
+{
+	return speed;
+}
+
+
+
 
 
 

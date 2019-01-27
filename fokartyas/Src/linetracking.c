@@ -6,7 +6,10 @@
  */
 
 #include <stdint.h>
+#include "timing.h"
 #include "linetracking.h"
+#include "tracking.h"
+#include "communicationvsz.h"
 #include "stm32f4xx_hal.h"
 
 uint32_t nullavonalszam = 0;
@@ -17,36 +20,37 @@ uint8_t flagharom = 0;
 uint8_t flagketto = 0;
 uint32_t hossz = 0;
 
+int32_t startposition;
+uint8_t flagsavvaltas = 0;
 
 
-extern uint8_t 	flagvonalszam ;
-extern uint8_t count;
-extern int32_t counterpres;
-extern int32_t startposition;
+
+
+
 
 
 void vonalszamlalo(void)	//vonalfigyelo
 {
-	if (flagvonalszam == 1)
+	if (GETflagvonalszam() == 1)
 	{
-		if(count == 0) nullavonalszam++;
-		if(count == 1) egyvonalszam++;
-		if(count == 3) haromvonalszam++;
-		flagvonalszam = 0;
+		if(GETcount() == 0) nullavonalszam++;
+		if(GETcount() == 1) egyvonalszam++;
+		if(GETcount() == 3) haromvonalszam++;
+		SETflagvonalszam(0);
 	}
 }
 
 uint32_t egyutanharomhossz(void)   //csak biztosan egy vonal esetén hívható meg
 {
-		if(count == 3 && flagharom == 0)
+		if(GETcount() == 3 && flagharom == 0)
 		{
-			startposition = counterpres;
+			startposition = GETcounterpres();
 			flagharom = 1;
 		}
 
-		if (count==1 && startposition != 0)
+		if (GETcount()==1 && startposition != 0)
 		{
-			hossz = counterpres - startposition;
+			hossz = GETcounterpres() - startposition;
 			startposition = 0;
 			return hossz;
 		}
@@ -55,15 +59,15 @@ uint32_t egyutanharomhossz(void)   //csak biztosan egy vonal esetén hívható meg
 
 uint32_t egyutankettohossz(void)
 {
-		if(count == 2 && flagketto == 0)
+		if(GETcount() == 2 && flagketto == 0)
 		{
-			startposition = counterpres;
+			startposition = GETcounterpres();
 			flagketto = 1;
 		}
 
-		if (count==1 && startposition != 0)
+		if (GETcount()==1 && startposition != 0)
 		{
-			hossz = counterpres - startposition;
+			hossz = GETcounterpres() - startposition;
 			startposition = 0;
 			return hossz;
 		}
@@ -73,14 +77,14 @@ uint32_t egyutankettohossz(void)
 
 uint32_t haromutanegyhossz(void)   //csak biztosan egy vonal esetén hívható meg
 {
-		if(count == 1 && flagharom == 1)
+		if(GETcount() == 1 && flagharom == 1)
 		{
-			startposition = counterpres;
+			startposition = GETcounterpres();
 			flagharom = 0;
 		}
-		if (count==3 && startposition != 0)
+		if (GETcount()==3 && startposition != 0)
 		{
-			hossz = counterpres - startposition;
+			hossz = GETcounterpres() - startposition;
 			startposition = 0;
 			return hossz;
 		}
@@ -89,16 +93,79 @@ uint32_t haromutanegyhossz(void)   //csak biztosan egy vonal esetén hívható meg
 
 uint32_t kettoutanegyhossz(void)
 {
-	if(count == 1 && flagketto == 1)
+	if(GETcount() == 1 && flagketto == 1)
 	{
-		startposition = counterpres;
+		startposition = GETcounterpres();
 		flagketto = 0;
 	}
-	if (count==2 && startposition != 0)
+	if (GETcount()==2 && startposition != 0)
 	{
-		hossz = counterpres - startposition;
+		hossz = GETcounterpres() - startposition;
 		startposition = 0;
 		return hossz;
 	}
 	return 0;
 }
+
+uint32_t GETnullavonalszam(void)
+{
+	return nullavonalszam;
+}
+
+uint32_t GETegyvonalszam(void)
+{
+	return egyvonalszam;
+}
+
+uint32_t GETharomvonalszam(void)
+{
+	return haromvonalszam;
+}
+
+
+void SETnullavonalszam(uint32_t ertek)
+{
+	nullavonalszam = ertek;
+}
+void SETegyvonalszam(uint32_t ertek)
+{
+	nullavonalszam = ertek;
+}
+void SETharomvonalszam(uint32_t ertek)
+{
+	nullavonalszam = ertek;
+}
+
+
+
+uint32_t GEThossz(void)
+{
+	return hossz;
+}
+
+void SEThossz(uint32_t ertek)
+{
+	hossz = ertek;
+}
+
+uint8_t GETflagsavvaltas(void)
+{
+	return flagsavvaltas;
+}
+
+void SETflagsavvaltas(uint8_t ertek)
+{
+	flagsavvaltas = ertek;
+}
+
+int32_t GETstartposition(void)
+{
+	return startposition;
+}
+
+void SETstartposition(int32_t ertek)
+{
+	startposition = ertek;
+}
+
+

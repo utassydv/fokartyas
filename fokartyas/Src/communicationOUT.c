@@ -7,32 +7,23 @@
 
 #include <string.h>
 #include "communicationOUT.h"
+#include "timing.h"
 #include "stm32f4xx_hal.h"
+
 
 extern UART_HandleTypeDef huart2;
 
 
-__IO uint32_t uwIC2Value = 0;
-__IO uint32_t  uwDutyCycle = 0;
-
-
-extern float szogseb;
-extern float offsetszog;
-extern int32_t currentX;
-extern int32_t currentY;
-
-extern uint8_t 	flagbluetooth;
-
 void bluetoothTX(void)
 {
-	if (flagbluetooth == 1)
+	if (GETflagbluetooth() == 1)
 	{
 		char TxData[16];
 		snprintf(TxData, 16, "bluetooth\n");
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 	}
-	flagbluetooth = 0;
+	SETflagbluetooth(0);
 }
 
 void bluetoothVSZ(void)
@@ -91,23 +82,4 @@ void bluetoothDRIVE(void)
 
 	}
 	flagbluetooth = 0;
-}
-
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELYEZO JEL
-{
-  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-  {
-    /* Get the Input Capture value */
-    uwIC2Value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-
-    if (uwIC2Value != 0)
-    {
-      uwDutyCycle = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-    }
-    else
-    {
-      uwDutyCycle = 150;
-    }
-  }
-
 }

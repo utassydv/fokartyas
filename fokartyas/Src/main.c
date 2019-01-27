@@ -44,6 +44,9 @@
 #include <string.h>
 #include <math.h>
 #include "tracking.h"
+#include "linetracking.h"
+#include "communicationvsz.h"
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -72,50 +75,10 @@ UART_HandleTypeDef huart3;
 
 
 uint32_t cntbeav 				= 0;
-uint8_t state 					= 0;
-uint8_t statelab 				= 0;
-
-
-
-uint8_t flaggyors;
-uint8_t flaglassu;
-
-int32_t hiba=0;
-int32_t elozohiba=0;
-int32_t beavatkozo=0;
-
-
-
-
-
-
-
-__IO uint32_t uwIC2Value = 0;
-__IO uint32_t  uwDutyCycle = 0;
-
-
-
 
 char TxDatak[200];
 
 
-
-int32_t startposition;
-
-int32_t currentX = 0;
-int32_t currentY = 0;
-
-typedef struct pont2D {
-    int32_t x, y;
-} pont2D;
-
-pont2D endlocation = { 0 , 0 };
-
-
-
-uint8_t flagsavvaltas = 0;
-
-float epres = 0.0f;
 
 
 /* USER CODE END PV */
@@ -146,14 +109,6 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 void vonalszamlalo(void);
 void uartprocess(void);
-uint8_t engedelyezo(uint32_t pwminput);
-
-
-
-
-void savelocation(pont2D location);
-
-
 
 
 /* USER CODE END PFP */
@@ -179,6 +134,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  communicationvszInit();
+  trackingInit();
 
   /* USER CODE END Init */
 
@@ -217,7 +174,7 @@ int main(void)
 
 
 
-  enablegyro();
+
 
   /* USER CODE END 2 */
 
@@ -227,12 +184,13 @@ int main(void)
 
 while (1)
 {
+	uartprocess(); 		//UART feldolgozasa
 	gyro();
+//	speedpos(); 		a tim5 IRQ handlerben
 	vonalszamlalo(); 	//vonalszam figyeles
 
-	uartprocess(); 		//UART feldolgozasa
+	allapotgeplab();	//state megadasa
 
-	allapotgeplab();		//state megadasa
 
 	beavatkozas();
 
@@ -850,41 +808,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-
-
-
-
-
-
-
-
-
-uint8_t engedelyezo(uint32_t pwminput)
-{
-	if (pwminput>160)
-		return 1;
-	else
-		return 0;
-}
-
-
-
-void savelocation(pont2D location)
-{
-	location.x = currentX;
-	location.y = currentY;
-}
-
-
-
-
-
-
-
-
-
-
 
 /* USER CODE END 4 */
 

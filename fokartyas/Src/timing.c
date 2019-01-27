@@ -27,6 +27,9 @@ uint16_t 	timeangle 			= 0;
 uint8_t 	flagangle			= 0;
 uint16_t 	timeangleoffset 	= 0;
 uint8_t 	flagangleoffset		= 0;
+uint16_t 	timeregulator	 	= 0;
+uint8_t 	flagregulator		= 0;
+
 
 void idozitoInit(){
 	  HAL_TIM_Base_Start_IT(&htim4);					//Idozitesekhez (1ms)
@@ -67,9 +70,103 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  idozito( 1, &timeangleoffset, &flagangleoffset);
 
+	  idozito( 5, &timeregulator, &flagregulator);
+
   }
 
 }
 
+//GETTEREK
 
+uint8_t GETflagspeed(void)
+{
+	return flagspeed;
+}
+
+uint8_t GETflagbluetooth(void)
+{
+	return flagbluetooth;
+}
+
+uint8_t GETflagvonalszam(void)
+{
+	return flagvonalszam;
+}
+
+uint8_t GETflagallapotgep(void)
+{
+	return flagallapotgep;
+}
+
+uint8_t GETflagbeav(void)
+{
+	return flagbeav;
+}
+
+uint8_t GETflaguartproc(void)
+{
+	return flaguartproc;
+}
+
+uint8_t GETflagangle(void)
+{
+	return flagangle;
+}
+
+uint8_t GETflagangleoffset(void)
+{
+	return flagangleoffset;
+}
+
+uint8_t GETflagregulator(void)
+{
+	return flagregulator;
+}
+
+//SETTEREK
+
+void SETflagspeed(uint8_t ertek)
+{
+	flagspeed = ertek;
+}
+
+void SETflagbluetooth(uint8_t ertek)
+{
+	flagbluetooth = ertek;
+}
+
+void SETflagvonalszam(uint8_t ertek)
+{
+	flagvonalszam = ertek;
+}
+
+void SETflagallapotgep(int8_t ertek)
+{
+	flagallapotgep = ertek;
+}
+
+void SETflagbeav(uint8_t ertek)
+{
+	flagbeav = ertek;
+}
+
+void SETflaguartproc(uint8_t ertek)
+{
+	flaguartproc = ertek;
+}
+
+void SETflagangle(uint8_t ertek)
+{
+	flagangle = ertek;
+}
+
+void SETflagangleoffset(uint8_t ertek)
+{
+	flagangleoffset = ertek;
+}
+
+void SETflagregulator(uint8_t ertek)
+{
+	flagregulator = ertek;
+}
 

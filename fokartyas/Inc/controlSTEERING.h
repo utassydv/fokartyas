@@ -11,6 +11,29 @@
 int32_t toerror(uint32_t dist);
 int32_t szabPD(int32_t elozohibajel, int32_t hibajel);
 int16_t toPWM(int32_t jel);
+void toservo(void);
 
+float GETp(void);
+void SETp(float ertek);
+float GETd(void);
+void SETd(float ertek);
+float GETplassu(void);
+void SETplassu(float ertek);
+float GETdlassu(void);
+void SETdlassu(float ertek);
+float GETpgyors(void);
+void SETpgyors(float ertek);
+float GETdgyors(void);
+void SETdgyors(float ertek);
+uint16_t GETpwmmide(void);
+uint16_t GETpwmmidh(void);
+int16_t GETpos(void);
+void SETpos(int16_t ertek);
+int16_t GETposh(void);
+void SETposh(int16_t ertek);
+uint8_t GETflaglassu(void);
+void SETflaglassu(uint8_t ertek);
+uint8_t GETflaggyors(void);
+void SETflaggyors(uint8_t ertek);
 
 #endif /* CONTROLSTEERING_H_ */

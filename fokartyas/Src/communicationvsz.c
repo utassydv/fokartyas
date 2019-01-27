@@ -5,6 +5,7 @@
  *      Author: utassyd
  */
 
+#include <stdint.h>
 #include "communicationvsz.h"
 #include "stm32f4xx_hal.h"
 
@@ -18,10 +19,8 @@ uint8_t feldvege=0;
 uint8_t olveleje=0;
 char posarray[64];
 
-uint8_t count = 0;    //vonal db szám
-uint32_t tav;
-
-
+uint8_t count 	= 0;
+uint32_t tav 	= 12799;
 
 extern uint8_t 	flaguartproc;
 
@@ -90,6 +89,17 @@ void uartprocess(void)
 		 flaguartproc = 0;
 	}
 }
+
+uint8_t GETcount(void)
+{
+	return count;
+}
+
+uint32_t GETtav(void)
+{
+	return tav;
+}
+
 
 //void vszdebugTx(void)// ezt nem hasznaljuk, a vonalszenzornak a hulyesegeinek megoldasara lehet jo
 //{

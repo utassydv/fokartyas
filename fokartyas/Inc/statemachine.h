@@ -1,5 +1,5 @@
 /*
- * statemachine.h
+ * statemac.h
  *
  *  Created on: 27 Jan 2019
  *      Author: utassyd
@@ -10,7 +10,5 @@
 
 void allapotgeplab(void);
 void allapotgep(void);
-
-
 
 #endif /* STATEMACHINE_H_ */

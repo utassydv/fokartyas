@@ -7,55 +7,110 @@
 
 #include "stm32f4xx_hal.h"
 #include "actuator.h"
+#include "controlSTEERING.h"
+#include "controlVELOCITY.h"
+#include "timing.h"
 
-extern uint8_t 	flagbeav;
-extern uint32_t tav;
 
-void beavatkozas(void)
+extern TIM_HandleTypeDef htim13; //elsoszervo
+extern TIM_HandleTypeDef htim14; //hatsoszervo
+extern TIM_HandleTypeDef htim10; //szenzorszervo
+extern TIM_HandleTypeDef htim1;  //motor
+
+
+__IO uint32_t uwIC2Value = 0;
+__IO uint32_t  uwDutyCycle = 0;
+
+
+void regulator(void)
 {
-	if (flagbeav == 1)
+	if (GETflagregulator() == 1)
+	{
+		toservo();
+		tomotorcontrol();
+		SETflagregulator(0);
+	}
+}
+
+void control(void)
+{
+	if (GETflagbeav() == 1)
+	{
+		if( uwDutyCycle < 160)
 		{
-
-			hiba 		= 	toerror(tav);
-			beavatkozo	= 	szabPD(elozohiba, hiba);
-			elozohiba	=	hiba;
-			toPWM(beavatkozo);
-
-
-			epres = toinkrspeed(v) - speed;
-			upres = 136.8 + 0.04*szabvPI(epres);
-
-
-
-			control();
-			flagbeav = 0;
+			SETupres(0);
+			SETu2prev(0.0f);
+			SETuprev(0.0f);
+			SETpos(1500);
+			SETposh(1500);
 		}
+
+		szervovezerles(GETpos(), GETposh());
+		motorvezerles(GETupres());						//motor
+		SETflagbeav(0);
+	}
+}
+
+void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
+{
+		htim13.Instance->CCR1 	= elsoszervo; 		//elso szervo
+		htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
+		htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+
+		//KOZEPRE ALLITO
+		//	htim13.Instance->CCR1 	= 1500; 		//elso szervo
+		//	htim14.Instance->CCR1 	= 1500; 	//hatso szervo
+}
+
+void motorvezerles(int16_t beavatkozojel)
+{
+	uint16_t csat1;
+	uint16_t csat2;
+
+
+	if(beavatkozojel > 524) 	beavatkozojel = 524;
+	if(beavatkozojel < -523)	beavatkozojel = -523;
+
+	csat1 = 525 + beavatkozojel;
+	csat2 = 525 - beavatkozojel;
+
+	htim1.Instance->CCR1 	= csat1;
+	htim1.Instance->CCR3 	= csat2;
+
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
 }
 
 void gyors(void)
 {
-	flaggyors = 1;
-	flaglassu = 0;
-	p= pgyors;
-	d= dgyors;
-	v= vgyors;
+	SETflaggyors(1);
+	SETflaglassu(0);
+
+	SETp(GETpgyors());
+	SETd(GETdgyors());
+
+	SETv(GETvgyors());
+
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
 void fekez(void)
 {
-	p= plassu;
-	d= dlassu;
-	v= vfek;
+	SETp(GETplassu());
+	SETd(GETdlassu());
+
+	SETv(GETvfek());
 }
 
 void lassu(void)
 {
-	flaglassu = 1;
-	flaggyors = 0;
-	p= plassu;
-	d= dlassu;
-	v= vlassu;
+	SETflaggyors(0);
+	SETflaglassu(1);
+
+	SETp(GETplassu());
+	SETd(GETdlassu());
+
+	SETv(GETvlassu());
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
@@ -67,55 +122,37 @@ void labyrinth(void)
 
 void savvaltas()
 {
-	v = vsavvalt;
-}
-
-void control(void)
-{
-	if( engedelyezo(uwDutyCycle) == 0)
-				{
-					upres		=   0;
-					u2prev = 0.0f;
-					uprev = 0.0f;
-				}
-
-	if(flagsavvaltas == 0)
-	{
-	htim13.Instance->CCR1 	= pos; 		//elso szervo
-	htim14.Instance->CCR1 	= pwmmidh; 	//hatso szervo
-
-	htim10.Instance->CCR1 	= 1500; 	//szenzor szervo
-	}
-	if(flagsavvaltas == 1)
-	{
-	htim13.Instance->CCR1 	= posvalte; 		//elso szervo
-	htim14.Instance->CCR1 	= posvalth; 	//hatso szervo
-	htim10.Instance->CCR1 	= 1500; 	//szenzor szervo
-	}
-
-//	htim13.Instance->CCR1 	= 1500; 		//elso szervo
-//	htim14.Instance->CCR1 	= 1500; 	//hatso szervo
-
-	velocity(upres);						//motor
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+	SETv(GETvsavvalt());
 }
 
 
 
-void velocity(int16_t sebesseg)
+
+
+
+
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELYEZO JEL
 {
-	uint16_t csat1;
-	uint16_t csat2;
+  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+  {
+    /* Get the Input Capture value */
+    uwIC2Value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
+    if (uwIC2Value != 0)
+    {
+      uwDutyCycle = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+    }
+    else
+    {
+      uwDutyCycle = 150;
+    }
+  }
 
-	if(sebesseg > 524) 		sebesseg = 524;
-	if(sebesseg < -523) 	sebesseg = -523;
+}
 
-	csat1 = 525 + sebesseg;
-	csat2 = 525 - sebesseg;
-
-	htim1.Instance->CCR1 	= csat1;
-	htim1.Instance->CCR3 	= csat2;
+uint32_t GETuwDutyCycle(void)
+{
+	return uwDutyCycle;
 }
 

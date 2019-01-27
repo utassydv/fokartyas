@@ -15,7 +15,8 @@ void lassu(void);
 void labyrinth(void);
 void savvaltas(void);
 void control(void);
-void velocity(int16_t sebesseg);
-
+void motorvezerles(int16_t sebesseg);
+void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo);
+uint32_t GETuwDutyCycle(void);
 
 #endif /* ACTUATOR_H_ */

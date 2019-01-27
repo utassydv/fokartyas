@@ -1,31 +1,40 @@
 /*
- * statemachine.c
+ * statemac.c
  *
  *  Created on: 27 Jan 2019
  *      Author: utassyd
  */
-#include <stdint.h>
-#include "statemachine.h"
+
+#include <statemachine.h>
 #include "stm32f4xx_hal.h"
+#include "timing.h"
+#include "actuator.h"
+#include "linetracking.h"
+#include "tracking.h"
+#include "communicationvsz.h"
+
+uint8_t state 					= 0;
+uint8_t statelab 				= 0;
+pont2D endlocation = { 0 , 0 };
 
 void allapotgeplab(void)
 {
-	if (flagallapotgep == 1)
+	if (GETflagallapotgep() == 1)
 	{
 		switch(statelab)
 		{
 			case 0:
 				labyrinth();
 				egyutankettohossz();
-				if(hossz > 13000 && hossz < 30000 ) //leghosszabb sávváltót lát
+				if(GEThossz() > 13000 && GEThossz() < 30000 ) //leghosszabb sávváltót lát
 				{
 					statelab = 1;
-					hossz = 0;
+					SEThossz(0);
 				}
-				else if(hossz > 5000 && hossz < 13000 ) //legrovidebb
+				else if( GEThossz() > 5000 && GEThossz() < 13000 ) //legrovidebb
 				{
 					statelab = 2;
-					hossz = 0;
+					SEThossz(0);
 				}
 
 				break;
@@ -33,17 +42,17 @@ void allapotgeplab(void)
 
 			case 1:
 				kettoutanegyhossz();
-				if(hossz > 13000 && hossz < 30000) //leghosszabb savvalto lyukat lat
+				if( GEThossz() > 13000 && GEThossz() < 30000) //leghosszabb savvalto lyukat lat
 				{
-					hossz = 0;
-					nullavonalszam = 0;
+					SEThossz(0);
+					SETnullavonalszam(0);
 					statelab = 3;
 				}
 				break;
 
 			case 2:
 				kettoutanegyhossz();
-				if(hossz > 5000 && hossz < 13000) //legrovidebb savvalto lyukat lat
+				if(GEThossz() > 5000 && GEThossz() < 13000) //legrovidebb savvalto lyukat lat
 				{
 					savelocation(endlocation);
 					statelab = 0;
@@ -51,19 +60,19 @@ void allapotgeplab(void)
 				break;
 
 			case 3:
-				flagsavvaltas = 1;
+				SETflagsavvaltas(1);
 				savvaltas();
-				if(nullavonalszam >= 20)			//amig el nem hagyjuk a vonalat
+				if(GETnullavonalszam() >= 20)			//amig el nem hagyjuk a vonalat
 				{
-					egyvonalszam = 0;
+					SETegyvonalszam(0);
 					statelab = 4;
 				}
 				break;
 
 			case 4:
-				if(egyvonalszam >= 4)			//amíg meg nem jövünk a vonalra
+				if(GETegyvonalszam() >= 4)			//amíg meg nem jövünk a vonalra
 				{
-					flagsavvaltas = 0;
+					SETflagsavvaltas(0);
 					lassu();
 					statelab = 0;
 				}
@@ -73,13 +82,13 @@ void allapotgeplab(void)
 				statelab = 0;
 				break;
 		}
-	flagallapotgep = 0;
+	SETflagallapotgep(0);
 	}
 }
 
 void allapotgep(void)
 {
-	if (flagallapotgep == 1)
+	if (GETflagallapotgep() == 1)
 	{
 		switch(state)
 		{// lassu, ha 3 vonal -> state 1
@@ -87,77 +96,80 @@ void allapotgep(void)
 			case 0:
 				lassu();
 				egyutanharomhossz();
-				if(hossz > 5000 && hossz < 18000 )
+				if(GEThossz() > 5000 && GEThossz() < 18000 )
 				{
 					state = 1;
-					hossz = 0;
+					SEThossz(0);
 				}
 				break;
 
 			case 1:
 				haromutanegyhossz();
-				if(hossz > 5000 && hossz < 20000) {
+				if(GEThossz() > 5000 && GEThossz() < 20000) {
 					state = 2;
-					startposition = counterpres;
-					hossz = 0;
+					SETstartposition(GETcounterpres());
+					SEThossz(0);
 					gyors();
 				}
 				break;
 
 			case 2:
-				if (counterpres - startposition > 280000) //14000 x 2(m)
+				if (GETcounterpres() - GETstartposition() > 280000) //14000 x 2(m)
 				{
-					haromvonalszam = 0;
+					SETharomvonalszam(0);
 					state = 3;
 				}
 				break;
 
 			case 3:
-				if(count == 3)
+				if(GETcount() == 3)
 				{
-					startposition = counterpres;
+					SETstartposition(GETcounterpres());
 					state = 4;
 				}
 				break;
 
 			case 4:
-				if(counterpres - startposition > 42000) // 30cm-en belül
+				if(GETcounterpres() - GETstartposition() > 42000) // 30cm-en belül
 				{
-					if (haromvonalszam >= 6) state = 5;
+					if (GETharomvonalszam() >= 6)
+					{
+						state = 5;
+					}
 					else
 					{
-						haromvonalszam = 0;
+						SETharomvonalszam(0);
 						state = 3;
 					}
 				}
 				break;
 
 			case 5:
-				if(counterpres - startposition > 280000)//2m
+				if(GETcounterpres() - GETstartposition() > 280000)//2m
 				{
 					lassu() ;
-					egyvonalszam = 0;
+					SETegyvonalszam(0);
 					state = 6;
 				}
 				break;
 			case 6:
-				if(count == 1)
+				if(GETcount() == 1)
 				{
-					startposition = counterpres;
+					SETstartposition(GETcounterpres());
 					state = 7;
 				}
 				break;
 			case 7:
-				if(counterpres - startposition > 28000) // 2ű0cm-en belül
+				if(GETcounterpres() - GETstartposition() > 28000) // 2ű0cm-en belül
 				{
-					if (egyvonalszam >= 4)
+					if (GETegyvonalszam() >= 4)
 					{
-						hossz = 0;
+						SEThossz(0);
 						state = 0;
 					}
 					else
 					{
-						egyvonalszam = 0;
+						SETegyvonalszam(0);
 						state = 6;
 					}
 				}
@@ -167,6 +179,6 @@ void allapotgep(void)
 				state = 0;
 				break;
 		}
-	flagallapotgep = 0;
+	SETflagallapotgep(0);
 	}
 }

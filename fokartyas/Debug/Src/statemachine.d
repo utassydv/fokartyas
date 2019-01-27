@@ -1,4 +1,5 @@
-Src/main.o: ../Src/main.c C:/fokartyasz/fokartyas/Inc/main.h \
+Src/statemachine.o: ../Src/statemachine.c \
+ C:/fokartyasz/fokartyas/Inc/statemachine.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  C:/fokartyasz/fokartyas/Inc/stm32f4xx_hal_conf.h \
  C:/fokartyasz/fokartyas/Inc/main.h \
@@ -32,11 +33,13 @@ Src/main.o: ../Src/main.c C:/fokartyasz/fokartyas/Inc/main.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- C:/fokartyasz/fokartyas/Inc/tracking.h \
+ C:/fokartyasz/fokartyas/Inc/timing.h \
+ C:/fokartyasz/fokartyas/Inc/actuator.h \
  C:/fokartyasz/fokartyas/Inc/linetracking.h \
+ C:/fokartyasz/fokartyas/Inc/tracking.h \
  C:/fokartyasz/fokartyas/Inc/communicationvsz.h
 
-C:/fokartyasz/fokartyas/Inc/main.h:
+C:/fokartyasz/fokartyas/Inc/statemachine.h:
 
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 
@@ -104,8 +107,12 @@ C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-C:/fokartyasz/fokartyas/Inc/tracking.h:
+C:/fokartyasz/fokartyas/Inc/timing.h:
+
+C:/fokartyasz/fokartyas/Inc/actuator.h:
 
 C:/fokartyasz/fokartyas/Inc/linetracking.h:
+
+C:/fokartyasz/fokartyas/Inc/tracking.h:
 
 C:/fokartyasz/fokartyas/Inc/communicationvsz.h:
