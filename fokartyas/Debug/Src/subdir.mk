@@ -4,24 +4,48 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Src/actuator.c \
+../Src/communicationOUT.c \
+../Src/communicationvsz.c \
+../Src/controlSTEERING.c \
+../Src/controlVELOCITY.c \
+../Src/linetracking.c \
 ../Src/main.c \
+../Src/statemachine.c \
 ../Src/stm32f4xx_hal_msp.c \
 ../Src/stm32f4xx_it.c \
 ../Src/system_stm32f4xx.c \
+../Src/timing.c \
 ../Src/tracking.c 
 
 OBJS += \
+./Src/actuator.o \
+./Src/communicationOUT.o \
+./Src/communicationvsz.o \
+./Src/controlSTEERING.o \
+./Src/controlVELOCITY.o \
+./Src/linetracking.o \
 ./Src/main.o \
+./Src/statemachine.o \
 ./Src/stm32f4xx_hal_msp.o \
 ./Src/stm32f4xx_it.o \
 ./Src/system_stm32f4xx.o \
+./Src/timing.o \
 ./Src/tracking.o 
 
 C_DEPS += \
+./Src/actuator.d \
+./Src/communicationOUT.d \
+./Src/communicationvsz.d \
+./Src/controlSTEERING.d \
+./Src/controlVELOCITY.d \
+./Src/linetracking.d \
 ./Src/main.d \
+./Src/statemachine.d \
 ./Src/stm32f4xx_hal_msp.d \
 ./Src/stm32f4xx_it.d \
 ./Src/system_stm32f4xx.d \
+./Src/timing.d \
 ./Src/tracking.d 
 
 

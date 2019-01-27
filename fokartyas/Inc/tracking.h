@@ -11,6 +11,7 @@
 void speedpos(void);
 void angle(void);
 void enablegyro(void);
+void gyrooffset(void);
 void gyro(void);
 
 void poz(void);
