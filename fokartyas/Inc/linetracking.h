@@ -23,8 +23,6 @@ void SETegyvonalszam(uint32_t ertek);
 void SETharomvonalszam(uint32_t ertek);
 uint32_t GEThossz(void);
 void SEThossz(uint32_t ertek);
-uint8_t GETflagsavvaltas(void);
-void SETflagsavvaltas(uint8_t ertek);
 int32_t GETstartposition(void);
 void SETstartposition(int32_t ertek);
 

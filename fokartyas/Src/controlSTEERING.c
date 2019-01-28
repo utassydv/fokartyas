@@ -29,8 +29,6 @@ const uint16_t rangeh	=	400;
 
 int16_t pos;
 int16_t posh;
-const int16_t posvalte = 1700;
-const int16_t posvalth = 1850;
 uint8_t flaggyors;
 uint8_t flaglassu;
 
@@ -40,8 +38,16 @@ int32_t hiba		= 0;
 int32_t elozohiba	= 0;
 int32_t beavatkozo	= 0;
 
+extern TIM_HandleTypeDef htim10; 						//szenzor szervo timer
+extern TIM_HandleTypeDef htim13; 						//elsp szervo timer
+extern TIM_HandleTypeDef htim14; 						//hatso szervo timer
 
-
+void controlSTEERINGInit(void)
+{
+	  HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);		//PWM Szervo szenzor
+	  HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);		//PWM Szervo elso
+	  HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		//PWM Szervo hatso
+}
 
 int32_t toerror(uint32_t dist)
 {

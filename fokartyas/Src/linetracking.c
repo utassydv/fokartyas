@@ -20,7 +20,7 @@ uint8_t flagketto = 0;
 uint32_t hossz = 0;
 
 int32_t startposition;
-uint8_t flagsavvaltas = 0;
+
 
 
 void vonalszamlalo(void)	//vonalfigyelo
@@ -140,16 +140,6 @@ uint32_t GEThossz(void)
 void SEThossz(uint32_t ertek)
 {
 	hossz = ertek;
-}
-
-uint8_t GETflagsavvaltas(void)
-{
-	return flagsavvaltas;
-}
-
-void SETflagsavvaltas(uint8_t ertek)
-{
-	flagsavvaltas = ertek;
 }
 
 int32_t GETstartposition(void)

@@ -8,7 +8,8 @@
 #ifndef ACTUATOR_H_
 #define ACTUATOR_H_
 
-void beavatkozas(void);
+void actuatorInit(void);
+void regulator(void);
 void gyors(void);
 void fekez(void);
 void lassu(void);
@@ -18,5 +19,7 @@ void control(void);
 void motorvezerles(int16_t sebesseg);
 void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo);
 uint32_t GETuwDutyCycle(void);
+uint8_t GETflagsavvaltas(void);
+void SETflagsavvaltas(uint8_t ertek);
 
 #endif /* ACTUATOR_H_ */

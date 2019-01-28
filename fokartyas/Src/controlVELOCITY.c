@@ -26,6 +26,13 @@ float uprev 	= 0.0f;
 float u2 		= 0.0f;
 float u 		= 0.0f;
 
+extern TIM_HandleTypeDef htim1; 						//motor timer
+
+void controlVELOCITYInit(void)
+{
+	  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);			//PWM Motor
+	  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);			//PWM Motor
+}
 
 float toinkrspeed(float sebesseg)
 {

@@ -16,10 +16,21 @@ extern TIM_HandleTypeDef htim13; //elsoszervo
 extern TIM_HandleTypeDef htim14; //hatsoszervo
 extern TIM_HandleTypeDef htim10; //szenzorszervo
 extern TIM_HandleTypeDef htim1;  //motor
+extern TIM_HandleTypeDef htim3;  //taviranyito
 
 
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
+
+uint8_t flagsavvaltas = 0;
+const int16_t posvalte = 1700;
+const int16_t posvalth = 1850;
+
+void actuatorInit(void)
+{
+	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);		//Taviranyito CH1
+	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);		//Taviranyito CH2
+}
 
 
 void regulator(void)
@@ -53,9 +64,22 @@ void control(void)
 
 void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 {
-		htim13.Instance->CCR1 	= elsoszervo; 		//elso szervo
-		htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
-		htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+
+		if (flagsavvaltas == 1)
+		{
+			htim13.Instance->CCR1 	= posvalte; 		//elso szervo
+			htim14.Instance->CCR1 	= posvalth; 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
+		else
+		{
+			htim13.Instance->CCR1 	= elsoszervo; 		//elso szervo
+			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
+
+
+
 
 		//KOZEPRE ALLITO
 		//	htim13.Instance->CCR1 	= 1500; 		//elso szervo
@@ -151,3 +175,12 @@ uint32_t GETuwDutyCycle(void)
 	return uwDutyCycle;
 }
 
+uint8_t GETflagsavvaltas(void)
+{
+	return flagsavvaltas;
+}
+
+void SETflagsavvaltas(uint8_t ertek)
+{
+	flagsavvaltas = ertek;
+}

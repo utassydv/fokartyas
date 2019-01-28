@@ -31,8 +31,12 @@ int32_t speed		= 0;
 int32_t currentX = 0;
 int32_t currentY = 0;
 
+extern TIM_HandleTypeDef htim2; 						//encoder timer
+
 void trackingInit(void)
 {
+	HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);	//Inkrementalis ado
+
 	//Z tengely koruli szogsebesseg olvasasara
 	txdata1[0]		=	0b10100110; //OUTZ_L_G (26h)
 	txdata1[1]		=	0b00000000;
@@ -63,8 +67,12 @@ void gyro(void)
 	}
 //	else if(offsetcnt == offsetlimit)
 //	{
-//		offsetszog = offsetszog / (float)offsetlimit;
-//		offsetcnt++;
+//		if (GETflagangleoffset() == 1)
+//		{
+//			offsetszog = offsetszog / (float)offsetlimit;
+//			offsetcnt++;
+//			SETflagangleoffset(0);
+//		}
 //	}
 	else
 	{

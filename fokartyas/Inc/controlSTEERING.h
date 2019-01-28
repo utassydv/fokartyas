@@ -10,6 +10,8 @@
 #ifndef CONTROLSTEERING_H_
 #define CONTROLSTEERING_H_
 
+
+void controlSTEERINGInit(void);
 int32_t toerror(uint32_t dist);
 int32_t szabPD(int32_t elozohibajel, int32_t hibajel);
 int16_t toPWM(int32_t jel);

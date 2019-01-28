@@ -48,7 +48,9 @@
 #include "communicationvsz.h"
 #include "statemachine.h"
 #include "communicationOUT.h"
-
+#include "controlSTEERING.h"
+#include "controlVELOCITY.h"
+#include "actuator.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -98,15 +100,9 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
-void vonalszamlalo(void);
-void uartprocess(void);
-
-
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /**
@@ -117,7 +113,6 @@ void uartprocess(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -128,6 +123,8 @@ int main(void)
   /* USER CODE BEGIN Init */
   communicationvszInit();
   trackingInit();
+  controlVELOCITYInit();
+  controlSTEERINGInit();
 
   /* USER CODE END Init */
 
@@ -155,19 +152,6 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);			//PWM Motor
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);			//PWM Motor
-  HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);		//PWM Szervo elso
-  HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);		//PWM Szervo elso
-  HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		//PWM Szervo hatso
-  HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);	//Inkrementalis ado
-  HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);		//Taviranyito CH1
-  HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);		//Taviranyito CH2
-
-
-
-
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -178,17 +162,11 @@ while (1)
 {
 	uartprocess(); 		//UART feldolgozasa
 	gyro();
-//	speedpos(); 		a tim5 IRQ handlerben
 	vonalszamlalo(); 	//vonalszam figyeles
-
-	allapotgeplab();	//state megadasa
-
-
-	//beavatkozas();
-
+	allapotgeplab();
+	regulator();
+	control();
 	bluetoothDRIVE();
-
-
 }
 
   /* USER CODE END WHILE */
