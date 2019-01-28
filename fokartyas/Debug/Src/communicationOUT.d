@@ -36,7 +36,8 @@ Src/communicationOUT.o: ../Src/communicationOUT.c \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  C:/fokartyasz/fokartyas/Inc/tracking.h \
  C:/fokartyasz/fokartyas/Inc/linetracking.h \
- C:/fokartyasz/fokartyas/Inc/statemachine.h
+ C:/fokartyasz/fokartyas/Inc/statemachine.h \
+ C:/fokartyasz/fokartyas/Inc/controlVELOCITY.h
 
 C:/fokartyasz/fokartyas/Inc/communicationOUT.h:
 
@@ -113,3 +114,5 @@ C:/fokartyasz/fokartyas/Inc/tracking.h:
 C:/fokartyasz/fokartyas/Inc/linetracking.h:
 
 C:/fokartyasz/fokartyas/Inc/statemachine.h:
+
+C:/fokartyasz/fokartyas/Inc/controlVELOCITY.h:

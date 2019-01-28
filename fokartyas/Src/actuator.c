@@ -52,8 +52,6 @@ void control(void)
 			SETupres(0);
 			SETu2prev(0.0f);
 			SETuprev(0.0f);
-			SETpos(1500);
-			SETposh(1500);
 		}
 
 		szervovezerles(GETpos(), GETposh());

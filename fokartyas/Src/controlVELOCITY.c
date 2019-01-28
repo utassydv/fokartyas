@@ -14,7 +14,7 @@
 #define UMAX	(5000)
 
 float v 		= 	0.0f;
-float vlassu	=	1.5f;
+float vlassu	=	1.0f;
 float vgyors	=	2.5f;
 float vfek		=	0.0f;
 float vsavvalt 	=	1.0f;

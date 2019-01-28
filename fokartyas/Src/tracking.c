@@ -18,9 +18,10 @@ uint8_t rxdata1[3];
 uint8_t enabledata[2];
 
 uint16_t offsetcnt = 0;
-uint16_t offsetlimit = 1000;
+uint16_t offsetlimit = 5000;
 float offsetszog;
 float szogseb;
+float szog = 0;
 
 
 int32_t counterpres	= 0;
@@ -99,7 +100,7 @@ void gyrooffset(void)
 		szogseb	= (float)adat*8.75f;
 
 
-		offsetszog = 0.001f*szogseb+0.999f*offsetszog;
+		offsetszog = 0.0002f*szogseb+1.0f*offsetszog;
 		//offsetszog = offsetszog + szogseb;
 
 		offsetcnt++;
@@ -112,6 +113,7 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 	if (GETflagangle() == 1)
 	{
 		int16_t adat;
+		float valto=M_PI/180;
 
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
 		HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 3, HAL_MAX_DELAY);
@@ -120,7 +122,11 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 
 		adat 	= rxdata1[2] << 8;
 		adat 	|=  rxdata1[1];
-		szogseb	= (float)adat*8.75-offsetszog;
+
+		szogseb=(((float)adat*8.75-offsetszog)/1000);
+
+		szog = szog+szogseb;
+
 		SETflagangle(0);
 	}
 }
@@ -134,19 +140,17 @@ void poz(void)
 
 float deltax(int vpalya, float vszog)
 {
-	float valto=M_PI/180;
 	float uthossz=(((float)vpalya)*200)/140;
-	float szog=((vszog/1000)*200)*valto;
-	float szin=(float)sin((double)szog);
+
+	float szin=(float)sin((double)vszog);
 	return uthossz*szin;
 }
 
 float deltay(int vpalya, float vszog)
 {
-	float valto=M_PI/180;
 	float uthossz=(((float)vpalya)*200)/140;
-	float szog=((vszog/1000)*200)*valto;
-	float kosz=(float)cos((double)szog);
+
+	float kosz=(float)cos((double)vszog);
 	return uthossz*kosz;
 }
 
@@ -201,6 +205,10 @@ float GEToffsetszog(void)
 	return offsetszog;
 }
 
+float GETszog(void)
+{
+	return szog;
+}
 
 
 

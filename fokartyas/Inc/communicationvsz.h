@@ -15,6 +15,7 @@ void vszRx(void);				//Vonalszenzor1 UART adatainak circ bufferbe toltese
 void uartprocess(void);			//circ buffer feldolgozasa
 uint8_t GETcount(void);
 uint32_t GETtav(void);
+uint32_t GETtav2(void);
 //void vszdebugTx(void);
 
 

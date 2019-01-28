@@ -8,6 +8,7 @@
 #include "stm32f4xx_hal.h"
 #include "controlSTEERING.h"
 #include "communicationvsz.h"
+#include <stdlib.h>
 
 
 float p			=	2.5f;
@@ -37,6 +38,11 @@ uint8_t flaglassu;
 int32_t hiba		= 0;
 int32_t elozohiba	= 0;
 int32_t beavatkozo	= 0;
+
+uint32_t vonal		= 12799;
+uint32_t regivonal	= 12799;
+
+
 
 extern TIM_HandleTypeDef htim10; 						//szenzor szervo timer
 extern TIM_HandleTypeDef htim13; 						//elsp szervo timer
@@ -97,9 +103,30 @@ int16_t toPWM(int32_t jel)
 	return pwme;
 }
 
+uint32_t vonalvalasztas()
+{
+	if( GETcount() == 2)
+	{
+		if ( abs((int32_t)regivonal-(int32_t)GETtav()) < abs((int32_t)regivonal - (int32_t)GETtav2()))
+		{
+			vonal = GETtav();
+		}
+		else
+		{
+			vonal = GETtav2();
+		}
+	}
+	else
+	{
+		vonal = GETtav();
+	}
+	return vonal;
+}
+
 void toservo(void)
 {
-	hiba 		= 	toerror(GETtav());
+	hiba 		= 	toerror(vonalvalasztas());
+	regivonal 	= 	vonal;
 	beavatkozo	= 	szabPD(elozohiba, hiba);
 	elozohiba	=	hiba;
 	toPWM(beavatkozo);
@@ -213,6 +240,16 @@ uint8_t GETflaggyors(void)
 void SETflaggyors(uint8_t ertek)
 {
 	flaggyors = ertek;
+}
+
+uint32_t GETvonal(void)
+{
+	return vonal;
+}
+
+uint32_t GETregivonal(void)
+{
+	return regivonal;
 }
 
 

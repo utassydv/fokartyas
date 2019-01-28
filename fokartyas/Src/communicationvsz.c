@@ -21,6 +21,8 @@ char posarray[64];
 
 uint8_t count 	= 0;
 uint32_t tav 	= 12799;
+uint32_t tav2 	= 12799;
+
 
 
 void communicationvszInit(void)
@@ -80,8 +82,9 @@ void uartprocess(void)
 		}
 		olveleje =feldvege;
 
+
 		//tomb szetbontas
-		 sscanf(posarray, "%d,%d\0", &count, &tav); // "1,15315'\0'"
+		 sscanf(posarray, "%d,%d,%d\0", &count, &tav, &tav2); // "1,15315'\0'"
 
 		 SETflaguartproc(0);
 	}
@@ -97,6 +100,10 @@ uint32_t GETtav(void)
 	return tav;
 }
 
+uint32_t GETtav2(void)
+{
+	return tav2;
+}
 
 //void vszdebugTx(void)// ezt nem hasznaljuk, a vonalszenzornak a hulyesegeinek megoldasara lehet jo
 //{

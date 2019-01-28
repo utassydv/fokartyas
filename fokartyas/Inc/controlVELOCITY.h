@@ -25,6 +25,9 @@ float GETu2prev();
 void SETuprev(float ertek);
 void SETupres(float ertek);
 void SETu2prev(float ertek);
+uint32_t GETvonal(void);
+uint32_t GETregivonal(void);
+
 
 
 #endif /* CONTROLVELOCITY_H_ */
