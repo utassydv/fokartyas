@@ -46,6 +46,8 @@
 #include "tracking.h"
 #include "linetracking.h"
 #include "communicationvsz.h"
+#include "statemachine.h"
+#include "communicationOUT.h"
 
 /* USER CODE END Includes */
 
@@ -71,16 +73,6 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
-
-
-uint32_t cntbeav 				= 0;
-
-char TxDatak[200];
-
-
-
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -192,7 +184,7 @@ while (1)
 	allapotgeplab();	//state megadasa
 
 
-	beavatkozas();
+	//beavatkozas();
 
 	bluetoothDRIVE();
 

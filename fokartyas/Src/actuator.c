@@ -127,11 +127,6 @@ void savvaltas()
 
 
 
-
-
-
-
-
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELYEZO JEL
 {
   if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)

@@ -4,10 +4,10 @@
  *  Created on: 20 Jan 2019
  *      Author: utassyd
  */
-#include <stdint.h>
 #include "tracking.h"
 #include "stm32f4xx_hal.h"
 #include "math.h"
+#include "timing.h"
 
 
 extern SPI_HandleTypeDef hspi2;
@@ -30,11 +30,6 @@ int32_t speed		= 0;
 
 int32_t currentX = 0;
 int32_t currentY = 0;
-
-
-
-extern uint8_t flagangle;
-extern uint8_t flagangleoffset;
 
 void trackingInit(void)
 {
@@ -82,7 +77,7 @@ void gyro(void)
 //GIROSZKOP OFFSETELESE
 void gyrooffset(void)
 {
-	if (flagangleoffset == 1)
+	if (GETflagangleoffset() == 1)
 	{
 		int16_t adat;
 
@@ -100,13 +95,13 @@ void gyrooffset(void)
 		//offsetszog = offsetszog + szogseb;
 
 		offsetcnt++;
-		flagangleoffset = 0;
+		SETflagangleoffset(0);
 	}
 }
 
 void angle(void)				//z elfordulas kiolvasas//////////////////
 {
-	if (flagangle == 1)
+	if (GETflagangle() == 1)
 	{
 		int16_t adat;
 
@@ -118,7 +113,7 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 		adat 	= rxdata1[2] << 8;
 		adat 	|=  rxdata1[1];
 		szogseb	= (float)adat*8.75-offsetszog;
-		flagangle = 0;
+		SETflagangle(0);
 	}
 }
 
@@ -192,6 +187,11 @@ int32_t GETspeed(void)
 	return speed;
 }
 
+
+float GEToffsetszog(void)
+{
+	return offsetszog;
+}
 
 
 

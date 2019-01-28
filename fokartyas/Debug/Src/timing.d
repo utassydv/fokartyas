@@ -1,4 +1,4 @@
-Src/timing.o: ../Src/timing.c C:/fokartyasz/fokartyas/Inc/timing.h \
+Src/timing.o: ../Src/timing.c \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  C:/fokartyasz/fokartyas/Inc/stm32f4xx_hal_conf.h \
  C:/fokartyasz/fokartyas/Inc/main.h \
@@ -31,9 +31,8 @@ Src/timing.o: ../Src/timing.c C:/fokartyasz/fokartyas/Inc/timing.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
- C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-
-C:/fokartyasz/fokartyas/Inc/timing.h:
+ C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
+ C:/fokartyasz/fokartyas/Inc/timing.h
 
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 
@@ -100,3 +99,5 @@ C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+
+C:/fokartyasz/fokartyas/Inc/timing.h:

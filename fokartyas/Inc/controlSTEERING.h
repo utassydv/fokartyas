@@ -5,6 +5,8 @@
  *      Author: utassyd
  */
 
+#include "stm32f4xx_hal.h"
+
 #ifndef CONTROLSTEERING_H_
 #define CONTROLSTEERING_H_
 

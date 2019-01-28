@@ -4,6 +4,8 @@
  *  Created on: 27 Jan 2019
  *      Author: utassyd
  */
+#include "stm32f4xx_hal.h"
+
 
 #ifndef COMMUNICATIONVSZ_H_
 #define COMMUNICATIONVSZ_H_

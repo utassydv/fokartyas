@@ -4,9 +4,8 @@
  *  Created on: 27 Jan 2019
  *      Author: utassyd
  */
-#include <stdint.h>
-#include "timing.h"
 #include "stm32f4xx_hal.h"
+#include "timing.h"
 
 extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim5;

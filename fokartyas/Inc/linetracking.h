@@ -5,6 +5,8 @@
  *      Author: utassyd
  */
 
+#include "stm32f4xx_hal.h"
+
 #ifndef LINETRACKING_H_
 #define LINETRACKING_H_
 

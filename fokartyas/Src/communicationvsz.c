@@ -5,9 +5,9 @@
  *      Author: utassyd
  */
 
-#include <stdint.h>
 #include "communicationvsz.h"
 #include "stm32f4xx_hal.h"
+#include "timing.h"
 
 extern UART_HandleTypeDef huart4;
 //extern UART_HandleTypeDef huart2;
@@ -21,9 +21,6 @@ char posarray[64];
 
 uint8_t count 	= 0;
 uint32_t tav 	= 12799;
-
-extern uint8_t 	flaguartproc;
-
 
 
 void communicationvszInit(void)
@@ -64,7 +61,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void uartprocess(void)
 {
-	if (flaguartproc == 1)
+	if (GETflaguartproc() == 1)
 	{
 		//UART ERTELMEZES
 		//Egy tombbe toltes
@@ -86,7 +83,7 @@ void uartprocess(void)
 		//tomb szetbontas
 		 sscanf(posarray, "%d,%d\0", &count, &tav); // "1,15315'\0'"
 
-		 flaguartproc = 0;
+		 SETflaguartproc(0);
 	}
 }
 

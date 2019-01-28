@@ -5,6 +5,8 @@
  *      Author: utassyd
  */
 
+#include "stm32f4xx_hal.h"
+
 #ifndef CONTROLVELOCITY_H_
 #define CONTROLVELOCITY_H_
 

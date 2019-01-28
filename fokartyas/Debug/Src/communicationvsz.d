@@ -32,7 +32,8 @@ Src/communicationvsz.o: ../Src/communicationvsz.c \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
- C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+ C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
+ C:/fokartyasz/fokartyas/Inc/timing.h
 
 C:/fokartyasz/fokartyas/Inc/communicationvsz.h:
 
@@ -101,3 +102,5 @@ C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+
+C:/fokartyasz/fokartyas/Inc/timing.h:

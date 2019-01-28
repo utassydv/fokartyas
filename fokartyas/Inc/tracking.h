@@ -5,6 +5,8 @@
  *      Author: utassyd
  */
 
+#include "stm32f4xx_hal.h"
+
 #ifndef TRACKING_H_
 #define TRACKING_H_
 
@@ -28,6 +30,6 @@ int32_t GETcurrentY(void);
 int32_t GETcounterpres(void);
 int32_t GETcounterprev(void);
 int32_t GETspeed(void);
-
+float GEToffsetszog(void);
 
 #endif /* TRACKING_H_ */

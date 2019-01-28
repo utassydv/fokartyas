@@ -9,7 +9,7 @@
 #include "communicationOUT.h"
 #include "timing.h"
 #include "stm32f4xx_hal.h"
-
+#include "tracking.h"
 
 extern UART_HandleTypeDef huart2;
 
@@ -21,7 +21,6 @@ void bluetoothTX(void)
 		char TxData[16];
 		snprintf(TxData, 16, "bluetooth\n");
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)+1), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
-
 	}
 	SETflagbluetooth(0);
 }
@@ -29,7 +28,7 @@ void bluetoothTX(void)
 void bluetoothVSZ(void)
 {
 
-	if (flagbluetooth == 1)
+	if (GETflagbluetooth() == 1)
 	{
 		uint8_t adcMeasures[32];
 
@@ -51,17 +50,14 @@ void bluetoothVSZ(void)
 		strcat(TxDatak, "\n");
 
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxDatak, strlen(TxDatak)+1 , HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
-
-
-
 	}
-	flagbluetooth = 0;
+	SETflagbluetooth(0);
 }
 
 
 void bluetoothDRIVE(void)
 {
-	if (flagbluetooth == 1)
+	if (GETflagbluetooth() == 1)
 	{
 
 		char TxData[100];
@@ -70,10 +66,10 @@ void bluetoothDRIVE(void)
 //		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 		//sebesseg
-		int32_t szogsebki=szogseb;
-		int32_t offsetszogki=offsetszog;
-		int32_t currentXki =currentX;
-		int32_t currentYki =currentY;
+		int32_t szogsebki=GETszogseb();
+		int32_t offsetszogki=GEToffsetszog();
+		int32_t currentXki =GETcurrentX();
+		int32_t currentYki =GETcurrentY();
 
 //		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
 		snprintf(TxData, 100, "%d,%d\n",currentXki, currentYki);
@@ -81,5 +77,5 @@ void bluetoothDRIVE(void)
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 	}
-	flagbluetooth = 0;
+	SETflagbluetooth(0);
 }

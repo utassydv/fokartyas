@@ -5,7 +5,6 @@
  *      Author: utassyd
  */
 
-#include <stdint.h>
 #include "timing.h"
 #include "linetracking.h"
 #include "tracking.h"
@@ -22,11 +21,6 @@ uint32_t hossz = 0;
 
 int32_t startposition;
 uint8_t flagsavvaltas = 0;
-
-
-
-
-
 
 
 void vonalszamlalo(void)	//vonalfigyelo
