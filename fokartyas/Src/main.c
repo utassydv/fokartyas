@@ -51,6 +51,7 @@
 #include "controlSTEERING.h"
 #include "controlVELOCITY.h"
 #include "actuator.h"
+#include "timing.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -121,10 +122,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  communicationvszInit();
-  trackingInit();
-  controlVELOCITYInit();
-  controlSTEERINGInit();
+
 
   /* USER CODE END Init */
 
@@ -152,6 +150,12 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
+  communicationvszInit();
+  trackingInit();
+  controlVELOCITYInit();
+  controlSTEERINGInit();
+  idozitoInit();
+  actuatorInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -163,7 +167,7 @@ while (1)
 	uartprocess(); 		//UART feldolgozasa
 	gyro();
 	vonalszamlalo(); 	//vonalszam figyeles
-	allapotgeplab();
+	allapotgep();
 	regulator();
 	control();
 	bluetoothDRIVE();

@@ -13,9 +13,11 @@
 #include "tracking.h"
 #include "communicationvsz.h"
 
+uint8_t gyorsasagi = 0;
 uint8_t state 					= 0;
 uint8_t statelab 				= 0;
 pont2D endlocation = { 0 , 0 };
+
 
 void allapotgeplab(void)
 {
@@ -62,7 +64,7 @@ void allapotgeplab(void)
 			case 3:
 				SETflagsavvaltas(1);
 				savvaltas();
-				if(GETnullavonalszam() >= 20)			//amig el nem hagyjuk a vonalat
+				if(GETnullavonalszam() >= 80)			//amig el nem hagyjuk a vonalat
 				{
 					SETegyvonalszam(0);
 					statelab = 4;
@@ -181,4 +183,9 @@ void allapotgep(void)
 		}
 	SETflagallapotgep(0);
 	}
+}
+
+uint8_t GETstatelab(void)
+{
+	return statelab;
 }

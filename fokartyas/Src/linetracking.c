@@ -123,11 +123,11 @@ void SETnullavonalszam(uint32_t ertek)
 }
 void SETegyvonalszam(uint32_t ertek)
 {
-	nullavonalszam = ertek;
+	egyvonalszam = ertek;
 }
 void SETharomvonalszam(uint32_t ertek)
 {
-	nullavonalszam = ertek;
+	haromvonalszam = ertek;
 }
 
 

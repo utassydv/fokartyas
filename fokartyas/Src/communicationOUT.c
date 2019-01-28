@@ -10,6 +10,9 @@
 #include "timing.h"
 #include "stm32f4xx_hal.h"
 #include "tracking.h"
+#include "linetracking.h"
+#include "statemachine.h"
+
 
 extern UART_HandleTypeDef huart2;
 
@@ -72,10 +75,11 @@ void bluetoothDRIVE(void)
 		int32_t currentYki =GETcurrentY();
 
 //		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
-		snprintf(TxData, 100, "%d,%d\n",currentXki, currentYki);
+		snprintf(TxData, 100, "%d,%d,%d,%d\n",GETcount(), GETnullavonalszam(), GETegyvonalszam(), GETstatelab());
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
+		SETflagbluetooth(0);
 
 	}
-	SETflagbluetooth(0);
+
 }
