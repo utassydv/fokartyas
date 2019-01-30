@@ -15,15 +15,19 @@ extern SPI_HandleTypeDef hspi2;
 
 uint8_t txdata1[3];
 uint8_t rxdata1[3];
+
+uint8_t txdata1TEMP[3];
+uint8_t rxdata1TEMP[3];
+
 uint8_t enabledata[2];
-uint8_t HPFdata[2];
+uint8_t TEMPenabledata[2];
 
 uint16_t offsetcnt = 0;
 uint16_t offsetlimit = 6200;
 float offsetszog;
 float szogseb;
 float szog = 0;
-
+float TEMPERATURE = 0;
 
 int32_t counterpres	= 0;
 int32_t counterprev	= 0;
@@ -44,13 +48,18 @@ void trackingInit(void)
 	txdata1[1]		=	0b00000000;
 	txdata1[2]		=	0b00000000;
 
+	//temp olvasasara
+	txdata1TEMP[0]		=	0b10100000; //(20h)
+	txdata1TEMP[1]		=	0b00000000;
+	txdata1TEMP[2]		=	0b00000000;
+
 	//giroszkor engedelyezese
 	enabledata[0]	= 0b00010001; //CTRL2_G (11h)
-	enabledata[1]	= 0b01010010; //208Hz....
+	enabledata[1]	= 0b01010000; //208Hz....
 
 
-	HPFdata[0]	= 0b00010110;
-	HPFdata[1]	= 0b00000000;
+	TEMPenabledata[0]	= 0b00010011; //h13
+	TEMPenabledata[1]	= 0b00010000;
 
 	enablegyro();
 }
@@ -64,7 +73,7 @@ void enablegyro(void)
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi2, HPFdata, 2, HAL_MAX_DELAY);
+	HAL_SPI_Transmit(&hspi2, TEMPenabledata, 2, HAL_MAX_DELAY);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
@@ -95,6 +104,8 @@ void gyro(void)
 		poz();
 	}
 
+	//temp();
+
 }
 
 
@@ -112,7 +123,7 @@ void gyrooffset(void)
 
 		adat 	= rxdata1[2] << 8;
 		adat 	|=  rxdata1[1];
-		szogseb	= (float)adat*4.2984375f;
+		szogseb	= (float)adat*8.61262521018907f;  //4.3140960937-< 125dpsnel
 
 
 		offsetszog = 0.0002f*szogseb+offsetszog; //átlag
@@ -137,7 +148,35 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 		adat 	= rxdata1[2] << 8;
 		adat 	|=  rxdata1[1];
 
-		szogseb=((float)adat*4.2984375f-offsetszog)/200000.0f;
+		szogseb=((float)adat*8.61262521018907f-offsetszog)/200000.0f;  // 4.3140960937f
+
+		szog = szog+szogseb;
+
+//		if (szog >= 180.0f) szog = szog-360.0f;
+//		if (szog <= -180.0f) szog = szog+360.0f;
+
+
+
+		SETflagangle(0);
+	}
+}
+
+void temp(void)				//z elfordulas kiolvasas//////////////////
+{
+	if (GETflagangle() == 1)
+	{
+		int16_t adattemp;
+
+
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
+		HAL_SPI_TransmitReceive(&hspi2, txdata1TEMP, rxdata1TEMP, 3, HAL_MAX_DELAY);
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 				//CD
+
+
+		adattemp 	= rxdata1TEMP[2] << 8;
+		adattemp 	|=  rxdata1TEMP[1];
+
+		TEMPERATURE	=	(float)adattemp;
 
 		szog = szog+szogseb;
 
@@ -238,6 +277,11 @@ float GETszog(void)
 uint16_t GEToffsetcnt(void)
 {
 	return offsetcnt;
+}
+
+float GETTEMPERATURE(void)
+{
+	return TEMPERATURE;
 }
 
 

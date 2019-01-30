@@ -20,6 +20,7 @@ void gyro(void);
 void gyrooffset(void);
 void angle(void);
 void poz(void);
+void temp(void);
 float deltax(int vpalya, float vszog);
 float deltay(int vpalya, float vszog);
 void speedpos(void);
@@ -33,6 +34,7 @@ int32_t GETspeed(void);
 float GEToffsetszog(void);
 float GETszog(void);
 uint16_t GEToffsetcnt(void);
+float GETTEMPERATURE(void);
 
 
 #endif /* TRACKING_H_ */
