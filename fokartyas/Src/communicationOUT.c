@@ -70,14 +70,14 @@ void bluetoothDRIVE(void)
 //		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 		//sebesseg
-		int32_t szogki=GETszog();
-		int32_t szogsebki=GETszogseb()*1000;
+		int32_t szogki=GETszog()*100;
+		int32_t szogsebki=GETszogseb();
 		int32_t offsetszogki=GEToffsetszog();
-		int32_t currentXki =GETcurrentX();
-		int32_t currentYki =GETcurrentY();
+		int32_t currentXki =GETcurrentX()*0.001;  // -> cm
+		int32_t currentYki =GETcurrentY()*0.001;
 
 //		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
-		snprintf(TxData, 100, "%d,%d\n",szogsebki,szogki);
+		snprintf(TxData, 100, "%d,%d\n",currentXki,currentYki);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 		SETflagbluetooth(0);

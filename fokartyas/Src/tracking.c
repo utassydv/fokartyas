@@ -16,9 +16,10 @@ extern SPI_HandleTypeDef hspi2;
 uint8_t txdata1[3];
 uint8_t rxdata1[3];
 uint8_t enabledata[2];
+uint8_t HPFdata[2];
 
 uint16_t offsetcnt = 0;
-uint16_t offsetlimit = 5000;
+uint16_t offsetlimit = 6200;
 float offsetszog;
 float szogseb;
 float szog = 0;
@@ -45,7 +46,11 @@ void trackingInit(void)
 
 	//giroszkor engedelyezese
 	enabledata[0]	= 0b00010001; //CTRL2_G (11h)
-	enabledata[1]	= 0b01000000; //104Hz..
+	enabledata[1]	= 0b01010010; //208Hz....
+
+
+	HPFdata[0]	= 0b00010110;
+	HPFdata[1]	= 0b00000000;
 
 	enablegyro();
 }
@@ -57,6 +62,10 @@ void enablegyro(void)
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi2, enabledata, 2, HAL_MAX_DELAY);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi2, HPFdata, 2, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
 //ADAT KIOLVASAS GIROSZKOPBOL
@@ -64,22 +73,28 @@ void gyro(void)
 {
 	if (offsetcnt < offsetlimit)	//OFFSET atlag db. szam
 	{
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+		if (offsetcnt > 1200)
+		{
 		gyrooffset();
+		}
+		else
+		{
+			if(GETflagangleoffset()==1)
+			{
+			offsetcnt++;
+			SETflagangleoffset(0);
+			}
+		}
 	}
-//	else if(offsetcnt == offsetlimit)
-//	{
-//		if (GETflagangleoffset() == 1)
-//		{
-//			offsetszog = offsetszog / (float)offsetlimit;
-//			offsetcnt++;
-//			SETflagangleoffset(0);
-//		}
-//	}
+
 	else
 	{
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 		angle();
+		poz();
 	}
-	poz();
+
 }
 
 
@@ -97,11 +112,10 @@ void gyrooffset(void)
 
 		adat 	= rxdata1[2] << 8;
 		adat 	|=  rxdata1[1];
-		szogseb	= (float)adat*8.75f;
+		szogseb	= (float)adat*4.2984375f;
 
 
-		offsetszog = 0.0002f*szogseb+1.0f*offsetszog;
-		//offsetszog = offsetszog + szogseb;
+		offsetszog = 0.0002f*szogseb+offsetszog; //átlag
 
 		offsetcnt++;
 		SETflagangleoffset(0);
@@ -113,7 +127,7 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 	if (GETflagangle() == 1)
 	{
 		int16_t adat;
-		float valto=M_PI/180;
+
 
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
 		HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 3, HAL_MAX_DELAY);
@@ -123,9 +137,14 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 		adat 	= rxdata1[2] << 8;
 		adat 	|=  rxdata1[1];
 
-		szogseb=(((float)adat*8.75-offsetszog)/1000);
+		szogseb=((float)adat*4.2984375f-offsetszog)/200000.0f;
 
 		szog = szog+szogseb;
+
+//		if (szog >= 180.0f) szog = szog-360.0f;
+//		if (szog <= -180.0f) szog = szog+360.0f;
+
+
 
 		SETflagangle(0);
 	}
@@ -134,24 +153,30 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 
 void poz(void)
 {
-	currentX = currentX + deltax(speed,szogseb);
-	currentY = currentY + deltay(speed,szogseb);
+
+	if (GETflagpoz() == 1)
+	{
+		currentX = currentX + deltax(speed,szog);
+		currentY = currentY + deltay(speed,szog);
+		SETflagpoz(0);
+	}
 }
 
 float deltax(int vpalya, float vszog)
 {
-	float uthossz=(((float)vpalya)*200)/140;
 
-	float szin=(float)sin((double)vszog);
-	return uthossz*szin;
+	float uthossz=((float)vpalya)*0.7142857143f;   //     /1.40
+
+	float kosz=(float)cosf(vszog*0.01745329252f);
+	return uthossz*kosz;
 }
 
 float deltay(int vpalya, float vszog)
 {
-	float uthossz=(((float)vpalya)*200)/140;
+	float uthossz=((float)vpalya)*0.7142857143f;    //   /1.40
 
-	float kosz=(float)cos((double)vszog);
-	return uthossz*kosz;
+	float szin=(float)sinf(vszog*0.01745329252f);
+	return uthossz*szin;
 }
 
 
@@ -210,6 +235,10 @@ float GETszog(void)
 	return szog;
 }
 
+uint16_t GEToffsetcnt(void)
+{
+	return offsetcnt;
+}
 
 
 

@@ -113,7 +113,7 @@ void gyors(void)
 
 	SETv(GETvgyors());
 
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
 void fekez(void)
@@ -134,7 +134,7 @@ void lassu(void)
 
 	SETv(GETvlassu());
 
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
 void labyrinth(void)

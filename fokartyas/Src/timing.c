@@ -28,7 +28,8 @@ uint16_t 	timeangleoffset 	= 0;
 uint8_t 	flagangleoffset		= 0;
 uint16_t 	timeregulator	 	= 0;
 uint8_t 	flagregulator		= 0;
-
+uint16_t 	timepoz	 			= 0;
+uint8_t 	flagpoz				= 0;
 
 void idozitoInit(){
 	  HAL_TIM_Base_Start_IT(&htim4);					//Idozitesekhez (1ms)
@@ -67,9 +68,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  idozito( 5, &timeangle, &flagangle); 				//szogseb meres 	(ido(ms), szamlalo, flag)
 
-	  idozito( 1, &timeangleoffset, &flagangleoffset);
+	  idozito( 5, &timeangleoffset, &flagangleoffset);
 
 	  idozito( 5, &timeregulator, &flagregulator);
+
+	  idozito( 5, &timepoz, &flagpoz);
 
   }
 
@@ -122,6 +125,11 @@ uint8_t GETflagregulator(void)
 	return flagregulator;
 }
 
+uint8_t GETflagpoz(void)
+{
+	return flagpoz;
+}
+
 //SETTEREK
 
 void SETflagspeed(uint8_t ertek)
@@ -168,4 +176,11 @@ void SETflagregulator(uint8_t ertek)
 {
 	flagregulator = ertek;
 }
+
+void SETflagpoz(uint8_t ertek)
+{
+	flagpoz = ertek;
+}
+
+
 

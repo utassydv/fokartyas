@@ -32,5 +32,7 @@ int32_t GETcounterprev(void);
 int32_t GETspeed(void);
 float GEToffsetszog(void);
 float GETszog(void);
+uint16_t GEToffsetcnt(void);
+
 
 #endif /* TRACKING_H_ */
