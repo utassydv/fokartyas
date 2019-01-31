@@ -78,8 +78,8 @@ void bluetoothDRIVE(void)
 		int32_t TEMPERATUREKI=GETTEMPERATURE();
 
 //		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
-		snprintf(TxData, 100, "%d,%d\n",currentXki,currentYki);
-		//snprintf(TxData, 100, "%d\n",szogki);
+		//snprintf(TxData, 100, "%d,%d\n",currentXki,currentYki);
+		snprintf(TxData, 100, "%d,%d\n",szogki, offsetszogki);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 		SETflagbluetooth(0);
