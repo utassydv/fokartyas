@@ -110,28 +110,6 @@ int16_t toPWM(int32_t jel)
 
 uint32_t vonalvalasztas(uint8_t melyik)
 {
-	if(melyik == 1)
-	{
-		if( GETcount() == 2)
-		{
-				if ( abs((int32_t)regivonal-(int32_t)GETtav()) < abs((int32_t)regivonal - (int32_t)GETtav2()))
-				{
-					vonal = GETtav2();
-				}
-				else
-				{
-					vonal = GETtav();
-				}
-				}
-				else
-				{
-					vonal = GETtav();
-				}
-				return vonal;
-	}
-
-	else
-	{
 		if( GETcount() == 2)
 		{
 			if ( abs((int32_t)regivonal-(int32_t)GETtav()) < abs((int32_t)regivonal - (int32_t)GETtav2()))
@@ -148,13 +126,24 @@ uint32_t vonalvalasztas(uint8_t melyik)
 			vonal = GETtav();
 		}
 		return vonal;
-	}
+
 }
 
 void toservo(void)
 {
 	hiba 		= 	toerror(vonalvalasztas(GETamelyik()));
-	regivonal 	= 	vonal;
+
+	if(GETamelyik() == 1)
+	{
+		if(vonal == GETtav()) 	regivonal = GETtav2();
+		else 					regivonal = GETtav();
+		SETamelyik(0);
+	}
+	else
+	{
+		regivonal 	= 	vonal;
+	}
+
 	beavatkozo	= 	szabPD(elozohiba, hiba);
 	elozohiba	=	hiba;
 	toPWM(beavatkozo);

@@ -11,6 +11,6 @@
 
 uint8_t GETamelyik();
 void SETamelyik(uint8_t ertek);
-
+uint8_t GETstatevonalvaltas(void);
 
 #endif /* NAVIGATION_H_ */

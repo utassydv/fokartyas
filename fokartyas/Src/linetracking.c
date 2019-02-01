@@ -19,7 +19,7 @@ uint8_t flagharom = 0;
 uint8_t flagketto = 0;
 uint32_t hossz = 0;
 
-uint32_t kettohossz = 0;
+int32_t kettohossz = 0;
 
 int32_t startposition;
 
@@ -103,7 +103,7 @@ uint32_t kettoutanegyhossz(void)
 	return 0;
 }
 
-uint32_t GETkettohossz(void)
+void kettohosszfv(void)
 {
 		if(GETcount() == 2 && flagketto == 0)
 		{
@@ -114,12 +114,14 @@ uint32_t GETkettohossz(void)
 		if (startposition != 0)
 		{
 			kettohossz = GETcounterpres() - startposition;
-			return kettohossz;
 		}
-		return 0;
 }
 
-void SETkettohossz(uint32_t ertek)
+int32_t GETkettohossz(void)
+{
+	return kettohossz;
+}
+void SETkettohossz(int32_t ertek)
 {
 	kettohossz = ertek;
 }
@@ -173,6 +175,11 @@ int32_t GETstartposition(void)
 void SETstartposition(int32_t ertek)
 {
 	startposition = ertek;
+}
+
+void SETflagketto(uint8_t ertek)
+{
+	flagketto = ertek;
 }
 
 

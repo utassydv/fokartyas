@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Src/MadgwickAHRS.c \
 ../Src/actuator.c \
 ../Src/communicationOUT.c \
 ../Src/communicationvsz.c \
@@ -20,6 +21,7 @@ C_SRCS += \
 ../Src/tracking.c 
 
 OBJS += \
+./Src/MadgwickAHRS.o \
 ./Src/actuator.o \
 ./Src/communicationOUT.o \
 ./Src/communicationvsz.o \
@@ -36,6 +38,7 @@ OBJS += \
 ./Src/tracking.o 
 
 C_DEPS += \
+./Src/MadgwickAHRS.d \
 ./Src/actuator.d \
 ./Src/communicationOUT.d \
 ./Src/communicationvsz.d \

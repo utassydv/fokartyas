@@ -34,17 +34,17 @@ void vonalvaltas(void)
 		{
 			case 0:
 				lassu();
-				if(GETcount() == 2 && GETtavolsag() < 5000)
+				if(GETcount() == 2 && GETtavolsag() < 5500)
 				{
 					statevonalvaltas = 1;
 				}
-				else if(GETcount() == 2)
+				else if(GETcount() == 2 && GETtavolsag() > 5500 )
 				{
 					statevonalvaltas = 2;
 				}
 				break;
 			case 1:
-
+				kettohosszfv();
 				if( GETkettohossz() > 30000)
 				{
 					SETamelyik(1);
@@ -56,6 +56,7 @@ void vonalvaltas(void)
 				if(GETcount() == 1)
 				{
 					SETkettohossz(0);
+					SETflagketto(0);
 					statevonalvaltas = 0;
 				}
 				break;
@@ -84,4 +85,7 @@ void SETamelyik(uint8_t ertek)
 	amelyik = ertek;
 }
 
-
+uint8_t GETstatevonalvaltas(void)
+{
+	return statevonalvaltas;
+}

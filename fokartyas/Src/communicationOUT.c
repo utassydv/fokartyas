@@ -13,6 +13,8 @@
 #include "linetracking.h"
 #include "statemachine.h"
 #include "controlVELOCITY.h"
+#include "communicationvsz.h"
+#include "navigation.h"
 
 uint8_t startjel;
 
@@ -94,7 +96,7 @@ void bluetoothDRIVE(void)
 	//	snprintf(TxData, 100, "%u\n",GETstartjel());
 		//snprintf(TxData, 100, "%d\n",szogki);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
-		snprintf(TxData, 100, "%u\n",GETstartjel());
+		snprintf(TxData, 100, "%d,%d,%d\n",GETcount(), GETstatevonalvaltas(), GETkettohossz());
 
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 		SETflagbluetooth(0);
