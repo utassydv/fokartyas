@@ -99,7 +99,7 @@ void gyro(void)
 
 	else
 	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 		angle();
 		poz();
 	}

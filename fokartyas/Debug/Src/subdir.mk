@@ -11,6 +11,7 @@ C_SRCS += \
 ../Src/controlVELOCITY.c \
 ../Src/linetracking.c \
 ../Src/main.c \
+../Src/navigation.c \
 ../Src/statemachine.c \
 ../Src/stm32f4xx_hal_msp.c \
 ../Src/stm32f4xx_it.c \
@@ -26,6 +27,7 @@ OBJS += \
 ./Src/controlVELOCITY.o \
 ./Src/linetracking.o \
 ./Src/main.o \
+./Src/navigation.o \
 ./Src/statemachine.o \
 ./Src/stm32f4xx_hal_msp.o \
 ./Src/stm32f4xx_it.o \
@@ -41,6 +43,7 @@ C_DEPS += \
 ./Src/controlVELOCITY.d \
 ./Src/linetracking.d \
 ./Src/main.d \
+./Src/navigation.d \
 ./Src/statemachine.d \
 ./Src/stm32f4xx_hal_msp.d \
 ./Src/stm32f4xx_it.d \

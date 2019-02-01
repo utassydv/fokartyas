@@ -40,7 +40,8 @@ Src/main.o: ../Src/main.c C:/fokartyasz/fokartyas/Inc/main.h \
  C:/fokartyasz/fokartyas/Inc/controlSTEERING.h \
  C:/fokartyasz/fokartyas/Inc/controlVELOCITY.h \
  C:/fokartyasz/fokartyas/Inc/actuator.h \
- C:/fokartyasz/fokartyas/Inc/timing.h
+ C:/fokartyasz/fokartyas/Inc/timing.h \
+ C:/fokartyasz/fokartyas/Inc/navigation.h
 
 C:/fokartyasz/fokartyas/Inc/main.h:
 
@@ -127,3 +128,5 @@ C:/fokartyasz/fokartyas/Inc/controlVELOCITY.h:
 C:/fokartyasz/fokartyas/Inc/actuator.h:
 
 C:/fokartyasz/fokartyas/Inc/timing.h:
+
+C:/fokartyasz/fokartyas/Inc/navigation.h:

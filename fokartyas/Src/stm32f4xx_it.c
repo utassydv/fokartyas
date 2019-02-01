@@ -37,6 +37,8 @@
 
 /* USER CODE BEGIN 0 */
 #include "tracking.h"
+
+extern UART_HandleTypeDef husart6;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -283,6 +285,15 @@ void UART4_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+void USART6_IRQHandler(void)
+{
+  /* USER CODE BEGIN UART4_IRQn 0 */
 
+  /* USER CODE END UART4_IRQn 0 */
+  HAL_UART_IRQHandler(&husart6);
+  /* USER CODE BEGIN UART4_IRQn 1 */
+
+  /* USER CODE END UART4_IRQn 1 */
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

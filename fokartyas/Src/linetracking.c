@@ -19,6 +19,8 @@ uint8_t flagharom = 0;
 uint8_t flagketto = 0;
 uint32_t hossz = 0;
 
+uint32_t kettohossz = 0;
+
 int32_t startposition;
 
 
@@ -99,6 +101,27 @@ uint32_t kettoutanegyhossz(void)
 		return hossz;
 	}
 	return 0;
+}
+
+uint32_t GETkettohossz(void)
+{
+		if(GETcount() == 2 && flagketto == 0)
+		{
+			startposition = GETcounterpres();
+			flagketto = 1;
+		}
+
+		if (startposition != 0)
+		{
+			kettohossz = GETcounterpres() - startposition;
+			return kettohossz;
+		}
+		return 0;
+}
+
+void SETkettohossz(uint32_t ertek)
+{
+	kettohossz = ertek;
 }
 
 uint32_t GETnullavonalszam(void)

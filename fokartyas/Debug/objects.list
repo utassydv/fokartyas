@@ -25,6 +25,7 @@
 "Src/controlVELOCITY.o"
 "Src/linetracking.o"
 "Src/main.o"
+"Src/navigation.o"
 "Src/statemachine.o"
 "Src/stm32f4xx_hal_msp.o"
 "Src/stm32f4xx_it.o"

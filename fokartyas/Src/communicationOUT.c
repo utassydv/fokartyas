@@ -14,9 +14,21 @@
 #include "statemachine.h"
 #include "controlVELOCITY.h"
 
+uint8_t startjel;
+
 
 extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef husart6;
 
+void communicationOUTInit(void)
+{
+		HAL_UART_Receive_IT(&husart6, &startjel, 1);
+}
+
+void radioRx(void) 				//Vonalszenzor1 UART adatainak circ bufferbe toltese
+{
+		HAL_UART_Receive_IT(&husart6, &startjel, 1);
+}
 
 void bluetoothTX(void)
 {
@@ -78,12 +90,20 @@ void bluetoothDRIVE(void)
 		int32_t TEMPERATUREKI=GETTEMPERATURE();
 
 //		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
-		snprintf(TxData, 100, "%d,%d\n",currentXki,currentYki);
+	//	snprintf(TxData, 100, "%d,%d\n",currentXki,currentYki);
+	//	snprintf(TxData, 100, "%u\n",GETstartjel());
 		//snprintf(TxData, 100, "%d\n",szogki);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
+		snprintf(TxData, 100, "%u\n",GETstartjel());
+
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 		SETflagbluetooth(0);
 
 	}
 
+}
+
+uint8_t GETstartjel(void)
+{
+	return startjel;
 }

@@ -52,6 +52,7 @@
 #include "controlVELOCITY.h"
 #include "actuator.h"
 #include "timing.h"
+#include "navigation.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -75,6 +76,7 @@ UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
+UART_HandleTypeDef husart6;
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE END PV */
 
@@ -93,14 +95,15 @@ static void MX_TIM13_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_TIM14_Init(void);
 static void MX_SPI2_Init(void);
-static void MX_TIM5_Init(void);
 static void MX_TIM10_Init(void);
+static void MX_TIM5_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                                 
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+static void MX_USART6_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -147,15 +150,17 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM14_Init();
   MX_SPI2_Init();
-  MX_TIM5_Init();
   MX_TIM10_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
+  MX_USART6_Init();
   communicationvszInit();
   trackingInit();
   controlVELOCITYInit();
   controlSTEERINGInit();
   idozitoInit();
   actuatorInit();
+  communicationOUTInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -167,10 +172,18 @@ while (1)
 	uartprocess(); 		//UART feldolgozasa
 	gyro();
 	vonalszamlalo(); 	//vonalszam figyeles
-	allapotgep();
+	//allapotgeplab();
+	vonalvaltas();
 	regulator();
 	control();
 	bluetoothDRIVE();
+
+//	if(GETstartjel() == '0')
+//	{
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+//	}
+
+
 }
 
   /* USER CODE END WHILE */
@@ -491,6 +504,13 @@ static void MX_TIM3_Init(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
+  sConfigIC.ICSelection = TIM_ICSELECTION_INDIRECTTI;
+  if (HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_4) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
 }
 
 /* TIM4 init function */
@@ -736,7 +756,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3|GPIO_PIN_8, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_3, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LD2_Pin|GPIO_PIN_12, GPIO_PIN_RESET);
@@ -750,8 +770,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PC0 PC3 PC8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_3|GPIO_PIN_8;
+  /*Configure GPIO pins : PC0 PC3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -782,7 +802,25 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+/* UART6 init function */
 
+static void MX_USART6_Init(void)
+{
+
+  husart6.Instance = USART6;
+  husart6.Init.BaudRate = 115200;
+  husart6.Init.WordLength = UART_WORDLENGTH_8B;
+  husart6.Init.StopBits = UART_STOPBITS_1;
+  husart6.Init.Parity = UART_PARITY_NONE;
+  husart6.Init.Mode = UART_MODE_RX;
+  husart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  husart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&husart6) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
 /* USER CODE END 4 */
 
 /**

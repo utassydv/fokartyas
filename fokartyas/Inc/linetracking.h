@@ -25,6 +25,8 @@ uint32_t GEThossz(void);
 void SEThossz(uint32_t ertek);
 int32_t GETstartposition(void);
 void SETstartposition(int32_t ertek);
+uint32_t GETkettohossz(void);
+void SETkettohossz(uint32_t ertek);
 
 
 

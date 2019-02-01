@@ -8,6 +8,7 @@
 #include "communicationvsz.h"
 #include "stm32f4xx_hal.h"
 #include "timing.h"
+#include "communicationOUT.h"
 
 extern UART_HandleTypeDef huart4;
 //extern UART_HandleTypeDef huart2;
@@ -55,10 +56,21 @@ void vszRx(void) 				//Vonalszenzor1 UART adatainak circ bufferbe toltese
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-		/* Prevent unused argument(s) compilation warning */
+
+	  if(huart->Instance == UART4)
+	  {
+	/* Prevent unused argument(s) compilation warning */
 		UNUSED(huart);
 		vszRx();
-		//vszdebugTx();
+	  }
+
+	  if(huart->Instance == USART6)
+	  {
+	/* Prevent unused argument(s) compilation warning */
+		UNUSED(huart);
+		radioRx();
+	  }
+
 }
 
 void uartprocess(void)

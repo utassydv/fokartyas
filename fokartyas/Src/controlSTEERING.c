@@ -8,6 +8,7 @@
 #include "stm32f4xx_hal.h"
 #include "controlSTEERING.h"
 #include "communicationvsz.h"
+#include "navigation.h"
 #include <stdlib.h>
 
 
@@ -107,29 +108,52 @@ int16_t toPWM(int32_t jel)
 	return pwme;
 }
 
-uint32_t vonalvalasztas()
+uint32_t vonalvalasztas(uint8_t melyik)
 {
-	if( GETcount() == 2)
+	if(melyik == 1)
 	{
-		if ( abs((int32_t)regivonal-(int32_t)GETtav()) < abs((int32_t)regivonal - (int32_t)GETtav2()))
+		if( GETcount() == 2)
 		{
-			vonal = GETtav();
+				if ( abs((int32_t)regivonal-(int32_t)GETtav()) < abs((int32_t)regivonal - (int32_t)GETtav2()))
+				{
+					vonal = GETtav2();
+				}
+				else
+				{
+					vonal = GETtav();
+				}
+				}
+				else
+				{
+					vonal = GETtav();
+				}
+				return vonal;
+	}
+
+	else
+	{
+		if( GETcount() == 2)
+		{
+			if ( abs((int32_t)regivonal-(int32_t)GETtav()) < abs((int32_t)regivonal - (int32_t)GETtav2()))
+			{
+				vonal = GETtav();
+			}
+			else
+			{
+				vonal = GETtav2();
+			}
 		}
 		else
 		{
-			vonal = GETtav2();
+			vonal = GETtav();
 		}
+		return vonal;
 	}
-	else
-	{
-		vonal = GETtav();
-	}
-	return vonal;
 }
 
 void toservo(void)
 {
-	hiba 		= 	toerror(vonalvalasztas());
+	hiba 		= 	toerror(vonalvalasztas(GETamelyik()));
 	regivonal 	= 	vonal;
 	beavatkozo	= 	szabPD(elozohiba, hiba);
 	elozohiba	=	hiba;
