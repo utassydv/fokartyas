@@ -209,6 +209,7 @@ void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, flo
 	q3 *= recipNorm;
 
 	SETszog(atan2f(2 * (q1 * q2 - q0 * q3), 2 * q0 * q0 - 1.0f - 2 * q1 * q1));
+	SETszog(atan2f(2*q1*q2 - 2*q0*q3  ,  2*q0*q0 + 2*q1*q1 - 1 ));
 
 }
 

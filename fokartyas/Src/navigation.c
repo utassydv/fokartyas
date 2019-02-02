@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 
-uint8_t amelyik = 0;
+uint8_t valtaslehetoseg = 0;
 uint8_t statevonalvaltas = 0;
 
 uint32_t tavolsag;
@@ -54,10 +54,14 @@ void vonalvaltas(void)
 				kettohosszfv();
 				if( GETkettohossz() > 30000)
 				{
-					SETamelyik(1);
+					SETvaltaslehetoseg(1);
 					statevonalvaltas = 2;
 				}
-				if (GETcount() == 1) SETkettohossz(0);
+				if (GETcount() == 1)
+				{
+					SETkettohossz(0);
+					statevonalvaltas=2;
+				}
 				break;
 
 			case 2:
@@ -65,13 +69,14 @@ void vonalvaltas(void)
 //				{
 //					SETregivonal(GETvonal());
 //				}
-
+				SETvaltaslehetoseg(0);
 				if(GETcount() == 1)
 				{
 					SETkettohossz(0);
 					SETflagketto(0);
 					statevonalvaltas = 0;
 				}
+
 				break;
 
 
@@ -88,14 +93,14 @@ void vonalvaltas(void)
 
 
 
-uint8_t GETamelyik()
+uint8_t GETvaltaslehetoseg()
 {
-	return amelyik;
+	return valtaslehetoseg;
 }
 
-void SETamelyik(uint8_t ertek)
+void SETvaltaslehetoseg(uint8_t ertek)
 {
-	amelyik = ertek;
+	valtaslehetoseg = ertek;
 }
 
 uint8_t GETstatevonalvaltas(void)

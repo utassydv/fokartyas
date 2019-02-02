@@ -108,7 +108,7 @@ int16_t toPWM(int32_t jel)
 	return pwme;
 }
 
-uint32_t vonalvalasztas(uint8_t melyik)
+uint32_t vonalvalasztas(void)
 {
 		if( GETcount() == 2)
 		{
@@ -133,13 +133,14 @@ uint32_t vonalvalasztas(uint8_t melyik)
 
 void toservo(void)
 {
-	hiba 		= 	toerror(vonalvalasztas(GETamelyik()));
+	hiba 		= 	toerror(vonalvalasztas());
 
 
-	if(GETamelyik() == 1)
+	if(GETvaltaslehetoseg() == 1)
 	{
-		irany(1);
-		SETamelyik(0);
+		irany(mindigvalt());
+		//irany(0);
+		SETvaltaslehetoseg(0);
 	}
 
 
@@ -152,6 +153,18 @@ void irany(uint8_t merre)
 {
 	if (merre == 0) regivonal = GETtav2();
 	if (merre == 1) regivonal = GETtav();
+}
+
+uint8_t mindigvalt(void)
+{
+	if ( abs((int32_t)regivonal-(int32_t)GETtav()) /*jobb*/    <     /*bal*/  abs((int32_t)regivonal - (int32_t)GETtav2())) //regit koveti
+	{
+					return 0;
+	}
+	else
+	{
+					return 1;
+	}
 }
 
 float GETp(void)

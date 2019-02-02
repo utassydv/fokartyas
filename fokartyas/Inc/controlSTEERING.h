@@ -16,7 +16,7 @@ int32_t toerror(uint32_t dist);
 int32_t szabPD(int32_t elozohibajel, int32_t hibajel);
 int16_t toPWM(int32_t jel);
 void toservo(void);
-uint32_t vonalvalasztas(uint8_t melyik);
+uint32_t vonalvalasztas(void);
 void irany(uint8_t merre);
 
 float GETp(void);
@@ -43,5 +43,6 @@ uint8_t GETflaggyors(void);
 void SETflaggyors(uint8_t ertek);
 void SETregivonal(uint32_t ertek);
 uint32_t GETvonal(void);
+uint8_t mindigvalt(void);
 
 #endif /* CONTROLSTEERING_H_ */

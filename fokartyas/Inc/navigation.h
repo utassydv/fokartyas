@@ -9,8 +9,8 @@
 #define NAVIGATION_H_
 
 
-uint8_t GETamelyik();
-void SETamelyik(uint8_t ertek);
+uint8_t GETvaltaslehetoseg();
+void SETvaltaslehetoseg(uint8_t ertek);
 uint8_t GETstatevonalvaltas(void);
 uint8_t randomiser(void);
 uint32_t GETtavolsag(void);

@@ -74,7 +74,7 @@ void trackingInit(void)
 	enabledata[2]	= 0b01010000; //208Hz....
 
 	orient[0]	= 0b00001011;
-	orient[1]	= 0b00000000;
+	orient[1]	= 0b00101000;
 
 
 	enablegyro();
