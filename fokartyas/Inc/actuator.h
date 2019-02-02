@@ -21,5 +21,6 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo);
 uint32_t GETuwDutyCycle(void);
 uint8_t GETflagsavvaltas(void);
 void SETflagsavvaltas(uint8_t ertek);
+void SETflagSTART(uint8_t ertek);
 
 #endif /* ACTUATOR_H_ */

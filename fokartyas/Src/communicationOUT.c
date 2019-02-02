@@ -15,6 +15,7 @@
 #include "controlVELOCITY.h"
 #include "communicationvsz.h"
 #include "navigation.h"
+#include "actuator.h"
 
 uint8_t startjel;
 
@@ -30,6 +31,14 @@ void communicationOUTInit(void)
 void radioRx(void) 				//Vonalszenzor1 UART adatainak circ bufferbe toltese
 {
 		HAL_UART_Receive_IT(&husart6, &startjel, 1);
+}
+
+void trackRADIO(void)
+{
+		if(startjel == '0')
+		{
+			SETflagSTART(1);
+		}
 }
 
 void bluetoothTX(void)
@@ -73,6 +82,7 @@ void bluetoothVSZ(void)
 }
 
 
+
 void bluetoothDRIVE(void)
 {
 	if (GETflagbluetooth() == 1)
@@ -89,7 +99,7 @@ void bluetoothDRIVE(void)
 		int32_t offsetszogki=GEToffsetszog();
 		int32_t currentXki =GETcurrentX()*0.001;  // -> cm
 		int32_t currentYki =GETcurrentY()*0.001;
-		int32_t TEMPERATUREKI=GETTEMPERATURE();
+
 
 //		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
 	//	snprintf(TxData, 100, "%d,%d\n",currentXki,currentYki);

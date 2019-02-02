@@ -317,10 +317,5 @@ uint16_t GEToffsetcnt(void)
 	return offsetcnt;
 }
 
-float GETTEMPERATURE(void)
-{
-	return TEMPERATURE;
-}
-
 
 

@@ -22,9 +22,11 @@ extern TIM_HandleTypeDef htim3;  //taviranyito
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
 
-uint8_t flagsavvaltas = 0;
+uint8_t flagsavvaltas 	= 0;
+uint8_t flagSTART 		= 0;
 const int16_t posvalte = 1700;
 const int16_t posvalth = 1850;
+
 
 void actuatorInit(void)
 {
@@ -47,7 +49,7 @@ void control(void)
 {
 	if (GETflagbeav() == 1)
 	{
-		if( uwDutyCycle < 160)
+		if( uwDutyCycle < 160 && flagSTART == 1)
 		{
 			SETupres(0);
 			SETu2prev(0.0f);
@@ -182,3 +184,9 @@ void SETflagsavvaltas(uint8_t ertek)
 {
 	flagsavvaltas = ertek;
 }
+
+void SETflagSTART(uint8_t ertek)
+{
+	flagSTART = ertek;
+}
+

@@ -178,10 +178,7 @@ while (1)
 	control();
 	bluetoothDRIVE();
 
-//	if(GETstartjel() == '0')
-//	{
-//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
-//	}
+
 
 
 }
