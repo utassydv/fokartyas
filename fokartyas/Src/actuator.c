@@ -49,7 +49,7 @@ void control(void)
 {
 	if (GETflagbeav() == 1)
 	{
-		if( uwDutyCycle < 160 && flagSTART == 1)
+		if( uwDutyCycle < 160 || flagSTART != 1)
 		{
 			SETupres(0);
 			SETu2prev(0.0f);

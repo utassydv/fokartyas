@@ -41,5 +41,7 @@ uint8_t GETflaglassu(void);
 void SETflaglassu(uint8_t ertek);
 uint8_t GETflaggyors(void);
 void SETflaggyors(uint8_t ertek);
+void SETregivonal(uint32_t ertek);
+uint32_t GETvonal(void);
 
 #endif /* CONTROLSTEERING_H_ */

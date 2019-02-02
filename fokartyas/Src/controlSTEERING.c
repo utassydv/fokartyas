@@ -274,4 +274,9 @@ uint32_t GETregivonal(void)
 	return regivonal;
 }
 
+void SETregivonal(uint32_t ertek)
+{
+	regivonal = ertek;
+}
+
 

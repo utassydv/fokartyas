@@ -35,9 +35,13 @@ void radioRx(void) 				//Vonalszenzor1 UART adatainak circ bufferbe toltese
 
 void trackRADIO(void)
 {
-		if(startjel == '0')
-		{
-			SETflagSTART(1);
+
+		if (GETflagradio() == 1) {
+			if(startjel == '0')
+			{
+				SETflagSTART(1);
+			}
+		SETflagradio(0);
 		}
 }
 
@@ -94,17 +98,22 @@ void bluetoothDRIVE(void)
 //		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 
 		//sebesseg
-		int32_t szogki=GETszog()*100;
+		int32_t szogki=GETszog()*1000000;
 		int32_t szogsebki=GETszogseb();
-		int32_t offsetszogki=GEToffsetszog();
+		int32_t gXki=GETgX();
+		int32_t gYki=GETgY();
+		int32_t gZki=GETgZ();
+		int32_t aXki=GETaX();
+		int32_t aYki=GETaY();
+		int32_t aZki=GETaZ();
 		int32_t currentXki =GETcurrentX()*0.001;  // -> cm
 		int32_t currentYki =GETcurrentY()*0.001;
 
 
 //		snprintf(TxData, 100, "%d,%d,%d,%d\n",count ,tav, pos, speed);
-	//	snprintf(TxData, 100, "%d,%d\n",currentXki,currentYki);
-	//	snprintf(TxData, 100, "%u\n",GETstartjel());
-		snprintf(TxData, 100, "%d,%d\n",szogki,offsetszogki);
+		//snprintf(TxData, 100, "%d,%d\n",currentXki,currentYki);
+		//snprintf(TxData, 100, "%u\n",GETstartjel());
+		snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d,%d\n",gXki,gYki,gZki,aXki,aYki,aZki,szogki);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",GETstatevonalvaltas(),GETcount(), GETkettohossz(), GETtav(),GETtav2(),GETtavolsag());
 

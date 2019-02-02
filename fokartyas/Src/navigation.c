@@ -10,6 +10,7 @@
 #include "linetracking.h"
 #include "timing.h"
 #include "actuator.h"
+#include "controlSTEERING.h"
 
 #include <stdlib.h>
 
@@ -40,11 +41,11 @@ void vonalvaltas(void)
 		{
 			case 0:
 				lassu();
-				if(GETcount() == 2 && GETtavolsag() < 4500)
+				if(GETcount() == 2 && GETtavolsag() < 5500)
 				{
 					statevonalvaltas = 1;
 				}
-				else if(GETcount() == 2 && GETtavolsag() > 4500 )
+				else if(GETcount() == 2 && GETtavolsag() > 5500 )
 				{
 					statevonalvaltas = 2;
 				}
@@ -60,6 +61,11 @@ void vonalvaltas(void)
 				break;
 
 			case 2:
+//				if(GETcount() == 2)
+//				{
+//					SETregivonal(GETvonal());
+//				}
+
 				if(GETcount() == 1)
 				{
 					SETkettohossz(0);
