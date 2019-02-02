@@ -48,9 +48,11 @@ float aY;
 float aZ;
 
 extern TIM_HandleTypeDef htim2; 						//encoder timer
+extern TIM_HandleTypeDef htim8;
 
 void trackingInit(void)
 {
+	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);		//PWM Szervo szenzor
 	HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);	//Inkrementalis ado
 
 	//Z tengely koruli szogsebesseg olvasasara

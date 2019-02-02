@@ -9,6 +9,7 @@
 
 extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim5;
+extern TIM_HandleTypeDef htim8;
 
 uint16_t 	timespeed 			= 0;
 uint8_t 	flagspeed 			= 0;
@@ -32,13 +33,15 @@ uint16_t 	timepoz	 			= 0;
 uint8_t 	flagpoz				= 0;
 uint16_t 	timevonalvaltas	 	= 0;
 uint8_t 	flagvonalvaltas		= 0;
-
 uint16_t 	timeradio		 	= 0;
 uint8_t 	flagradio			= 0;
+
+uint32_t tavszenzorcnt = 0;
 
 void idozitoInit(){
 	  HAL_TIM_Base_Start_IT(&htim4);					//Idozitesekhez (1ms)
 	  HAL_TIM_Base_Start_IT(&htim5);					//Idozitesekhez (1ms)
+	  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);
 }
 
 void idozito( uint16_t ido, uint16_t *idocount, uint8_t *flag)
@@ -84,6 +87,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  idozito( 100, &timeradio, &flagradio);
 
   }
+
 
 }
 

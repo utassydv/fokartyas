@@ -22,6 +22,11 @@ extern TIM_HandleTypeDef htim3;  //taviranyito
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
 
+__IO uint32_t vlmi = 0;
+__IO uint32_t  tavolsagpwm = 0;
+
+
+
 uint8_t flagsavvaltas 	= 0;
 uint8_t flagSTART 		= 0;
 const int16_t posvalte = 1700;
@@ -32,6 +37,8 @@ void actuatorInit(void)
 {
 	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);		//Taviranyito CH1
 	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);		//Taviranyito CH2
+	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_3);		//Taviranyito CH1
+	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_4);		//Taviranyito CH2
 }
 
 
@@ -49,7 +56,7 @@ void control(void)
 {
 	if (GETflagbeav() == 1)
 	{
-		if( uwDutyCycle < 160 || flagSTART != 1)
+		if( uwDutyCycle < 1600 || flagSTART != 1)
 		{
 			SETupres(0);
 			SETu2prev(0.0f);
@@ -164,10 +171,24 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELY
     }
     else
     {
-      uwDutyCycle = 150;
+      uwDutyCycle = 1500;
     }
   }
 
+  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
+    {
+      /* Get the Input Capture value */
+      vlmi = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+
+      if (vlmi != 0)
+      {
+    	  tavolsagpwm = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
+      }
+      else
+      {
+        tavolsagpwm = 1500;
+      }
+    }
 }
 
 uint32_t GETuwDutyCycle(void)
@@ -188,5 +209,10 @@ void SETflagsavvaltas(uint8_t ertek)
 void SETflagSTART(uint8_t ertek)
 {
 	flagSTART = ertek;
+}
+
+uint32_t GETtavolsagpwm(void)
+{
+	return tavolsagpwm;
 }
 

@@ -115,7 +115,8 @@ void bluetoothDRIVE(void)
 		//snprintf(TxData, 100, "%u\n",GETstartjel());
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d,%d\n",gXki,gYki,gZki,aXki,aYki,aZki,szogki);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
-		snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",GETstatevonalvaltas(),GETcount(), GETkettohossz(), GETtav(),GETtav2(),GETtavolsag());
+		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",GETstatevonalvaltas(),GETcount(), GETkettohossz(), GETtav(),GETtav2(),GETtavolsag());
+		snprintf(TxData, 100, "%d\n",GETuwDutyCycle()/58);
 
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 		SETflagbluetooth(0);
