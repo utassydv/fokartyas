@@ -12,5 +12,8 @@
 uint8_t GETamelyik();
 void SETamelyik(uint8_t ertek);
 uint8_t GETstatevonalvaltas(void);
+uint8_t randomiser(void);
+uint32_t GETtavolsag(void);
+void vonalvaltas(void);
 
 #endif /* NAVIGATION_H_ */

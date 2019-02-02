@@ -13,29 +13,30 @@
 extern SPI_HandleTypeDef hspi2;
 
 
-uint8_t txdata1[3];
-uint8_t rxdata1[3];
+uint8_t txdata1[13];
+uint8_t rxdata1[13];
 
-uint8_t txdata1TEMP[3];
-uint8_t rxdata1TEMP[3];
-
-uint8_t enabledata[2];
-uint8_t TEMPenabledata[2];
+uint8_t enabledata[3];
 
 uint16_t offsetcnt = 0;
 uint16_t offsetlimit = 6200;
-float offsetszog;
+float offsetszog = 0;
 float szogseb;
 float szog = 0;
-float TEMPERATURE = 0;
 
 int32_t counterpres	= 0;
 int32_t counterprev	= 0;
 int32_t speed		= 0;
 
-
 int32_t currentX = 0;
 int32_t currentY = 0;
+
+float gX;
+float gY;
+float gZ;
+float aX;
+float aY;
+float aZ;
 
 extern TIM_HandleTypeDef htim2; 						//encoder timer
 
@@ -44,22 +45,24 @@ void trackingInit(void)
 	HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);	//Inkrementalis ado
 
 	//Z tengely koruli szogsebesseg olvasasara
-	txdata1[0]		=	0b10100110; //OUTZ_L_G (26h)
+	txdata1[0]		=	0b10100010; // (22h)  00100010
 	txdata1[1]		=	0b00000000;
 	txdata1[2]		=	0b00000000;
+	txdata1[3]		=	0b00000000;
+	txdata1[4]		=	0b00000000;
+	txdata1[5]		=	0b00000000;
+	txdata1[6]		=	0b00000000;
+	txdata1[7]		=	0b00000000;
+	txdata1[8]		=	0b00000000;
+	txdata1[9]		=	0b00000000;
+	txdata1[10]		=	0b00000000;
+	txdata1[11]		=	0b00000000;
+	txdata1[12]		=	0b00000000;
 
-	//temp olvasasara
-	txdata1TEMP[0]		=	0b10100000; //(20h)
-	txdata1TEMP[1]		=	0b00000000;
-	txdata1TEMP[2]		=	0b00000000;
-
-	//giroszkor engedelyezese
-	enabledata[0]	= 0b00010001; //CTRL2_G (11h)
+	//giroszkop és acc engedelyezese
+	enabledata[0]	= 0b00010000; //CTRL1_XL (10h), CTRL2_G (11h)
 	enabledata[1]	= 0b01010000; //208Hz....
-
-
-	TEMPenabledata[0]	= 0b00010011; //h13
-	TEMPenabledata[1]	= 0b00010000;
+	enabledata[2]	= 0b01010000; //208Hz....
 
 	enablegyro();
 }
@@ -69,11 +72,7 @@ void trackingInit(void)
 void enablegyro(void)
 {
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi2, enabledata, 2, HAL_MAX_DELAY);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi2, TEMPenabledata, 2, HAL_MAX_DELAY);
+	HAL_SPI_Transmit(&hspi2, enabledata, 3, HAL_MAX_DELAY);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
@@ -117,16 +116,36 @@ void gyrooffset(void)
 		int16_t adat;
 
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
-		HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 3, HAL_MAX_DELAY);
+		HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 13, HAL_MAX_DELAY);
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 				//CD
 
 
-		adat 	= rxdata1[2] << 8;
-		adat 	|=  rxdata1[1];
-		szogseb	= (float)adat*8.61262521018907f;  //4.3140960937-< 125dpsnel
+//		adat 	= rxdata1[2] << 8;
+//		adat 	|=  rxdata1[1];
+//		gX	= (float)adat*8.61262521018907f;  //4.3140960937-< 125dpsnel
+//
+//		adat 	= rxdata1[4] << 8;
+//		adat 	|=  rxdata1[3];
+//		gY	= (float)adat*8.61262521018907f;  //4.3140960937-< 125dpsnel
+
+		adat 	= rxdata1[6] << 8;
+		adat 	|=  rxdata1[5];
+		gZ	= (float)adat*8.61262521018907f;  //4.3140960937-< 125dpsnel
+
+//		adat 	= rxdata1[8] << 8;
+//		adat 	|=  rxdata1[7];
+//		aX	= (float)adat*0.061f;
+//
+//		adat 	= rxdata1[10] << 8;
+//		adat 	|=  rxdata1[9];
+//		aY	= (float)adat*0.061f;
+//
+//		adat 	= rxdata1[12] << 8;
+//		adat 	|=  rxdata1[11];
+//		aZ	= (float)adat*0.061f;
 
 
-		offsetszog = 0.0002f*szogseb+offsetszog; //átlag
+		offsetszog = 0.0002f*gZ+offsetszog; //átlag
 
 		offsetcnt++;
 		SETflagangleoffset(0);
@@ -139,18 +158,37 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 	{
 		int16_t adat;
 
-
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
-		HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 3, HAL_MAX_DELAY);
+		HAL_SPI_TransmitReceive(&hspi2, txdata1, rxdata1, 13, HAL_MAX_DELAY);
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 				//CD
 
 
-		adat 	= rxdata1[2] << 8;
-		adat 	|=  rxdata1[1];
+//		adat 	= rxdata1[2] << 8;
+//		adat 	|=  rxdata1[1];
+//		gX	= (float)adat*8.61262521018907f;  //4.3140960937-< 125dpsnel
+//
+//		adat 	= rxdata1[4] << 8;
+//		adat 	|=  rxdata1[3];
+//		gY	= (float)adat*8.61262521018907f;  //4.3140960937-< 125dpsnel
 
-		szogseb=((float)adat*8.61262521018907f-offsetszog)/200000.0f;  // 4.3140960937f
+		adat 	= rxdata1[6] << 8;
+		adat 	|=  rxdata1[5];
 
-		szog = szog+szogseb;
+//		adat 	= rxdata1[8] << 8;
+//		adat 	|=  rxdata1[7];
+//		aX	= (float)adat*0.061f;
+//
+//		adat 	= rxdata1[10] << 8;
+//		adat 	|=  rxdata1[9];
+//		aY	= (float)adat*0.061f;
+//
+//		adat 	= rxdata1[12] << 8;
+//		adat 	|=  rxdata1[11];
+//		aZ	= (float)adat*0.061f;
+
+		gZ=((float)adat*8.61262521018907f-offsetszog)/200000.0f;  // 4.3140960937f
+
+		szog = szog+gZ;
 
 //		if (szog >= 180.0f) szog = szog-360.0f;
 //		if (szog <= -180.0f) szog = szog+360.0f;
@@ -161,33 +199,33 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 	}
 }
 
-void temp(void)				//z elfordulas kiolvasas//////////////////
-{
-	if (GETflagangle() == 1)
-	{
-		int16_t adattemp;
-
-
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
-		HAL_SPI_TransmitReceive(&hspi2, txdata1TEMP, rxdata1TEMP, 3, HAL_MAX_DELAY);
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 				//CD
-
-
-		adattemp 	= rxdata1TEMP[2] << 8;
-		adattemp 	|=  rxdata1TEMP[1];
-
-		TEMPERATURE	=	(float)adattemp;
-
-		szog = szog+szogseb;
-
-//		if (szog >= 180.0f) szog = szog-360.0f;
-//		if (szog <= -180.0f) szog = szog+360.0f;
-
-
-
-		SETflagangle(0);
-	}
-}
+//void temp(void)				//z elfordulas kiolvasas//////////////////
+//{
+//	if (GETflagangle() == 1)
+//	{
+//		int16_t adattemp;
+//
+//
+//		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); 			//CS
+//		HAL_SPI_TransmitReceive(&hspi2, txdata1TEMP, rxdata1TEMP, 3, HAL_MAX_DELAY);
+//		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); 				//CD
+//
+//
+//		adattemp 	= rxdata1TEMP[2] << 8;
+//		adattemp 	|=  rxdata1TEMP[1];
+//
+//		TEMPERATURE	=	(float)adattemp;
+//
+//		szog = szog+szogseb;
+//
+////		if (szog >= 180.0f) szog = szog-360.0f;
+////		if (szog <= -180.0f) szog = szog+360.0f;
+//
+//
+//
+//		SETflagangle(0);
+//	}
+//}
 
 
 void poz(void)

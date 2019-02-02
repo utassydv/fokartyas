@@ -35,6 +35,7 @@ void SETflagbeav(uint8_t ertek);
 void SETflaguartproc(uint8_t ertek);
 void SETflagangle(uint8_t ertek);
 void SETflagangleoffset(uint8_t ertek);
+void SETflagpoz(uint8_t ertek);
 void SETflagvonalvaltas(uint8_t ertek);
 
 #endif /* TIMING_H_ */

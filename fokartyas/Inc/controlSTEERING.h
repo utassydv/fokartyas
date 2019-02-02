@@ -17,6 +17,7 @@ int32_t szabPD(int32_t elozohibajel, int32_t hibajel);
 int16_t toPWM(int32_t jel);
 void toservo(void);
 uint32_t vonalvalasztas(uint8_t melyik);
+void irany(uint8_t merre);
 
 float GETp(void);
 void SETp(float ertek);

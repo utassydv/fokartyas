@@ -112,7 +112,8 @@ uint32_t vonalvalasztas(uint8_t melyik)
 {
 		if( GETcount() == 2)
 		{
-			if ( abs((int32_t)regivonal-(int32_t)GETtav()) < abs((int32_t)regivonal - (int32_t)GETtav2()))
+			//regivonal = vonal;
+			if ( abs((int32_t)regivonal-(int32_t)GETtav()) < abs((int32_t)regivonal - (int32_t)GETtav2())) //regit koveti
 			{
 				vonal = GETtav();
 			}
@@ -120,6 +121,7 @@ uint32_t vonalvalasztas(uint8_t melyik)
 			{
 				vonal = GETtav2();
 			}
+
 		}
 		else
 		{
@@ -133,20 +135,23 @@ void toservo(void)
 {
 	hiba 		= 	toerror(vonalvalasztas(GETamelyik()));
 
+
 	if(GETamelyik() == 1)
 	{
-		if(vonal == GETtav()) 	regivonal = GETtav2();
-		else 					regivonal = GETtav();
+		irany(1);
 		SETamelyik(0);
 	}
-	else
-	{
-		regivonal 	= 	vonal;
-	}
+
 
 	beavatkozo	= 	szabPD(elozohiba, hiba);
 	elozohiba	=	hiba;
 	toPWM(beavatkozo);
+}
+
+void irany(uint8_t merre)
+{
+	if (merre == 0) regivonal = GETtav2();
+	if (merre == 1) regivonal = GETtav();
 }
 
 float GETp(void)

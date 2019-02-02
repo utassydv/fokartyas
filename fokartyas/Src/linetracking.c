@@ -111,7 +111,7 @@ void kettohosszfv(void)
 			flagketto = 1;
 		}
 
-		if (startposition != 0)
+		if (GETcount()==2 && startposition != 0)
 		{
 			kettohossz = GETcounterpres() - startposition;
 		}

@@ -19,6 +19,12 @@ uint8_t statevonalvaltas = 0;
 
 uint32_t tavolsag;
 
+uint8_t randomiser(void)
+{
+	return GETtav()-((GETtav()/2)*2);
+}
+
+
 
 uint32_t GETtavolsag(void)
 {
@@ -34,11 +40,11 @@ void vonalvaltas(void)
 		{
 			case 0:
 				lassu();
-				if(GETcount() == 2 && GETtavolsag() < 5500)
+				if(GETcount() == 2 && GETtavolsag() < 4500)
 				{
 					statevonalvaltas = 1;
 				}
-				else if(GETcount() == 2 && GETtavolsag() > 5500 )
+				else if(GETcount() == 2 && GETtavolsag() > 4500 )
 				{
 					statevonalvaltas = 2;
 				}
@@ -50,6 +56,7 @@ void vonalvaltas(void)
 					SETamelyik(1);
 					statevonalvaltas = 2;
 				}
+				if (GETcount() == 1) SETkettohossz(0);
 				break;
 
 			case 2:
