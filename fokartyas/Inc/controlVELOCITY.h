@@ -14,6 +14,8 @@ void controlVELOCITYInit(void);
 float szabvPI(float err);
 float toinkrspeed(float sebesseg);
 void tomotorcontrol(void);
+void velocitySETTER(void);
+
 void SETv(float ertek);
 float GETvlassu();
 float GETvgyors();
@@ -27,6 +29,7 @@ void SETupres(float ertek);
 void SETu2prev(float ertek);
 uint32_t GETvonal(void);
 uint32_t GETregivonal(void);
+float GETv(void);
 
 
 

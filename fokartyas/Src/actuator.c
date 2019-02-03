@@ -17,13 +17,14 @@ extern TIM_HandleTypeDef htim14; //hatsoszervo
 extern TIM_HandleTypeDef htim10; //szenzorszervo
 extern TIM_HandleTypeDef htim1;  //motor
 extern TIM_HandleTypeDef htim3;  //taviranyito
+extern TIM_HandleTypeDef htim12;  //elsotavolsagerzekelo
 
 
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
 
 __IO uint32_t vlmi = 0;
-__IO uint32_t  tavolsagpwm = 0;
+__IO uint32_t  SCtavolsag = 0;
 
 
 
@@ -37,8 +38,8 @@ void actuatorInit(void)
 {
 	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);		//Taviranyito CH1
 	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);		//Taviranyito CH2
-	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_3);		//Taviranyito CH1
-	 HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_4);		//Taviranyito CH2
+	 HAL_TIM_IC_Start_IT(&htim12, TIM_CHANNEL_1);		//Taviranyito CH1
+	 HAL_TIM_IC_Start_IT(&htim12, TIM_CHANNEL_2);		//Taviranyito CH2
 }
 
 
@@ -47,6 +48,11 @@ void regulator(void)
 	if (GETflagregulator() == 1)
 	{
 		toservo();
+
+
+		velocitySETTER();
+
+
 		tomotorcontrol();
 		SETflagregulator(0);
 	}
@@ -56,12 +62,7 @@ void control(void)
 {
 	if (GETflagbeav() == 1)
 	{
-		if( uwDutyCycle < 1600 || flagSTART != 1)
-		{
-			SETupres(0);
-			SETu2prev(0.0f);
-			SETuprev(0.0f);
-		}
+
 
 		szervovezerles(GETpos(), GETposh());
 		motorvezerles(GETupres());						//motor
@@ -160,35 +161,44 @@ void savvaltas()
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELYEZO JEL
 {
-  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-  {
-    /* Get the Input Capture value */
-    uwIC2Value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
-    if (uwIC2Value != 0)
-    {
-      uwDutyCycle = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-    }
-    else
-    {
-      uwDutyCycle = 1500;
-    }
-  }
+	if (htim->Instance == TIM3)
+	{
+		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+		{
+			/* Get the Input Capture value */
+			uwIC2Value = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
-  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
-    {
-      /* Get the Input Capture value */
-      vlmi = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+			if (uwIC2Value != 0)
+			{
+				uwDutyCycle = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+			}
+			else
+			{
+				uwDutyCycle = 1500;
+			}
+		}
+	}
 
-      if (vlmi != 0)
-      {
-    	  tavolsagpwm = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
-      }
-      else
-      {
-        tavolsagpwm = 1500;
-      }
-    }
+	if (htim->Instance == TIM12)
+	{
+		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+		{
+			/* Get the Input Capture value */
+			vlmi = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+
+			if (vlmi != 0)
+			{
+				SCtavolsag = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2)/58;
+			}
+			else
+			{
+				SCtavolsag = 100;
+			}
+		}
+	}
+
+
 }
 
 uint32_t GETuwDutyCycle(void)
@@ -211,8 +221,8 @@ void SETflagSTART(uint8_t ertek)
 	flagSTART = ertek;
 }
 
-uint32_t GETtavolsagpwm(void)
+uint32_t GETSCtavolsag(void)
 {
-	return tavolsagpwm;
+	return SCtavolsag;
 }
 

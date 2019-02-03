@@ -35,16 +35,6 @@ float GEToffsetszog(void);
 float GETszog(void);
 uint16_t GEToffsetcnt(void);
 float GETTEMPERATURE(void);
-void SETszog(float ertek);
-
-
-float GETgX(void);
-float GETgY(void);
-float GETgZ(void);
-float GETaX(void);
-float GETaY(void);
-float GETaZ(void);
-
 
 
 #endif /* TRACKING_H_ */

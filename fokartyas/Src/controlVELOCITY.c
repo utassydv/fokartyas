@@ -8,6 +8,8 @@
 #include "stm32f4xx_hal.h"
 #include "controlVELOCITY.h"
 #include "tracking.h"
+#include "actuator.h"
+
 
 #define KC		(4.0f)
 #define ZD		(0.98f)
@@ -67,6 +69,29 @@ void SETv(float ertek)
 {
 	v = ertek;
 }
+
+void velocitySETTER(void)
+{
+	if( GETuwDutyCycle() < 1600 /*|| flagSTART != 1*/)
+	{
+		SETv(-9.0f);
+//		SETupres(0);
+//		SETu2prev(0.0f);
+//		SETuprev(0.0f);
+	}
+	else
+	{
+		SETv(vlassu);
+	}
+
+}
+
+float GETv(void)
+{
+	return v;
+}
+
+
 
 float GETvlassu()
 {

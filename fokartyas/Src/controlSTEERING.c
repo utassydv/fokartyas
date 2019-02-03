@@ -138,8 +138,8 @@ void toservo(void)
 
 	if(GETvaltaslehetoseg() == 1)
 	{
-		irany(mindigvalt());
-		//irany(0);
+		//irany(mindigvalt());
+		irany(1);
 		SETvaltaslehetoseg(0);
 	}
 

@@ -32,8 +32,7 @@ Src/tracking.o: ../Src/tracking.c C:/fokartyasz/fokartyas/Inc/tracking.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- C:/fokartyasz/fokartyas/Inc/timing.h \
- C:/fokartyasz/fokartyas/Inc/MadgwickAHRS.h
+ C:/fokartyasz/fokartyas/Inc/timing.h
 
 C:/fokartyasz/fokartyas/Inc/tracking.h:
 
@@ -104,5 +103,3 @@ C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
 C:/fokartyasz/fokartyas/Inc/timing.h:
-
-C:/fokartyasz/fokartyas/Inc/MadgwickAHRS.h:

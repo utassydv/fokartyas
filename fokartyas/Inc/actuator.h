@@ -22,6 +22,6 @@ uint32_t GETuwDutyCycle(void);
 uint8_t GETflagsavvaltas(void);
 void SETflagsavvaltas(uint8_t ertek);
 void SETflagSTART(uint8_t ertek);
-uint32_t GETtavolsagpwm(void);
+uint32_t GETSCtavolsag(void);
 
 #endif /* ACTUATOR_H_ */
