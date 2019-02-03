@@ -10,6 +10,7 @@
 #ifndef CONTROLVELOCITY_H_
 #define CONTROLVELOCITY_H_
 
+void szabSCkovet(void);
 void controlVELOCITYInit(void);
 float szabvPI(float err);
 float toinkrspeed(float sebesseg);

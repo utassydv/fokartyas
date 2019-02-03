@@ -20,6 +20,7 @@ float vlassu	=	1.5f;
 float vgyors	=	1.5f;
 float vfek		=	0.0f;
 float vsavvalt 	=	1.0f;
+float vkovet	=   0.1f;
 
 float epres 	= 0.0f;
 float upres 	= 0.0f;
@@ -79,12 +80,42 @@ void velocitySETTER(void)
 //		SETu2prev(0.0f);
 //		SETuprev(0.0f);
 	}
-	else
+	else if (GETflaglassu() == 1)
 	{
 		SETv(vlassu);
 	}
-
+	else if (GETflaggyors() == 1)
+	{
+		SETv(vgyors);
+	}
+	else if (GETflagfekez() == 1)
+	{
+		SETv(vfek);
+	}
+	else if (GETflagsavvalt() == 1)
+	{
+		SETv(vsavvalt);
+	}
+	else if (GETflagSCkovet()== 1)
+	{
+		SETv(vkovet);
+	}
 }
+
+//void szabSCkovet(void)
+//{
+//	if(GETflagSCkovet() == 1)
+//	{
+//
+//		errtav =GETSCtavolsag() - kivanttavolsag;
+//		INT = INT + errtav* dT;
+//		DER = (errtav - preverrtav)/dT;
+//
+//		out= Kp*errtav + Ki*INT + Kd* DER;
+//
+//		preverrtav = errtav;
+//	}
+//}
 
 float GETv(void)
 {

@@ -24,4 +24,17 @@ void SETflagsavvaltas(uint8_t ertek);
 void SETflagSTART(uint8_t ertek);
 uint32_t GETSCtavolsag(void);
 
+uint8_t GETflaglassu(void);
+void SETflaglassu(uint8_t ertek);
+uint8_t GETflaggyors(void);
+void SETflaggyors(uint8_t ertek);
+uint8_t GETflagfekez(void);
+void SETflagfekez(uint8_t ertek);
+uint8_t GETflagsavvalt(void);
+void SETflagsavvalt(uint8_t ertek);
+uint8_t GETflagSCkovet(void);
+void SETflagSCkovet(uint8_t ertek);
+
+
+
 #endif /* ACTUATOR_H_ */

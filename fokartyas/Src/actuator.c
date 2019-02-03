@@ -22,13 +22,17 @@ extern TIM_HandleTypeDef htim12;  //elsotavolsagerzekelo
 
 __IO uint32_t uwIC2Value = 0;
 __IO uint32_t  uwDutyCycle = 0;
-
 __IO uint32_t vlmi = 0;
 __IO uint32_t  SCtavolsag = 0;
 
+uint8_t flagsavvalt	= 0;
+uint8_t flaggyors	= 0;
+uint8_t flaglassu	= 0;
+uint8_t flagfekez	= 0;
+uint8_t flagkovet	= 0;
+uint8_t flagSCkovet	= 0;
 
 
-uint8_t flagsavvaltas 	= 0;
 uint8_t flagSTART 		= 0;
 const int16_t posvalte = 1700;
 const int16_t posvalth = 1850;
@@ -73,7 +77,7 @@ void control(void)
 void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 {
 
-		if (flagsavvaltas == 1)
+		if (flagsavvalt == 1)
 		{
 			htim13.Instance->CCR1 	= posvalte; 		//elso szervo
 			htim14.Instance->CCR1 	= posvalth; 	//hatso szervo
@@ -206,15 +210,6 @@ uint32_t GETuwDutyCycle(void)
 	return uwDutyCycle;
 }
 
-uint8_t GETflagsavvaltas(void)
-{
-	return flagsavvaltas;
-}
-
-void SETflagsavvaltas(uint8_t ertek)
-{
-	flagsavvaltas = ertek;
-}
 
 void SETflagSTART(uint8_t ertek)
 {
@@ -226,3 +221,52 @@ uint32_t GETSCtavolsag(void)
 	return SCtavolsag;
 }
 
+uint8_t GETflaglassu(void)
+{
+	return flaglassu;
+}
+
+void SETflaglassu(uint8_t ertek)
+{
+	flaglassu = ertek;
+}
+
+uint8_t GETflaggyors(void)
+{
+	return flaggyors;
+}
+
+void SETflaggyors(uint8_t ertek)
+{
+	flaggyors = ertek;
+}
+
+uint8_t GETflagfekez(void)
+{
+	return flagfekez;
+}
+
+void SETflagfekez(uint8_t ertek)
+{
+	flagfekez = ertek;
+}
+
+uint8_t GETflagsavvalt(void)
+{
+	return flagsavvalt;
+}
+
+void SETflagsavvalt(uint8_t ertek)
+{
+	flagsavvalt = ertek;
+}
+
+uint8_t GETflagSCkovet(void)
+{
+	return flagSCkovet;
+}
+
+void SETflagSCkovet(uint8_t ertek)
+{
+	flagSCkovet = ertek;
+}

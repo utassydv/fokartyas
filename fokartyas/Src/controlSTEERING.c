@@ -35,8 +35,7 @@ const uint16_t rangeh	=	400;
 
 int16_t pos;
 int16_t posh;
-uint8_t flaggyors;
-uint8_t flaglassu;
+
 
 
 
@@ -91,13 +90,13 @@ int16_t toPWM(int32_t jel)
 	pos		=	pwme;
 //HATSO
 	int16_t pwmh;
-	if (flaglassu == 1)
+	if (GETflaglassu() == 1)
 	{
 		pwmh=pwmmidh+scalelassu*jel*(rangeh*100000/12799)/100000; //KORM�?NY
 		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
 		if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
 	}
-	if (flaggyors == 1)
+	if (GETflaggyors() == 1)
 	{
 		pwmh=pwmmidh-scalegyors*jel*(rangeh*1000000/12799)/100000; //KORM�?NY
 		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
@@ -255,26 +254,6 @@ int16_t GETposh(void)
 void SETposh(int16_t ertek)
 {
 	posh = ertek;
-}
-
-uint8_t GETflaglassu(void)
-{
-	return flaglassu;
-}
-
-void SETflaglassu(uint8_t ertek)
-{
-	flaglassu = ertek;
-}
-
-uint8_t GETflaggyors(void)
-{
-	return flaggyors;
-}
-
-void SETflaggyors(uint8_t ertek)
-{
-	flaggyors = ertek;
 }
 
 uint32_t GETvonal(void)
