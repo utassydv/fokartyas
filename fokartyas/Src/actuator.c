@@ -100,8 +100,8 @@ void motorvezerles(int16_t beavatkozojel)
 	uint16_t csat2;
 
 
-	if(beavatkozojel > 524) 	beavatkozojel = 524;
-	if(beavatkozojel < -523)	beavatkozojel = -523;
+	if(beavatkozojel >  520) 	beavatkozojel =  520;
+	if(beavatkozojel < -520)	beavatkozojel = -520;
 
 	csat1 = 525 + beavatkozojel;
 	csat2 = 525 - beavatkozojel;

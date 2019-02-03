@@ -38,7 +38,7 @@ void controlVELOCITYInit(void)
 
 float toinkrspeed(float sebesseg)
 {
-	return sebesseg*(float)700;
+	return sebesseg*700.0f;
 }
 
 
@@ -74,7 +74,7 @@ void velocitySETTER(void)
 {
 	if( GETuwDutyCycle() < 1600 /*|| flagSTART != 1*/)
 	{
-		SETv(-9.0f);
+		SETv(0.0f);
 //		SETupres(0);
 //		SETu2prev(0.0f);
 //		SETuprev(0.0f);
