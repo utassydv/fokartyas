@@ -9,18 +9,21 @@
 #include "controlVELOCITY.h"
 #include "tracking.h"
 #include "actuator.h"
+#include "timing.h"
 
 
 #define KC		(4.0f)
 #define ZD		(0.98f)
 #define UMAX	(5000)
+#define VKOVMAX	(1.5f)
+#define VKOVMIN	(0.0f)
 
 float v 		= 	0.0f;
 float vlassu	=	1.5f;
 float vgyors	=	1.5f;
 float vfek		=	0.0f;
 float vsavvalt 	=	1.0f;
-float vkovet	=   0.1f;
+float vkovet	=   0.0f;
 
 float epres 	= 0.0f;
 float upres 	= 0.0f;
@@ -29,9 +32,9 @@ float uprev 	= 0.0f;
 float u2 		= 0.0f;
 float u 		= 0.0f;
 
-uint32_t kivanttavolsag = 60;
-float Kp = 0.05f;
-float Kd = 0.0f;
+uint32_t kivanttavolsag = 80;
+float Kp = 0.0375f;
+float Kd = 8.0f;
 float Ki = 0.0f;
 int32_t errtav = 0;
 int32_t preverrtav = 0;
@@ -89,14 +92,14 @@ void SETv(float ertek)
 
 void velocitySETTER(void)
 {
-	if( GETuwDutyCycle() < 1600    || GETflagSTART()  != 1)
+	if( GETuwDutyCycle() < 1600    /*|| GETflagSTART()  != 1*/)
 	{
 		SETv(-20.0f);
 	}
-	else if (GETflaglassu() == 1)
-	{
-		SETv(vlassu);
-	}
+//	else if (GETflaglassu() == 1)
+//	{
+//		SETv(vlassu);
+//	}
 	else if (GETflaggyors() == 1)
 	{
 		SETv(vgyors);
@@ -115,20 +118,26 @@ void velocitySETTER(void)
 	}
 }
 
-//void szabSCkovet(void)
-//{
-//	if(GETflagSCkovet() == 1)
-//	{
-//
-//		errtav =GETSCtavolsag() - kivanttavolsag;
-//		Integ = Integ + errtav;
-//		Der = errtav - preverrtav;
-//
-//		vkovet= Kp*(float)errtav + Ki*(float)Integ + Kd* (float)Der;
-//
-//		preverrtav = errtav;
-//	}
-//}
+void szabSCkovet(void)
+{
+	if(GETflagkovet() == 1)
+	{
+
+		errtav =GETSCtavolsag() - kivanttavolsag;
+		Integ = Integ + errtav;
+		Der = errtav - preverrtav;
+
+		vkovet= 0.75 +  Kp*(float)errtav + Ki*(float)Integ + Kd* (float)Der;
+		vkovet = (vkovet > VKOVMAX) ? 	VKOVMAX : vkovet;
+		vkovet = (vkovet < VKOVMIN) ? 	VKOVMIN : vkovet;
+
+		if(GETSCtavolsag() > 99) vkovet=1.5f;
+		if(GETSCtavolsag() < 60) vkovet=-20.0f;
+
+		preverrtav = errtav;
+		SETflagkovet(0);
+	}
+}
 
 float GETv(void)
 {
@@ -155,6 +164,11 @@ float GETvsavvalt()
 float GETvfek()
 {
 	return vfek;
+}
+
+float GETvkovet()
+{
+	return vkovet;
 }
 
 float GETupres()

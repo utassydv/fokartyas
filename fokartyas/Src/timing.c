@@ -35,6 +35,8 @@ uint16_t 	timevonalvaltas	 	= 0;
 uint8_t 	flagvonalvaltas		= 0;
 uint16_t 	timeradio		 	= 0;
 uint8_t 	flagradio			= 0;
+uint16_t 	timekovet		 	= 0;
+uint8_t 	flagkovet			= 0;
 
 uint32_t tavszenzorcnt = 0;
 
@@ -85,6 +87,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  idozito( 5, &timevonalvaltas, &flagvonalvaltas);
 
 	  idozito( 100, &timeradio, &flagradio);
+
+	  idozito( 50, &timekovet, &flagkovet);
 
   }
 
@@ -152,6 +156,11 @@ uint8_t GETflagradio(void)
 {
 	return flagradio;
 }
+
+uint8_t GETflagkovet(void)
+{
+	return flagkovet;
+}
 //SETTEREK
 
 void SETflagspeed(uint8_t ertek)
@@ -213,6 +222,12 @@ void SETflagradio(uint8_t ertek)
 {
 	flagradio = ertek;
 }
+
+void SETflagkovet(uint8_t ertek)
+{
+	flagkovet = ertek;
+}
+
 
 
 

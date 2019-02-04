@@ -21,6 +21,7 @@ void SETv(float ertek);
 float GETvlassu();
 float GETvgyors();
 float GETvsavvalt();
+float GETvkovet();
 
 float GETvfek();
 float GETupres();

@@ -27,6 +27,7 @@ uint8_t GETflagregulator(void);
 uint8_t GETflagpoz(void);
 uint8_t GETflagvonalvaltas(void);
 uint8_t GETflagradio(void);
+uint8_t GETflagkovet(void);
 
 void SETflagspeed(uint8_t ertek);
 void SETflagbluetooth(uint8_t ertek);
@@ -40,5 +41,6 @@ void SETflagpoz(uint8_t ertek);
 void SETflagvonalvaltas(uint8_t ertek);
 void SETflagregulator(uint8_t ertek);
 void SETflagradio(uint8_t ertek);
+void SETflagkovet(uint8_t ertek);
 
 #endif /* TIMING_H_ */
