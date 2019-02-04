@@ -216,6 +216,11 @@ void SETflagSTART(uint8_t ertek)
 	flagSTART = ertek;
 }
 
+uint8_t GETflagSTART(void)
+{
+	return flagSTART;
+}
+
 uint32_t GETSCtavolsag(void)
 {
 	return SCtavolsag;

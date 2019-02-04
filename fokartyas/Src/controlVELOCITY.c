@@ -29,6 +29,19 @@ float uprev 	= 0.0f;
 float u2 		= 0.0f;
 float u 		= 0.0f;
 
+uint32_t kivanttavolsag = 60;
+float Kp = 0.05f;
+float Kd = 0.0f;
+float Ki = 0.0f;
+int32_t errtav = 0;
+int32_t preverrtav = 0;
+int32_t Integ = 0;
+int32_t Der = 0;
+
+
+
+
+
 extern TIM_HandleTypeDef htim1; 						//motor timer
 
 void controlVELOCITYInit(void)
@@ -63,7 +76,10 @@ float szabvPI(float err)
 void tomotorcontrol(void)
 {
 	epres = toinkrspeed(v) - GETspeed();
+
 	upres = 136.8 + 0.04*szabvPI(epres);
+
+
 }
 
 void SETv(float ertek)
@@ -73,12 +89,9 @@ void SETv(float ertek)
 
 void velocitySETTER(void)
 {
-	if( GETuwDutyCycle() < 1600 /*|| flagSTART != 1*/)
+	if( GETuwDutyCycle() < 1600    || GETflagSTART()  != 1)
 	{
-		SETv(0.0f);
-//		SETupres(0);
-//		SETu2prev(0.0f);
-//		SETuprev(0.0f);
+		SETv(-20.0f);
 	}
 	else if (GETflaglassu() == 1)
 	{
@@ -108,10 +121,10 @@ void velocitySETTER(void)
 //	{
 //
 //		errtav =GETSCtavolsag() - kivanttavolsag;
-//		INT = INT + errtav* dT;
-//		DER = (errtav - preverrtav)/dT;
+//		Integ = Integ + errtav;
+//		Der = errtav - preverrtav;
 //
-//		out= Kp*errtav + Ki*INT + Kd* DER;
+//		vkovet= Kp*(float)errtav + Ki*(float)Integ + Kd* (float)Der;
 //
 //		preverrtav = errtav;
 //	}

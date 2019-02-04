@@ -22,7 +22,9 @@ uint32_t GETuwDutyCycle(void);
 uint8_t GETflagsavvaltas(void);
 void SETflagsavvaltas(uint8_t ertek);
 void SETflagSTART(uint8_t ertek);
+uint8_t GETflagSTART(void);
 uint32_t GETSCtavolsag(void);
+
 
 uint8_t GETflaglassu(void);
 void SETflaglassu(uint8_t ertek);
