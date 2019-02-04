@@ -16,7 +16,10 @@
 uint8_t gyorsasagi = 0;
 uint8_t state 					= 0;
 uint8_t statelab 				= 0;
+uint8_t SCstate 				= 0;
 pont2D endlocation = { 0 , 0 };
+
+uint8_t egyenescounter = 0;
 
 
 void allapotgeplab(void)
@@ -88,100 +91,215 @@ void allapotgeplab(void)
 	}
 }
 
+void SCallapotgep(void)
+{
+
+	if (GETflagSCkovet() == 1)
+	{
+		if (GETflagallapotgep() == 1)
+		{
+			switch(SCstate)
+					{
+						case 0:
+							egyutanharomhossz();
+							if(GEThossz() > 5000 && GEThossz() < 18000 )  //elso szaggatott haromvonalfigyelo
+							{
+								SCstate = 1;
+								SEThossz(0);
+							}
+							break;
+
+						case 1:
+							haromutanegyhossz();
+							if(GEThossz() > 5000 && GEThossz() < 20000)  //elso szaggatott egyvonalfigyelo, utana gyorsít
+							{
+								SCstate = 2;
+								SETstartposition(GETcounterpres());
+								SEThossz(0);
+							}
+							break;
+
+						case 2:
+							if (GETcounterpres() - GETstartposition() > 280000) //14000 x 2(m) // ennyi távolsagig nem figyeljuk a haromvonalat
+							{
+								SETharomvonalszam(0);
+								egyenescounter++;
+								if (egyenescounter == 2) 		SCstate = 8; //elozes
+								else if (egyenescounter == 4) 	SETflagSCkovet(0);
+								else							SCstate = 3;
+							}
+							break;
+
+						case 3:
+							if(GETcount() == 3)													//ha haromvonal, nezzok az elejet
+							{
+								SETstartposition(GETcounterpres());
+								SCstate = 4;
+							}
+							break;
+
+						case 4:
+							if(GETcounterpres() - GETstartposition() > 42000) //  ha 30cm-en belül
+							{
+								if (GETharomvonalszam() >= 6)					// min.6x volt 6 vonal
+								{
+									state = 5;
+								}
+								else											//különben hiba volt, vissza
+								{
+									SETharomvonalszam(0);
+									state = 3;
+								}
+							}
+							break;
+
+						case 5:
+							if(GETcounterpres() - GETstartposition() > 280000)//2m kesobbb lassií
+							{
+								lassu() ;
+								SETegyvonalszam(0);
+								SCstate = 6;
+							}
+							break;
+						case 6:
+							if(GETcount() == 1)									//ha 1 vonal
+							{
+								SETstartposition(GETcounterpres());
+								SCstate = 7;
+							}
+							break;
+						case 7:
+							if(GETcounterpres() - GETstartposition() > 28000) // 20cm-en belül
+							{
+								if (GETegyvonalszam() >= 4)					//4x van 1 vonal, akkor lassu szakasz, indul elolrol az allapotgep
+								{
+									SEThossz(0);
+									SCstate = 0;
+								}
+								else										//hiba volt, vissza
+								{
+									SETegyvonalszam(0);
+									SCstate = 6;
+								}
+							}
+							break;
+
+						case 8:
+							SCstate = 0;
+							break;
+
+						default:
+							SCstate = 0;
+							break;
+					}
+
+
+
+
+			SETflagallapotgep(0);
+		}
+	}
+
+}
+
 void allapotgep(void)
 {
-	if (GETflagallapotgep() == 1)
+
+	if (GETflagSCkovet() == 0)
 	{
-		switch(state)
-		{// lassu, ha 3 vonal -> state 1
-
-			case 0:
-				lassu();
-				egyutanharomhossz();
-				if(GEThossz() > 5000 && GEThossz() < 18000 )
-				{
-					state = 1;
-					SEThossz(0);
-				}
-				break;
-
-			case 1:
-				haromutanegyhossz();
-				if(GEThossz() > 5000 && GEThossz() < 20000) {
-					state = 2;
-					SETstartposition(GETcounterpres());
-					SEThossz(0);
-					gyors();
-				}
-				break;
-
-			case 2:
-				if (GETcounterpres() - GETstartposition() > 280000) //14000 x 2(m)
-				{
-					SETharomvonalszam(0);
-					state = 3;
-				}
-				break;
-
-			case 3:
-				if(GETcount() == 3)
-				{
-					SETstartposition(GETcounterpres());
-					state = 4;
-				}
-				break;
-
-			case 4:
-				if(GETcounterpres() - GETstartposition() > 42000) // 30cm-en belül
-				{
-					if (GETharomvonalszam() >= 6)
+		if (GETflagallapotgep() == 1)
+		{
+			switch(state)
+			{
+				case 0:
+					lassu();
+					egyutanharomhossz();
+					if(GEThossz() > 5000 && GEThossz() < 18000 )  //elso szaggatott haromvonalfigyelo
 					{
-						state = 5;
+						state = 1;
+						SEThossz(0);
 					}
-					else
+					break;
+
+				case 1:
+					haromutanegyhossz();
+					if(GEThossz() > 5000 && GEThossz() < 20000)  //elso szaggatott egyvonalfigyelo, utana gyorsít
+					{
+						state = 2;
+						SETstartposition(GETcounterpres());
+						SEThossz(0);
+						gyors();
+					}
+					break;
+
+				case 2:
+					if (GETcounterpres() - GETstartposition() > 280000) //14000 x 2(m) // ennyi távolsagig nem figyeljuk a haromvonalat
 					{
 						SETharomvonalszam(0);
 						state = 3;
 					}
-				}
-				break;
+					break;
 
-			case 5:
-				if(GETcounterpres() - GETstartposition() > 280000)//2m
-				{
-					lassu() ;
-					SETegyvonalszam(0);
-					state = 6;
-				}
-				break;
-			case 6:
-				if(GETcount() == 1)
-				{
-					SETstartposition(GETcounterpres());
-					state = 7;
-				}
-				break;
-			case 7:
-				if(GETcounterpres() - GETstartposition() > 28000) // 2ű0cm-en belül
-				{
-					if (GETegyvonalszam() >= 4)
+				case 3:
+					if(GETcount() == 3)													//ha haromvonal, nezzok az elejet
 					{
-						SEThossz(0);
-						state = 0;
+						SETstartposition(GETcounterpres());
+						state = 4;
 					}
-					else
+					break;
+
+				case 4:
+					if(GETcounterpres() - GETstartposition() > 42000) //  ha 30cm-en belül
 					{
+						if (GETharomvonalszam() >= 6)					// min.6x volt 6 vonal
+						{
+							state = 5;
+						}
+						else											//különben hiba volt, vissza
+						{
+							SETharomvonalszam(0);
+							state = 3;
+						}
+					}
+					break;
+
+				case 5:
+					if(GETcounterpres() - GETstartposition() > 280000)//2m kesobbb lassií
+					{
+						lassu() ;
 						SETegyvonalszam(0);
 						state = 6;
 					}
-				}
-				break;
+					break;
+				case 6:
+					if(GETcount() == 1)									//ha 1 vonal
+					{
+						SETstartposition(GETcounterpres());
+						state = 7;
+					}
+					break;
+				case 7:
+					if(GETcounterpres() - GETstartposition() > 28000) // 20cm-en belül
+					{
+						if (GETegyvonalszam() >= 4)					//4x van 1 vonal, akkor lassu szakasz, indul elolrol az allapotgep
+						{
+							SEThossz(0);
+							state = 0;
+						}
+						else										//hiba volt, vissza
+						{
+							SETegyvonalszam(0);
+							state = 6;
+						}
+					}
+					break;
 
-			default:
-				state = 0;
-				break;
+				default:
+					state = 0;
+					break;
+			}
+		SETflagallapotgep(0);
 		}
-	SETflagallapotgep(0);
 	}
 }
 

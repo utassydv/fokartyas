@@ -50,13 +50,12 @@ void regulator(void)
 {
 	if (GETflagregulator() == 1)
 	{
+		steeringSETTER();
 		toservo();
 
-
 		velocitySETTER();
-
-
 		tomotorcontrol();
+
 		SETflagregulator(0);
 	}
 }
@@ -97,17 +96,17 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 		//	htim14.Instance->CCR1 	= 1500; 	//hatso szervo
 }
 
-void motorvezerles(int16_t beavatkozojel)
+void motorvezerles(float beavatkozojel)
 {
-	uint16_t csat1;
-	uint16_t csat2;
+	float csat1;
+	float csat2;
 
 
-	if(beavatkozojel >  520) 	beavatkozojel =  520;
-	if(beavatkozojel < -520)	beavatkozojel = -520;
+	if(beavatkozojel >  520.0f) 	beavatkozojel =  520.0f;
+	if(beavatkozojel < -520.0f)		beavatkozojel = -520.0f;
 
-	csat1 = 525 + beavatkozojel;
-	csat2 = 525 - beavatkozojel;
+	csat1 = 525.0f + beavatkozojel;
+	csat2 = 525.0f - beavatkozojel;
 
 	htim1.Instance->CCR1 	= csat1;
 	htim1.Instance->CCR3 	= csat2;
@@ -118,36 +117,12 @@ void motorvezerles(int16_t beavatkozojel)
 
 void gyors(void)
 {
-	SETflaggyors(1);
 	SETflaglassu(0);
-
-	SETp(GETpgyors());
-	SETd(GETdgyors());
-
-	SETv(GETvgyors());
-
+	SETflaggyors(1);
+	SETflagSCkovet(0);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
-}
-
-void fekez(void)
-{
-	SETp(GETplassu());
-	SETd(GETdlassu());
-
-	SETv(GETvfek());
-}
-
-void lassu(void)
-{
-	SETflaggyors(0);
-	SETflaglassu(1);
-
-	SETp(GETplassu());
-	SETd(GETdlassu());
-
-	SETv(GETvkovet());
-
-	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
 void labyrinth(void)
@@ -155,13 +130,45 @@ void labyrinth(void)
 	lassu();
 }
 
-void savvaltas()
+void lassu(void)
 {
-	SETv(GETvsavvalt());
+	SETflaglassu(1);
+	SETflaggyors(0);
+	SETflagSCkovet(0);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
+void savvaltas()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagSCkovet(0);
+	SETflagfekez(0);
+	SETflagsavvalt(1);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
 
+void fekez()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagSCkovet(0);
+	SETflagfekez(1);
+	SETflagsavvalt(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
 
+void SCkovet()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagSCkovet(1);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
 
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELYEZO JEL

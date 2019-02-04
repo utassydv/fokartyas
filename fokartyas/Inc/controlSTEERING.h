@@ -18,6 +18,7 @@ int16_t toPWM(int32_t jel);
 void toservo(void);
 uint32_t vonalvalasztas(void);
 void irany(uint8_t merre);
+void steeringSETTER(void);
 
 float GETp(void);
 void SETp(float ertek);

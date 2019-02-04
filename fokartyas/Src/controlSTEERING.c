@@ -9,6 +9,7 @@
 #include "controlSTEERING.h"
 #include "communicationvsz.h"
 #include "navigation.h"
+#include "actuator.h"
 #include <stdlib.h>
 
 
@@ -19,9 +20,9 @@ float plassu	=	2.7f;
 float dlassu	=	10.0f;
 float scalelassu=	0.7f;
 
-//float pgyors	=	0.8f;
-//float dgyors	=	5.0f;
-//float scalegyors=	1.0f;
+//float pgyors		=	0.8f;
+//float dgyors		=	5.0f;
+//float scalegyors	=	1.0f;
 
 float pgyors	=	2.7f;
 float dgyors	=	10.0f;
@@ -163,6 +164,30 @@ uint8_t mindigvalt(void)
 	else
 	{
 					return 1;
+	}
+}
+
+void steeringSETTER(void)
+{
+	if (GETflaglassu() == 1)
+	{
+		SETp(GETplassu());
+		SETd(GETdlassu());
+	}
+	if (GETflaggyors() == 1)
+	{
+		SETp(GETpgyors());
+		SETd(GETdgyors());
+	}
+	if (GETflagfekez() == 1)
+	{
+		SETp(GETplassu());
+		SETd(GETdlassu());
+	}
+	if (GETflagSCkovet() == 1)
+	{
+		SETp(GETplassu());
+		SETd(GETdlassu());
 	}
 }
 

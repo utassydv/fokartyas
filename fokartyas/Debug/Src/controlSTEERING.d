@@ -34,7 +34,8 @@ Src/controlSTEERING.o: ../Src/controlSTEERING.c \
  C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  C:/fokartyasz/fokartyas/Inc/controlSTEERING.h \
  C:/fokartyasz/fokartyas/Inc/communicationvsz.h \
- C:/fokartyasz/fokartyas/Inc/navigation.h
+ C:/fokartyasz/fokartyas/Inc/navigation.h \
+ C:/fokartyasz/fokartyas/Inc/actuator.h
 
 C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 
@@ -107,3 +108,5 @@ C:/fokartyasz/fokartyas/Inc/controlSTEERING.h:
 C:/fokartyasz/fokartyas/Inc/communicationvsz.h:
 
 C:/fokartyasz/fokartyas/Inc/navigation.h:
+
+C:/fokartyasz/fokartyas/Inc/actuator.h:

@@ -10,13 +10,16 @@
 
 void actuatorInit(void);
 void regulator(void);
+
 void gyors(void);
 void fekez(void);
 void lassu(void);
 void labyrinth(void);
 void savvaltas(void);
+void SCkovet(void);
+
 void control(void);
-void motorvezerles(int16_t sebesseg);
+void motorvezerles(float sebesseg);
 void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo);
 uint32_t GETuwDutyCycle(void);
 uint8_t GETflagsavvaltas(void);
