@@ -13,5 +13,6 @@
 void allapotgeplab(void);
 void allapotgep(void);
 uint8_t GETstatelab(void);
+uint8_t GETstate(void);
 
 #endif /* STATEMACHINE_H_ */

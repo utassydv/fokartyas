@@ -84,7 +84,7 @@ void gyro(void)
 {
 	if (offsetcnt < offsetlimit)	//OFFSET atlag db. szam
 	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 		if (offsetcnt > 1200)
 		{
 		gyrooffset();
@@ -101,7 +101,7 @@ void gyro(void)
 
 	else
 	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 		angle();
 		poz();
 	}

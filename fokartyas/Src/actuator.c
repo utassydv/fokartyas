@@ -29,7 +29,7 @@ uint8_t flagsavvalt	= 0;
 uint8_t flaggyors	= 0;
 uint8_t flaglassu	= 0;
 uint8_t flagfekez	= 0;
-uint8_t flagSCkovet	= 1;
+uint8_t flagSCkovet	= 0;
 
 
 uint8_t flagSTART 		= 0;
@@ -85,7 +85,7 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 		{
 			htim13.Instance->CCR1 	= elsoszervo; 		//elso szervo
 			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
-			htim10.Instance->CCR1 	= (1500-elsoszervo)*0.5+1500; 			//szenzor szervo
+			htim10.Instance->CCR1 	= -(1500-elsoszervo)*0.5+1500; 			//szenzor szervo
 		}
 
 
@@ -122,7 +122,7 @@ void gyors(void)
 	SETflagSCkovet(0);
 	SETflagfekez(0);
 	SETflagsavvalt(0);
-	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
 void labyrinth(void)
@@ -137,7 +137,7 @@ void lassu(void)
 	SETflagSCkovet(0);
 	SETflagfekez(0);
 	SETflagsavvalt(0);
-	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
 void savvaltas()

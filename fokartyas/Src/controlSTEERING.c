@@ -20,13 +20,13 @@ float plassu	=	2.7f;
 float dlassu	=	10.0f;
 float scalelassu=	0.7f;
 
-//float pgyors		=	0.8f;
-//float dgyors		=	5.0f;
-//float scalegyors	=	1.0f;
+float pgyors		=	0.8f;
+float dgyors		=	5.0f;
+float scalegyors	=	1.0f;
 
-float pgyors	=	2.7f;
-float dgyors	=	10.0f;
-float scalegyors=	0.7f;
+//float pgyors	=	2.7f;
+//float dgyors	=	10.0f;
+//float scalegyors=	0.7f;
 
 
 const uint16_t pwmmide	=	1500;

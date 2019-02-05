@@ -307,3 +307,8 @@ uint8_t GETstatelab(void)
 {
 	return statelab;
 }
+
+uint8_t GETstate(void)
+{
+	return state;
+}

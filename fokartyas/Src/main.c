@@ -178,9 +178,11 @@ while (1)
 	uartprocess(); 		//UART feldolgozasa
 	gyro();
 	vonalszamlalo(); 	//vonalszam figyeles
-	//allapotgep();
+
+	allapotgep();
 	//allapotgeplab();
-	vonalvaltas();
+	//vonalvaltas();
+
 	regulator();
 	control();
 	szabSCkovet();
