@@ -13,6 +13,7 @@
 #include "linetracking.h"
 #include "statemachine.h"
 #include "controlVELOCITY.h"
+#include "controlSTEERING.h"
 #include "communicationvsz.h"
 #include "navigation.h"
 #include "actuator.h"
@@ -106,8 +107,8 @@ void bluetoothDRIVE(void)
 //		int32_t aXki=GETaX();
 //		int32_t aYki=GETaY();
 //		int32_t aZki=GETaZ();
-		int32_t currentXki =GETcurrentX()*0.001;  // -> cm
-		int32_t currentYki =GETcurrentY()*0.001;
+		int32_t currentXki =GETcurrentX();  // -> cm
+		int32_t currentYki =GETcurrentY();
 		int32_t vki =GETv()*1000;
 		int32_t vkikovet =GETvkovet()*1000;
 		int32_t epreski =GETepres();
@@ -122,7 +123,10 @@ void bluetoothDRIVE(void)
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",GETstatevonalvaltas(),GETcount(), GETkettohossz(), GETtav(),GETtav2(),GETtavolsag());
 		//snprintf(TxData, 100, "%d, %d,%d,%d,%d,%d,%d,%d,%d\n",epreski ,GETSCtavolsag(),vki, vkikovet, GETflaglassu(), GETflaggyors(), GETflagsavvalt(), GETflagfekez() , GETflagSCkovet());
-		snprintf(TxData, 100, "%d\n",GETstate());
+		snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d,%d,%d,%d \n",GETcount(), GETegyenescounter(), GETflagSCkovet(),GETstate(), GETSCstate(), GETkisorol() , GETgiroszab(),currentXki ,currentYki);
+		//snprintf(TxData, 100, "%d\n",GETuwDutyCycle());
+		//snprintf(TxData, 100, "%d\n",GETcounterpres());
+
 
 		HAL_UART_Transmit(&huart2, (uint8_t *)TxData, (strlen(TxData)), HAL_MAX_DELAY); //melyik, mit, mennyi, mennyi ido
 		SETflagbluetooth(0);

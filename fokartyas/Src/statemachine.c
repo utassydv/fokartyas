@@ -12,8 +12,9 @@
 #include "linetracking.h"
 #include "tracking.h"
 #include "communicationvsz.h"
+#include "controlSTEERING.h"
 
-uint8_t gyorsasagi = 0;
+uint8_t gyorsasagi 				= 0;
 uint8_t state 					= 0;
 uint8_t statelab 				= 0;
 uint8_t SCstate 				= 0;
@@ -98,103 +99,168 @@ void SCallapotgep(void)
 	{
 		if (GETflagallapotgep() == 1)
 		{
+			if (GETcounterpres() > 8391400)
+			{
+
+				gyors();
+				SETflagSCkovet(0);
+				state = 2;
+				SETstartposition(GETcounterpres());
+				SEThossz(0);
+
+			}
 			switch(SCstate)
 					{
+
+
 						case 0:
+							if(GETcount() == 3)
+							{
+								SETstartposition(GETcounterpres());
+								SCstate = 1;
+							}
+							break;
+						case 1:
+							if(GETcounterpres() - GETstartposition() > 500000)
+							{
+								SCstate = 3;
+								SETflagharom(0);
+								SEThossz(0);
+							}
+							break;
+						case 3:
 							egyutanharomhossz();
 							if(GEThossz() > 5000 && GEThossz() < 18000 )  //elso szaggatott haromvonalfigyelo
 							{
-								SCstate = 1;
-								SEThossz(0);
-							}
-							break;
-
-						case 1:
-							haromutanegyhossz();
-							if(GEThossz() > 5000 && GEThossz() < 20000)  //elso szaggatott egyvonalfigyelo, utana gyorsít
-							{
-								SCstate = 2;
-								SETstartposition(GETcounterpres());
-								SEThossz(0);
-							}
-							break;
-
-						case 2:
-							if (GETcounterpres() - GETstartposition() > 280000) //14000 x 2(m) // ennyi távolsagig nem figyeljuk a haromvonalat
-							{
-								SETharomvonalszam(0);
-								egyenescounter++;
-								if (egyenescounter == 2) 		SCstate = 8; //elozes
-								else if (egyenescounter == 4) 	SETflagSCkovet(0);
-								else							SCstate = 3;
-							}
-							break;
-
-						case 3:
-							if(GETcount() == 3)													//ha haromvonal, nezzok az elejet
-							{
-								SETstartposition(GETcounterpres());
 								SCstate = 4;
+								SEThossz(0);
 							}
 							break;
 
 						case 4:
-							if(GETcounterpres() - GETstartposition() > 42000) //  ha 30cm-en belül
+							haromutanegyhossz();
+							if(GEThossz() > 5000 && GEThossz() < 20000)  //elso szaggatott egyvonalfigyelo, utana gyorsít
 							{
-								if (GETharomvonalszam() >= 6)					// min.6x volt 6 vonal
-								{
-									state = 5;
-								}
-								else											//különben hiba volt, vissza
-								{
-									SETharomvonalszam(0);
-									state = 3;
-								}
+								SCstate = 5;
+								SETstartposition(GETcounterpres());
+								SEThossz(0);
+								egyenescounter++;
+//								if (egyenescounter == 2)
+//								{
+//									SETszog(0.0f);
+//									SETcurrentX(0.0f);
+//									SETcurrentY(0.0f);
+//									SCstate = 11; //elozes
+//									lassu();
+//									SETkisorol(1);
+//								}
+//								if (egyenescounter == 4)
+//								{
+//
+//									gyors();
+//									SETflagSCkovet(0);
+//									state = 2;
+//								}
 							}
 							break;
 
 						case 5:
-							if(GETcounterpres() - GETstartposition() > 280000)//2m kesobbb lassií
+							if (GETcounterpres() - GETstartposition() > 280000) //14000 x 2(m) // ennyi távolsagig nem figyeljuk a haromvonalat
 							{
-								lassu() ;
-								SETegyvonalszam(0);
+								SETharomvonalszam(0);
+
 								SCstate = 6;
 							}
 							break;
+
 						case 6:
-							if(GETcount() == 1)									//ha 1 vonal
+							if(GETcount() == 3)													//ha haromvonal, nezzok az elejet
 							{
 								SETstartposition(GETcounterpres());
 								SCstate = 7;
 							}
 							break;
+
 						case 7:
-							if(GETcounterpres() - GETstartposition() > 28000) // 20cm-en belül
+							if(GETcounterpres() - GETstartposition() > 42000) //  ha 30cm-en belül
 							{
-								if (GETegyvonalszam() >= 4)					//4x van 1 vonal, akkor lassu szakasz, indul elolrol az allapotgep
+								if (GETharomvonalszam() >= 6)					// min.6x volt 6 vonal
 								{
-									SEThossz(0);
-									SCstate = 0;
+									SCstate = 8;
 								}
-								else										//hiba volt, vissza
+								else											//különben hiba volt, vissza
 								{
-									SETegyvonalszam(0);
+									SETharomvonalszam(0);
 									SCstate = 6;
 								}
 							}
 							break;
 
 						case 8:
-							SCstate = 0;
+							if(GETcounterpres() - GETstartposition() > 280000)//2m kesobbb lassií
+							{
+								SETegyvonalszam(0);
+								SCstate = 9;
+							}
+							break;
+						case 9:
+							if(GETcount() == 1)									//ha 1 vonal
+							{
+								SETstartposition(GETcounterpres());
+								SCstate = 10;
+							}
+							break;
+						case 10:
+							if(GETcounterpres() - GETstartposition() > 28000) // 20cm-en belül
+							{
+								if (GETegyvonalszam() >= 4)					//4x van 1 vonal, akkor lassu szakasz, indul elolrol az allapotgep
+								{
+									SEThossz(0);
+									SCstate = 3;
+								}
+								else										//hiba volt, vissza
+								{
+									SETegyvonalszam(0);
+									SCstate = 9;
+								}
+							}
+							break;
+
+						case 11:
+							SETkisorol(1);
+							if ( GETcurrentY() < -30000 )
+							{
+								lassu();
+								SETkisorol(0);
+								SETgiroszab(1);
+								SCstate = 12;
+							}
+							break;
+
+						case 12:
+							//SETgiroszab(1);
+							if (GETcurrentX() >  620000)
+							{
+								lassu();
+								SETgiroszab(0);
+								SETbesorol(1);
+								SETegyvonalszam(0);
+								SCstate = 13;
+								lassu();
+							}
+							break;
+						case 13:
+							if(GETegyvonalszam() >= 4)			//amíg meg nem jövünk a vonalra
+							{
+								SETbesorol(0);
+								SCstate = 3;
+							}
 							break;
 
 						default:
 							SCstate = 0;
 							break;
 					}
-
-
-
 
 			SETflagallapotgep(0);
 		}
@@ -251,7 +317,7 @@ void allapotgep(void)
 				case 4:
 					if(GETcounterpres() - GETstartposition() > 42000) //  ha 30cm-en belül
 					{
-						if (GETharomvonalszam() >= 6)					// min.6x volt 6 vonal
+						if (GETharomvonalszam() >= 6)					// min.6x volt 3 vonal
 						{
 							state = 5;
 						}
@@ -312,3 +378,14 @@ uint8_t GETstate(void)
 {
 	return state;
 }
+
+uint8_t GETSCstate(void)
+{
+	return SCstate;
+}
+
+uint8_t GETegyenescounter(void)
+{
+	return egyenescounter;
+}
+

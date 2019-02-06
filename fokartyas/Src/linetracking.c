@@ -182,4 +182,10 @@ void SETflagketto(uint8_t ertek)
 	flagketto = ertek;
 }
 
+void SETflagharom(uint8_t ertek)
+{
+	flagharom = ertek;
+}
+
+
 

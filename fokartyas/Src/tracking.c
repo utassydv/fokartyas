@@ -28,11 +28,14 @@ uint16_t offsetlimit = 6200;
 float offsetszog;
 float szogseb;
 float szog = 0;
+float regiszog =0;
 float TEMPERATURE = 0;
 
 int32_t counterpres	= 0;
 int32_t counterprev	= 0;
 int32_t speed		= 0;
+
+float autohossz=54000;
 
 
 int32_t currentX = 0;
@@ -84,7 +87,7 @@ void gyro(void)
 {
 	if (offsetcnt < offsetlimit)	//OFFSET atlag db. szam
 	{
-		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 		if (offsetcnt > 1200)
 		{
 		gyrooffset();
@@ -101,7 +104,7 @@ void gyro(void)
 
 	else
 	{
-		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 		angle();
 		poz();
 	}
@@ -151,7 +154,7 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 		adat 	|=  rxdata1[1];
 
 		szogseb=((float)adat*8.61262521018907f-offsetszog)/200000.0f;  // 4.3140960937f
-
+		regiszog=szog;
 		szog = szog+szogseb;
 
 //		if (szog >= 180.0f) szog = szog-360.0f;
@@ -197,27 +200,31 @@ void poz(void)
 
 	if (GETflagpoz() == 1)
 	{
-		currentX = currentX + deltax(speed,szog);
-		currentY = currentY + deltay(speed,szog);
+		currentX = currentX + deltax(speed,szog,regiszog);
+		currentY = currentY + deltay(speed,szog,regiszog);
 		SETflagpoz(0);
 	}
 }
 
-float deltax(int vpalya, float vszog)
+float deltax(int vpalya, float vszog, float vregiszog)
 {
 
 	float uthossz=((float)vpalya)*0.7142857143f;   //     /1.40
 
 	float kosz=(float)cosf(vszog*0.01745329252f);
-	return uthossz*kosz;
+	float koszregi=(float)cosf(vregiszog*0.01745329252f);
+	float koszuj=(float)cosf(vszog*0.01745329252f);
+	return uthossz*kosz+koszuj*autohossz-koszregi*autohossz;
 }
 
-float deltay(int vpalya, float vszog)
+float deltay(int vpalya, float vszog, float vregiszog)
 {
 	float uthossz=((float)vpalya)*0.7142857143f;    //   /1.40
 
 	float szin=(float)sinf(vszog*0.01745329252f);
-	return uthossz*szin;
+	float szinregi=(float)sinf(vregiszog*0.01745329252f);
+	float szinuj=(float)sinf(vszog*0.01745329252f);
+	return uthossz*szin+szinuj*autohossz-szinregi*autohossz;
 }
 
 
@@ -276,6 +283,31 @@ float GETszog(void)
 	return szog;
 }
 
+void SETszog(float ertek)
+{
+	szog=ertek;
+}
+
+float GETregiszog(void)
+{
+	return regiszog;
+}
+
+void SETregiszog(float ertek)
+{
+	regiszog=ertek;
+}
+
+void SETcurrentX(int32_t ertek)
+{
+	currentX=ertek;
+}
+
+void SETcurrentY(int32_t ertek)
+{
+	currentY=ertek;
+}
+
 uint16_t GEToffsetcnt(void)
 {
 	return offsetcnt;
@@ -285,6 +317,9 @@ float GETTEMPERATURE(void)
 {
 	return TEMPERATURE;
 }
+
+
+
 
 
 

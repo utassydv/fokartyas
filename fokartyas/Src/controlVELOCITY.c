@@ -24,7 +24,7 @@
 
 float v 		= 	0.0f;
 float vlassu	=	1.5f;
-float vgyors	=	3.5f;
+float vgyors	=	2.5f;
 float vfek		=	0.0f;
 float vsavvalt 	=	1.0f;
 float vkovet	=   0.0f;
@@ -84,7 +84,7 @@ void tomotorcontrol(void)
 {
 	epres = toinkrspeed(v) - (float)GETspeed();
 
-	if( fabs(GETv()) < 0.1  && fabs(epres) < 400 )		upres = 0;
+	if( fabs(GETv()) < 0.3  && fabs(epres) < 200 )		upres = 0;
 	if (epres   > 0 )							upres = 	 136.8f + 0.04f*szabvPI(epres);
 	if (epres   < 0 )							upres = 	-136.8f + 0.04f*szabvPI(epres);
 

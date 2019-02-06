@@ -11,13 +11,15 @@
 #include "navigation.h"
 #include "actuator.h"
 #include <stdlib.h>
+#include "tracking.h"
 
 
+int32_t Ykivant = 	-65000;
 float p			=	2.5f;
 float d			=	10.0f;
 
 float plassu	=	2.7f;
-float dlassu	=	10.0f;
+float dlassu	=	8.0f;
 float scalelassu=	0.7f;
 
 float pgyors		=	0.8f;
@@ -47,6 +49,10 @@ int32_t beavatkozo	= 0;
 uint32_t vonal		= 12799;
 uint32_t regivonal	= 12799;
 
+uint8_t kisorol = 0;
+uint8_t besorol = 0;
+uint8_t giroszab = 0;
+
 
 
 extern TIM_HandleTypeDef htim10; 						//szenzor szervo timer
@@ -63,8 +69,21 @@ void controlSTEERINGInit(void)
 int32_t toerror(uint32_t dist)
 {
 	int32_t tavolsag=dist;
-	if (tavolsag > 25599 || tavolsag < 0) tavolsag=12799;	//ha nemletezeo tavolsag, akkor kozep tavolsag.
-	tavolsag=tavolsag-12799;
+	//if (tavolsag > 25599 || tavolsag < 0) tavolsag=12799;	//ha nemletezeo tavolsag, akkor kozep tavolsag.
+
+	if(giroszab == 1)
+	{
+		tavolsag =  Ykivant - GETcurrentY() ;
+	}
+	else if(kisorol == 1)
+	{
+		tavolsag = GETcurrentX()/100- GETcurrentY();
+	}
+	else if(besorol == 1)
+	{
+		tavolsag = -GETcurrentX() + GETcurrentY();
+	}
+	else tavolsag=tavolsag-12799;
 
 	return tavolsag;
 }
@@ -295,5 +314,37 @@ void SETregivonal(uint32_t ertek)
 {
 	regivonal = ertek;
 }
+
+void SETkisorol(uint8_t ertek)
+{
+	kisorol = ertek;
+}
+
+void SETbesorol(uint8_t ertek)
+{
+ besorol = ertek;
+}
+
+void SETgiroszab(uint8_t ertek)
+{
+	giroszab = ertek;
+}
+
+int32_t GETkivantY()
+{
+	return Ykivant;
+}
+
+uint8_t GETkisorol(void)
+{
+	return kisorol;
+}
+
+uint8_t GETgiroszab(void)
+{
+	return giroszab;
+}
+
+
 
 

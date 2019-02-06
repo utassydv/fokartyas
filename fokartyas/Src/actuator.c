@@ -29,12 +29,19 @@ uint8_t flagsavvalt	= 0;
 uint8_t flaggyors	= 0;
 uint8_t flaglassu	= 0;
 uint8_t flagfekez	= 0;
-uint8_t flagSCkovet	= 0;
+uint8_t flagSCkovet	= 1;
 
 
 uint8_t flagSTART 		= 0;
 const int16_t posvalte = 1700;
 const int16_t posvalth = 1850;
+
+const int16_t posbale = 1700;
+const int16_t posjobbe = 1300;
+
+uint8_t balra		= 0;
+uint8_t jobbra		= 0;
+
 
 
 void actuatorInit(void)
@@ -52,6 +59,7 @@ void regulator(void)
 	{
 		steeringSETTER();
 		toservo();
+
 
 		velocitySETTER();
 		tomotorcontrol();
@@ -81,11 +89,23 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 			htim14.Instance->CCR1 	= posvalth; 	//hatso szervo
 			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
 		}
+		else if(balra == 1)
+		{
+			htim13.Instance->CCR1 	= posbale; 		//elso szervo
+			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
+		else if(jobbra == 1)
+		{
+			htim13.Instance->CCR1 	= posjobbe; 		//elso szervo
+			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
 		else
 		{
 			htim13.Instance->CCR1 	= elsoszervo; 		//elso szervo
 			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
-			htim10.Instance->CCR1 	= -(1500-elsoszervo)*0.5+1500; 			//szenzor szervo
+			htim10.Instance->CCR1 	= -(1500-elsoszervo)*1+1500; 			//szenzor szervo
 		}
 
 
@@ -119,7 +139,6 @@ void gyors(void)
 {
 	SETflaglassu(0);
 	SETflaggyors(1);
-	SETflagSCkovet(0);
 	SETflagfekez(0);
 	SETflagsavvalt(0);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
@@ -134,7 +153,6 @@ void lassu(void)
 {
 	SETflaglassu(1);
 	SETflaggyors(0);
-	SETflagSCkovet(0);
 	SETflagfekez(0);
 	SETflagsavvalt(0);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
@@ -144,7 +162,6 @@ void savvaltas()
 {
 	SETflaglassu(0);
 	SETflaggyors(0);
-	SETflagSCkovet(0);
 	SETflagfekez(0);
 	SETflagsavvalt(1);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
@@ -154,7 +171,6 @@ void fekez()
 {
 	SETflaglassu(0);
 	SETflaggyors(0);
-	SETflagSCkovet(0);
 	SETflagfekez(1);
 	SETflagsavvalt(0);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);

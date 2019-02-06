@@ -21,8 +21,8 @@ void gyrooffset(void);
 void angle(void);
 void poz(void);
 void temp(void);
-float deltax(int vpalya, float vszog);
-float deltay(int vpalya, float vszog);
+float deltax(int vpalya, float vszog,float vregiszog);
+float deltay(int vpalya, float vszog,float vregiszog);
 void speedpos(void);
 void savelocation(pont2D location);
 float GETszogseb(void);
@@ -35,6 +35,13 @@ float GEToffsetszog(void);
 float GETszog(void);
 uint16_t GEToffsetcnt(void);
 float GETTEMPERATURE(void);
+void SETszog(float ertek);
+void SETregiszog(float ertek);
+float GETregiszog(void);
+void SETcurrentX(int32_t ertek);
+void SETcurrentY(int32_t ertek);
+int32_t GETcurrentX(void);
+int32_t GETcurrentY(void);
 
 
 #endif /* TRACKING_H_ */

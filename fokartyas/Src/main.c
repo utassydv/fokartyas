@@ -179,6 +179,7 @@ while (1)
 	gyro();
 	vonalszamlalo(); 	//vonalszam figyeles
 
+	SCallapotgep();
 	allapotgep();
 	//allapotgeplab();
 	//vonalvaltas();

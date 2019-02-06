@@ -38,6 +38,7 @@ void SETflagfekez(uint8_t ertek);
 uint8_t GETflagsavvalt(void);
 void SETflagsavvalt(uint8_t ertek);
 uint8_t GETflagSCkovet(void);
+
 void SETflagSCkovet(uint8_t ertek);
 
 

@@ -45,5 +45,11 @@ void SETflaggyors(uint8_t ertek);
 void SETregivonal(uint32_t ertek);
 uint32_t GETvonal(void);
 uint8_t mindigvalt(void);
+void SETkisorol(uint8_t ertek);
+void SETbesorol(uint8_t ertek);
+void SETgiroszab(uint8_t ertek);
+int32_t GETkivantY();
+uint8_t GETkisorol(void);
+uint8_t GETgiroszab(void);
 
 #endif /* CONTROLSTEERING_H_ */
