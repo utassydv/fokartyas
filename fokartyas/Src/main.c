@@ -179,10 +179,10 @@ while (1)
 	gyro();
 	vonalszamlalo(); 	//vonalszam figyeles
 
-	SCallapotgep();
-	allapotgep();
+	//SCallapotgep();
+	//allapotgep();
 	//allapotgeplab();
-	//vonalvaltas();
+	vonalvaltas();
 	//allapotgepelozes();
 
 	regulator();
@@ -190,8 +190,6 @@ while (1)
 	szabSCkovet();
 	bluetoothDRIVE();
 	trackRADIO();
-
-
 
 }
 
@@ -752,7 +750,7 @@ static void MX_TIM14_Init(void)
   htim14.Instance = TIM14;
   htim14.Init.Prescaler = 83;
   htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim14.Init.Period = 15999;
+  htim14.Init.Period = 3999;
   htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
   {
@@ -896,6 +894,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF8_USART6;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 

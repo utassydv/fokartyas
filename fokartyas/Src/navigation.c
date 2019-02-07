@@ -69,7 +69,7 @@ void vonalvaltas(void)
 //				{
 //					SETregivonal(GETvonal());
 //				}
-				SETvaltaslehetoseg(0);
+				//SETvaltaslehetoseg(0);
 				if(GETcount() == 1)
 				{
 					SETkettohossz(0);

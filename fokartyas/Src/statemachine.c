@@ -70,7 +70,7 @@ void allapotgeplab(void)
 				break;
 
 			case 3:
-				savvaltas();
+				visszasavvaltas();
 				if(GETnullavonalszam() >= 80)			//amig el nem hagyjuk a vonalat
 				{
 					SETegyvonalszam(0);

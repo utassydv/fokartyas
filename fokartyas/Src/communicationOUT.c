@@ -143,3 +143,9 @@ uint8_t GETstartjel(void)
 	return startjel;
 }
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+}
+

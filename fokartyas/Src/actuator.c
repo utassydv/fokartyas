@@ -77,8 +77,6 @@ void control(void)
 {
 	if (GETflagbeav() == 1)
 	{
-
-
 		szervovezerles(GETpos(), GETposh());
 		motorvezerles(GETupres());						//motor
 		SETflagbeav(0);
@@ -185,7 +183,7 @@ void lassu(void)
 	SETflagsavvalt(0);
 	SETflagvisszasavvalt(0);
 	SETflageloz(0);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
 void savvaltas()

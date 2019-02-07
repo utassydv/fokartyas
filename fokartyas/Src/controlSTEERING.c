@@ -173,8 +173,9 @@ void toservo(void)
 
 	if(GETvaltaslehetoseg() == 1)
 	{
-		irany(mindigvalt());
+		//irany(mindigvalt());
 		//irany(1);
+		irany(randomiser());
 		SETvaltaslehetoseg(0);
 	}
 
