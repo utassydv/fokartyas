@@ -9,23 +9,36 @@
 #include "controlSTEERING.h"
 #include "communicationvsz.h"
 #include "navigation.h"
+#include "actuator.h"
 #include <stdlib.h>
+#include "tracking.h"
+#include "math.h"
 
 
+int32_t Ykivant = 	0;
 float p			=	2.5f;
 float d			=	10.0f;
 
-float plassu	=	2.7f;
-float dlassu	=	10.0f;
+float plassu	=	2.7f;  //2.7
+float dlassu	=	8.0f;  //8.0
 float scalelassu=	0.7f;
 
-//float pgyors	=	0.8f;
-//float dgyors	=	5.0f;
-//float scalegyors=	1.0f;
+//float pgyors		=	0.8f;
+//float dgyors		=	5.0f;
+//float scalegyors	=	1.0f;
 
-float pgyors	=	2.7f;
-float dgyors	=	10.0f;
-float scalegyors=	0.7f;
+float pgyors		=	0.8f;   //0.8
+float dgyors		=	15.0f;  //15.0
+float scalegyors	=	1.0f;
+
+float peloz		=	0.8f;
+float deloz	=	15.0f;
+float scaleeloz	=	1.0f;
+
+
+//float pgyors	=	2.7f;
+//float dgyors	=	10.0f;
+//float scalegyors=	0.7f;
 
 
 const uint16_t pwmmide	=	1500;
@@ -46,6 +59,10 @@ int32_t beavatkozo	= 0;
 uint32_t vonal		= 12799;
 uint32_t regivonal	= 12799;
 
+uint8_t kisorol = 0;
+uint8_t besorol = 0;
+uint8_t giroszab = 0;
+
 
 
 extern TIM_HandleTypeDef htim10; 						//szenzor szervo timer
@@ -62,8 +79,21 @@ void controlSTEERINGInit(void)
 int32_t toerror(uint32_t dist)
 {
 	int32_t tavolsag=dist;
-	if (tavolsag > 25599 || tavolsag < 0) tavolsag=12799;	//ha nemletezeo tavolsag, akkor kozep tavolsag.
-	tavolsag=tavolsag-12799;
+	//if (tavolsag > 25599 || tavolsag < 0) tavolsag=12799;	//ha nemletezeo tavolsag, akkor kozep tavolsag.
+
+	if(giroszab == 1)
+	{
+		tavolsag =  Ykivant + GETcurrentY() + 54000*(float)sinf(GETszog()*0.01745329252f);
+	}
+	else if(kisorol == 1)
+	{
+		tavolsag = (GETcurrentX() + 54000*(float)cosf(GETszog()*0.01745329252f)) /100 - GETcurrentY() - 54000*(float)cosf(GETszog()*0.01745329252f);
+	}
+	else if(besorol == 1)
+	{
+		tavolsag = -GETcurrentX() + 54000*(float)sinf(GETszog()*0.01745329252f) + GETcurrentY() - 54000*(float)cosf(GETszog()*0.01745329252f);
+	}
+	else tavolsag=tavolsag-12799;
 
 	return tavolsag;
 }
@@ -102,6 +132,12 @@ int16_t toPWM(int32_t jel)
 		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
 		if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
 	}
+	if (GETflageloz() == 1)
+		{
+			pwmh=pwmmidh-scaleeloz*jel*(rangeh*1000000/12799)/100000; //KORM�?NY
+			if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
+			if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
+		}
 	posh	=	pwmh;
 
 	return pwme;
@@ -166,6 +202,46 @@ uint8_t mindigvalt(void)
 	}
 }
 
+void steeringSETTER(void)
+{
+
+	if (GETflagSCkovet() == 1)
+	{
+
+		if (GETflageloz() == 1)
+		{
+			SETp(GETpeloz());
+			SETd(GETdeloz());
+		}
+		else
+		{
+			SETp(GETplassu());
+			SETd(GETdlassu());
+		}
+	}
+	if (GETflaglassu() == 1)
+	{
+		SETp(GETplassu());
+		SETd(GETdlassu());
+	}
+	if (GETflaggyors() == 1)
+	{
+		SETp(GETpgyors());
+		SETd(GETdgyors());
+	}
+	if (GETflageloz() == 1)
+	{
+		SETp(GETpeloz());
+		SETd(GETdeloz());
+	}
+	if (GETflagfekez() == 1)
+	{
+		SETp(GETplassu());
+		SETd(GETdlassu());
+	}
+
+}
+
 float GETp(void)
 {
 	return p;
@@ -216,6 +292,15 @@ void SETpgyors(float ertek)
 	pgyors = ertek;
 }
 
+float GETpeloz(void)
+{
+	return peloz;
+}
+void SETpeloz(float ertek)
+{
+	peloz = ertek;
+}
+
 float GETdgyors(void)
 {
 	return dgyors;
@@ -225,6 +310,14 @@ void SETdgyors(float ertek)
 	dgyors = ertek;
 }
 
+float GETdeloz(void)
+{
+	return deloz;
+}
+void SETdeloz(float ertek)
+{
+	deloz = ertek;
+}
 
 uint16_t GETpwmmide(void)
 {
@@ -270,5 +363,37 @@ void SETregivonal(uint32_t ertek)
 {
 	regivonal = ertek;
 }
+
+void SETkisorol(uint8_t ertek)
+{
+	kisorol = ertek;
+}
+
+void SETbesorol(uint8_t ertek)
+{
+ besorol = ertek;
+}
+
+void SETgiroszab(uint8_t ertek)
+{
+	giroszab = ertek;
+}
+
+int32_t GETkivantY()
+{
+	return Ykivant;
+}
+
+uint8_t GETkisorol(void)
+{
+	return kisorol;
+}
+
+uint8_t GETgiroszab(void)
+{
+	return giroszab;
+}
+
+
 
 

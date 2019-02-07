@@ -26,15 +26,27 @@ __IO uint32_t vlmi = 0;
 __IO uint32_t  SCtavolsag = 0;
 
 uint8_t flagsavvalt	= 0;
+uint8_t flagvisszasavvalt	= 0;
 uint8_t flaggyors	= 0;
 uint8_t flaglassu	= 0;
 uint8_t flagfekez	= 0;
 uint8_t flagSCkovet	= 1;
+uint8_t flageloz=0;
 
 
 uint8_t flagSTART 		= 0;
-const int16_t posvalte = 1700;
-const int16_t posvalth = 1850;
+const int16_t posvalte = 1850;
+const int16_t posvalth = 2000;
+
+const int16_t posvisszavalte = 1000;
+const int16_t posvisszavalth = 1000;
+
+const int16_t posbale = 1700;
+const int16_t posjobbe = 1300;
+
+uint8_t balra		= 0;
+uint8_t jobbra		= 0;
+
 
 
 void actuatorInit(void)
@@ -50,13 +62,13 @@ void regulator(void)
 {
 	if (GETflagregulator() == 1)
 	{
+		steeringSETTER();
 		toservo();
 
 
 		velocitySETTER();
-
-
 		tomotorcontrol();
+
 		SETflagregulator(0);
 	}
 }
@@ -82,11 +94,33 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 			htim14.Instance->CCR1 	= posvalth; 	//hatso szervo
 			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
 		}
+		else if (flagvisszasavvalt==1)
+		{
+			htim13.Instance->CCR1 	= posvisszavalte; 		//elso szervo
+			htim14.Instance->CCR1 	= posvisszavalth; 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
+		else if(balra == 1)
+		{
+			htim13.Instance->CCR1 	= posbale; 		//elso szervo
+			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
+		else if(jobbra == 1)
+		{
+			htim13.Instance->CCR1 	= posjobbe; 		//elso szervo
+			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
 		else
 		{
 			htim13.Instance->CCR1 	= elsoszervo; 		//elso szervo
 			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
-			htim10.Instance->CCR1 	= (1500-elsoszervo)*0.5+1500; 			//szenzor szervo
+			htim10.Instance->CCR1 	= -(1500-elsoszervo)*1+1500; 			//szenzor szervo
+
+	//		htim13.Instance->CCR1 	= 1800; 		//elso szervo
+	//		htim14.Instance->CCR1 	= 2000; 	//hatso szervo
+	//		htim10.Instance->CCR1 	= -(1500-elsoszervo)*1+1500; 			//szenzor szervo
 		}
 
 
@@ -97,17 +131,17 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 		//	htim14.Instance->CCR1 	= 1500; 	//hatso szervo
 }
 
-void motorvezerles(int16_t beavatkozojel)
+void motorvezerles(float beavatkozojel)
 {
-	uint16_t csat1;
-	uint16_t csat2;
+	float csat1;
+	float csat2;
 
 
-	if(beavatkozojel >  520) 	beavatkozojel =  520;
-	if(beavatkozojel < -520)	beavatkozojel = -520;
+	if(beavatkozojel >  520.0f) 	beavatkozojel =  520.0f;
+	if(beavatkozojel < -520.0f)		beavatkozojel = -520.0f;
 
-	csat1 = 525 + beavatkozojel;
-	csat2 = 525 - beavatkozojel;
+	csat1 = 525.0f + beavatkozojel;
+	csat2 = 525.0f - beavatkozojel;
 
 	htim1.Instance->CCR1 	= csat1;
 	htim1.Instance->CCR3 	= csat2;
@@ -118,36 +152,24 @@ void motorvezerles(int16_t beavatkozojel)
 
 void gyors(void)
 {
-	SETflaggyors(1);
 	SETflaglassu(0);
-
-	SETp(GETpgyors());
-	SETd(GETdgyors());
-
-	SETv(GETvgyors());
-
-	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+	SETflaggyors(1);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
+	SETflageloz(0);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
-void fekez(void)
+void eloz(void)
 {
-	SETp(GETplassu());
-	SETd(GETdlassu());
-
-	SETv(GETvfek());
-}
-
-void lassu(void)
-{
+	SETflaglassu(0);
 	SETflaggyors(0);
-	SETflaglassu(1);
-
-	SETp(GETplassu());
-	SETd(GETdlassu());
-
-	SETv(GETvkovet());
-
-	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
+	SETflageloz(1);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
 void labyrinth(void)
@@ -155,13 +177,61 @@ void labyrinth(void)
 	lassu();
 }
 
-void savvaltas()
+void lassu(void)
 {
-	SETv(GETvsavvalt());
+	SETflaglassu(1);
+	SETflaggyors(0);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
+	SETflageloz(0);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
+void savvaltas()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagfekez(0);
+	SETflagsavvalt(1);
+	SETflagvisszasavvalt(0);
+	SETflageloz(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
 
+void visszasavvaltas()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	SETflagvisszasavvalt(1);
+	SETflageloz(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
 
+void fekez()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagfekez(1);
+	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
+	SETflageloz(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
+
+void SCkovet()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagSCkovet(1);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
+	SETflageloz(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
 
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)  //TAVIRANYITO ENGEDELYEZO JEL
@@ -265,6 +335,26 @@ uint8_t GETflagsavvalt(void)
 void SETflagsavvalt(uint8_t ertek)
 {
 	flagsavvalt = ertek;
+}
+
+void SETflageloz(uint8_t ertek)
+{
+	flageloz = ertek;
+}
+
+uint8_t GETflageloz()
+{
+	return flageloz;
+}
+
+uint8_t GETvisszaflagsavvalt(void)
+{
+	return flagvisszasavvalt;
+}
+
+void SETflagvisszasavvalt(uint8_t ertek)
+{
+	flagvisszasavvalt = ertek;
 }
 
 uint8_t GETflagSCkovet(void)

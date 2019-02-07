@@ -29,6 +29,7 @@ int32_t GETkettohossz(void);
 void kettohosszfv(void);
 void SETkettohossz(int32_t ertek);
 void SETflagketto(uint8_t ertek);
+void SETflagharom(uint8_t ertek);
 
 
 

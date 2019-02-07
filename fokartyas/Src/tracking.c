@@ -24,7 +24,7 @@ uint8_t enabledata[2];
 uint8_t TEMPenabledata[2];
 
 uint16_t offsetcnt = 0;
-uint16_t offsetlimit = 6200;
+uint16_t offsetlimit = 1500;
 float offsetszog;
 float szogseb;
 float szog = 0;
@@ -33,6 +33,8 @@ float TEMPERATURE = 0;
 int32_t counterpres	= 0;
 int32_t counterprev	= 0;
 int32_t speed		= 0;
+
+float autohossz=54000;
 
 
 int32_t currentX = 0;
@@ -85,7 +87,7 @@ void gyro(void)
 	if (offsetcnt < offsetlimit)	//OFFSET atlag db. szam
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
-		if (offsetcnt > 1200)
+		if (offsetcnt > 500)
 		{
 		gyrooffset();
 		}
@@ -128,7 +130,7 @@ void gyrooffset(void)
 		szogseb	= (float)adat*8.61262521018907f;  //4.3140960937-< 125dpsnel,, 8.61262521018907-250dps
 
 
-		offsetszog = 0.0002f*szogseb+offsetszog; //Štlag
+		offsetszog = 0.001f*szogseb+offsetszog; //Štlag
 
 		offsetcnt++;
 		SETflagangleoffset(0);
@@ -151,7 +153,6 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 		adat 	|=  rxdata1[1];
 
 		szogseb=((float)adat*8.61262521018907f-offsetszog)/200000.0f;  // 4.3140960937f
-
 		szog = szog+szogseb;
 
 //		if (szog >= 180.0f) szog = szog-360.0f;
@@ -276,6 +277,22 @@ float GETszog(void)
 	return szog;
 }
 
+void SETszog(float ertek)
+{
+	szog=ertek;
+}
+
+
+void SETcurrentX(int32_t ertek)
+{
+	currentX=ertek;
+}
+
+void SETcurrentY(int32_t ertek)
+{
+	currentY=ertek;
+}
+
 uint16_t GEToffsetcnt(void)
 {
 	return offsetcnt;
@@ -285,6 +302,9 @@ float GETTEMPERATURE(void)
 {
 	return TEMPERATURE;
 }
+
+
+
 
 
 

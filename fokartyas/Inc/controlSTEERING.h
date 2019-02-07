@@ -18,6 +18,7 @@ int16_t toPWM(int32_t jel);
 void toservo(void);
 uint32_t vonalvalasztas(void);
 void irany(uint8_t merre);
+void steeringSETTER(void);
 
 float GETp(void);
 void SETp(float ertek);
@@ -31,6 +32,10 @@ float GETpgyors(void);
 void SETpgyors(float ertek);
 float GETdgyors(void);
 void SETdgyors(float ertek);
+float GETpeloz(void);
+void SETpeloz(float ertek);
+float GETdeloz(void);
+void SETdeloz(float ertek);
 uint16_t GETpwmmide(void);
 uint16_t GETpwmmidh(void);
 int16_t GETpos(void);
@@ -41,8 +46,16 @@ uint8_t GETflaglassu(void);
 void SETflaglassu(uint8_t ertek);
 uint8_t GETflaggyors(void);
 void SETflaggyors(uint8_t ertek);
+uint8_t GETflageloz(void);
+void SETflageloz(uint8_t ertek);
 void SETregivonal(uint32_t ertek);
 uint32_t GETvonal(void);
 uint8_t mindigvalt(void);
+void SETkisorol(uint8_t ertek);
+void SETbesorol(uint8_t ertek);
+void SETgiroszab(uint8_t ertek);
+int32_t GETkivantY();
+uint8_t GETkisorol(void);
+uint8_t GETgiroszab(void);
 
 #endif /* CONTROLSTEERING_H_ */

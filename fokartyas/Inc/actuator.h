@@ -10,13 +10,18 @@
 
 void actuatorInit(void);
 void regulator(void);
+
 void gyors(void);
+void eloz(void);
 void fekez(void);
 void lassu(void);
 void labyrinth(void);
 void savvaltas(void);
+void visszasavvaltas();
+void SCkovet(void);
+
 void control(void);
-void motorvezerles(int16_t sebesseg);
+void motorvezerles(float sebesseg);
 void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo);
 uint32_t GETuwDutyCycle(void);
 uint8_t GETflagsavvaltas(void);
@@ -35,6 +40,12 @@ void SETflagfekez(uint8_t ertek);
 uint8_t GETflagsavvalt(void);
 void SETflagsavvalt(uint8_t ertek);
 uint8_t GETflagSCkovet(void);
+uint8_t GETflagsavvalt(void);
+void SETflagsavvalt(uint8_t ertek);
+uint8_t GETflageloz(void);
+void SETflageloz(uint8_t ertek);
+
+
 void SETflagSCkovet(uint8_t ertek);
 
 

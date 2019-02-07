@@ -178,9 +178,13 @@ while (1)
 	uartprocess(); 		//UART feldolgozasa
 	gyro();
 	vonalszamlalo(); 	//vonalszam figyeles
-	//allapotgep();
+
+	SCallapotgep();
+	allapotgep();
 	//allapotgeplab();
-	vonalvaltas();
+	//vonalvaltas();
+	//allapotgepelozes();
+
 	regulator();
 	control();
 	szabSCkovet();
@@ -631,7 +635,7 @@ static void MX_TIM10_Init(void)
   htim10.Instance = TIM10;
   htim10.Init.Prescaler = 83;
   htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim10.Init.Period = 19999;
+  htim10.Init.Period = 3999;
   htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
   {

@@ -40,7 +40,7 @@ void vonalvaltas(void)
 		switch(statevonalvaltas)
 		{
 			case 0:
-				lassu();
+				labyrinth();
 				if(GETcount() == 2 && GETtavolsag() < 5500)
 				{
 					statevonalvaltas = 1;
@@ -78,7 +78,6 @@ void vonalvaltas(void)
 				}
 
 				break;
-
 
 			default:
 				statevonalvaltas = 0;

@@ -10,20 +10,25 @@
 #include "tracking.h"
 #include "actuator.h"
 #include "timing.h"
+#include "stdlib.h"
+#include "math.h"
+
+
 
 
 #define KC		(4.0f)
 #define ZD		(0.98f)
-#define UMAX	(5000)
+#define UMAX	(9500)
 #define VKOVMAX	(1.5f)
 #define VKOVMIN	(0.0f)
 
 float v 		= 	0.0f;
 float vlassu	=	1.5f;
-float vgyors	=	1.5f;
+float vgyors	=	2.5f;
 float vfek		=	0.0f;
 float vsavvalt 	=	1.0f;
 float vkovet	=   0.0f;
+float veloz 	=	3.0f;
 
 float epres 	= 0.0f;
 float upres 	= 0.0f;
@@ -34,7 +39,7 @@ float u 		= 0.0f;
 
 uint32_t kivanttavolsag = 80;
 float Kp = 0.0375f;
-float Kd = 8.0f;
+float Kd = 1.0f;
 float Ki = 0.0f;
 int32_t errtav = 0;
 int32_t preverrtav = 0;
@@ -78,10 +83,11 @@ float szabvPI(float err)
 
 void tomotorcontrol(void)
 {
-	epres = toinkrspeed(v) - GETspeed();
+	epres = toinkrspeed(v) - (float)GETspeed();
 
-	upres = 136.8 + 0.04*szabvPI(epres);
-
+	if( fabs(GETv()) < 0.3  && fabs(epres) < 200 )		upres = 0;
+	if (epres   > 0 )							upres = 	 136.8f + 0.04f*szabvPI(epres);
+	if (epres   < 0 )							upres = 	-136.8f + 0.04f*szabvPI(epres);
 
 }
 
@@ -94,27 +100,35 @@ void velocitySETTER(void)
 {
 	if( GETuwDutyCycle() < 1600    /*|| GETflagSTART()  != 1*/)
 	{
-		SETv(-20.0f);
+		SETv(0.0f);
 	}
-//	else if (GETflaglassu() == 1)
-//	{
-//		SETv(vlassu);
-//	}
-	else if (GETflaggyors() == 1)
+	else
 	{
-		SETv(vgyors);
-	}
-	else if (GETflagfekez() == 1)
-	{
-		SETv(vfek);
-	}
-	else if (GETflagsavvalt() == 1)
-	{
-		SETv(vsavvalt);
-	}
-	else if (GETflagSCkovet()== 1)
-	{
-		SETv(vkovet);
+		if (GETflagSCkovet() == 1)
+		{
+			SETv(vkovet);
+		}
+		if (GETflaglassu() == 1)
+		{
+			SETv(vlassu);
+		}
+		if (GETflaggyors() == 1)
+		{
+			SETv(vgyors);
+		}
+		if (GETflageloz() == 1)
+		{
+			SETv(veloz);
+		}
+		if (GETflagfekez() == 1)
+		{
+			SETv(vfek);
+		}
+		if (GETflagsavvalt() == 1)
+		{
+			SETv(vsavvalt);
+		}
+
 	}
 }
 
@@ -131,8 +145,8 @@ void szabSCkovet(void)
 		vkovet = (vkovet > VKOVMAX) ? 	VKOVMAX : vkovet;
 		vkovet = (vkovet < VKOVMIN) ? 	VKOVMIN : vkovet;
 
-		if(GETSCtavolsag() > 99) vkovet=1.5f;
-		if(GETSCtavolsag() < 60) vkovet=-20.0f;
+		if(GETSCtavolsag() > 99) vkovet =1.5f;
+		if(GETSCtavolsag() < 60) vkovet =0.0f;
 
 		preverrtav = errtav;
 		SETflagkovet(0);
@@ -154,6 +168,11 @@ float GETvlassu()
 float GETvgyors()
 {
 	return vgyors;
+}
+
+float GETveloz()
+{
+	return veloz;
 }
 
 float GETvsavvalt()
@@ -196,4 +215,8 @@ void SETu2prev(float ertek)
 	u2prev=ertek;
 }
 
+float GETepres()
+{
+	return epres;
+}
 

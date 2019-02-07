@@ -32,6 +32,7 @@ void SETu2prev(float ertek);
 uint32_t GETvonal(void);
 uint32_t GETregivonal(void);
 float GETv(void);
+float GETepres();
 
 
 

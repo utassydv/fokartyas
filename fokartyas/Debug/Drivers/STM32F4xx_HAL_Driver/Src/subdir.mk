@@ -75,7 +75,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/%.o: ../Drivers/STM32F4xx_HAL_Driver/Src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"C:/fokartyasz/fokartyas/Inc" -I"C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc" -I"C:/fokartyasz/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"C:/fokartyasz/fokartyas/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"C:/fokartyasz/fokartyas/Drivers/CMSIS/Include"  -Og -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"D:/robonaut/fokartyasz0204/fokartyas/Inc" -I"D:/robonaut/fokartyasz0204/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc" -I"D:/robonaut/fokartyasz0204/fokartyas/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"D:/robonaut/fokartyasz0204/fokartyas/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"D:/robonaut/fokartyasz0204/fokartyas/Drivers/CMSIS/Include"  -Og -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
