@@ -16,6 +16,7 @@ void fekez(void);
 void lassu(void);
 void labyrinth(void);
 void savvaltas(void);
+void visszasavvaltas();
 void SCkovet(void);
 
 void control(void);
@@ -38,6 +39,9 @@ void SETflagfekez(uint8_t ertek);
 uint8_t GETflagsavvalt(void);
 void SETflagsavvalt(uint8_t ertek);
 uint8_t GETflagSCkovet(void);
+uint8_t GETflagsavvalt(void);
+void SETflagsavvalt(uint8_t ertek);
+
 
 void SETflagSCkovet(uint8_t ertek);
 

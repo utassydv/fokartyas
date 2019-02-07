@@ -17,6 +17,7 @@
 #include "communicationvsz.h"
 #include "navigation.h"
 #include "actuator.h"
+#include "math.h"
 
 uint8_t startjel;
 
@@ -107,8 +108,8 @@ void bluetoothDRIVE(void)
 //		int32_t aXki=GETaX();
 //		int32_t aYki=GETaY();
 //		int32_t aZki=GETaZ();
-		int32_t currentXki =GETcurrentX();  // -> cm
-		int32_t currentYki =GETcurrentY();
+		int32_t currentXki =GETcurrentX() + 54000*(float)cosf(GETszog()*0.01745329252f);  // -> cm
+		int32_t currentYki =GETcurrentY() + 54000*(float)sinf(GETszog()*0.01745329252f);
 		int32_t vki =GETv()*1000;
 		int32_t vkikovet =GETvkovet()*1000;
 		int32_t epreski =GETepres();
@@ -123,7 +124,7 @@ void bluetoothDRIVE(void)
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",GETstatevonalvaltas(),GETcount(), GETkettohossz(), GETtav(),GETtav2(),GETtavolsag());
 		//snprintf(TxData, 100, "%d, %d,%d,%d,%d,%d,%d,%d,%d\n",epreski ,GETSCtavolsag(),vki, vkikovet, GETflaglassu(), GETflaggyors(), GETflagsavvalt(), GETflagfekez() , GETflagSCkovet());
-		snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d,%d,%d,%d \n",GETcount(), GETegyenescounter(), GETflagSCkovet(),GETstate(), GETSCstate(), GETkisorol() , GETgiroszab(),currentXki ,currentYki);
+		snprintf(TxData, 100, "%d,%d,%d\n",currentXki ,currentYki,szogki);
 		//snprintf(TxData, 100, "%d\n",GETuwDutyCycle());
 		//snprintf(TxData, 100, "%d\n",GETcounterpres());
 

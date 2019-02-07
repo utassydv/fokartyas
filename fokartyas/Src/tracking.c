@@ -28,7 +28,6 @@ uint16_t offsetlimit = 6200;
 float offsetszog;
 float szogseb;
 float szog = 0;
-float regiszog =0;
 float TEMPERATURE = 0;
 
 int32_t counterpres	= 0;
@@ -154,7 +153,6 @@ void angle(void)				//z elfordulas kiolvasas//////////////////
 		adat 	|=  rxdata1[1];
 
 		szogseb=((float)adat*8.61262521018907f-offsetszog)/200000.0f;  // 4.3140960937f
-		regiszog=szog;
 		szog = szog+szogseb;
 
 //		if (szog >= 180.0f) szog = szog-360.0f;
@@ -200,31 +198,27 @@ void poz(void)
 
 	if (GETflagpoz() == 1)
 	{
-		currentX = currentX + deltax(speed,szog,regiszog);
-		currentY = currentY + deltay(speed,szog,regiszog);
+		currentX = currentX + deltax(speed,szog);
+		currentY = currentY + deltay(speed,szog);
 		SETflagpoz(0);
 	}
 }
 
-float deltax(int vpalya, float vszog, float vregiszog)
+float deltax(int vpalya, float vszog)
 {
 
 	float uthossz=((float)vpalya)*0.7142857143f;   //     /1.40
 
 	float kosz=(float)cosf(vszog*0.01745329252f);
-	float koszregi=(float)cosf(vregiszog*0.01745329252f);
-	float koszuj=(float)cosf(vszog*0.01745329252f);
-	return uthossz*kosz+koszuj*autohossz-koszregi*autohossz;
+	return uthossz*kosz;
 }
 
-float deltay(int vpalya, float vszog, float vregiszog)
+float deltay(int vpalya, float vszog)
 {
 	float uthossz=((float)vpalya)*0.7142857143f;    //   /1.40
 
 	float szin=(float)sinf(vszog*0.01745329252f);
-	float szinregi=(float)sinf(vregiszog*0.01745329252f);
-	float szinuj=(float)sinf(vszog*0.01745329252f);
-	return uthossz*szin+szinuj*autohossz-szinregi*autohossz;
+	return uthossz*szin;
 }
 
 
@@ -288,15 +282,6 @@ void SETszog(float ertek)
 	szog=ertek;
 }
 
-float GETregiszog(void)
-{
-	return regiszog;
-}
-
-void SETregiszog(float ertek)
-{
-	regiszog=ertek;
-}
 
 void SETcurrentX(int32_t ertek)
 {

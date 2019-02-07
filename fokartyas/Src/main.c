@@ -179,10 +179,11 @@ while (1)
 	gyro();
 	vonalszamlalo(); 	//vonalszam figyeles
 
-	SCallapotgep();
-	allapotgep();
+	//SCallapotgep();
+	//allapotgep();
 	//allapotgeplab();
 	//vonalvaltas();
+	allapotgepelozes();
 
 	regulator();
 	control();

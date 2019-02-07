@@ -26,6 +26,7 @@ __IO uint32_t vlmi = 0;
 __IO uint32_t  SCtavolsag = 0;
 
 uint8_t flagsavvalt	= 0;
+uint8_t flagvisszasavvalt	= 0;
 uint8_t flaggyors	= 0;
 uint8_t flaglassu	= 0;
 uint8_t flagfekez	= 0;
@@ -33,8 +34,11 @@ uint8_t flagSCkovet	= 1;
 
 
 uint8_t flagSTART 		= 0;
-const int16_t posvalte = 1700;
-const int16_t posvalth = 1850;
+const int16_t posvalte = 1800;
+const int16_t posvalth = 2000;
+
+const int16_t posvisszavalte = 1100;
+const int16_t posvisszavalth = 1000;
 
 const int16_t posbale = 1700;
 const int16_t posjobbe = 1300;
@@ -89,6 +93,12 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 			htim14.Instance->CCR1 	= posvalth; 	//hatso szervo
 			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
 		}
+		else if (flagvisszasavvalt==1)
+		{
+			htim13.Instance->CCR1 	= posvisszavalte; 		//elso szervo
+			htim14.Instance->CCR1 	= posvisszavalth; 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
 		else if(balra == 1)
 		{
 			htim13.Instance->CCR1 	= posbale; 		//elso szervo
@@ -141,6 +151,7 @@ void gyors(void)
 	SETflaggyors(1);
 	SETflagfekez(0);
 	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
@@ -155,6 +166,7 @@ void lassu(void)
 	SETflaggyors(0);
 	SETflagfekez(0);
 	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -164,6 +176,17 @@ void savvaltas()
 	SETflaggyors(0);
 	SETflagfekez(0);
 	SETflagsavvalt(1);
+	SETflagvisszasavvalt(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
+
+void visszasavvaltas()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	SETflagvisszasavvalt(1);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -173,6 +196,7 @@ void fekez()
 	SETflaggyors(0);
 	SETflagfekez(1);
 	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -183,6 +207,7 @@ void SCkovet()
 	SETflagSCkovet(1);
 	SETflagfekez(0);
 	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -288,6 +313,16 @@ uint8_t GETflagsavvalt(void)
 void SETflagsavvalt(uint8_t ertek)
 {
 	flagsavvalt = ertek;
+}
+
+uint8_t GETvisszaflagsavvalt(void)
+{
+	return flagvisszasavvalt;
+}
+
+void SETflagvisszasavvalt(uint8_t ertek)
+{
+	flagvisszasavvalt = ertek;
 }
 
 uint8_t GETflagSCkovet(void)

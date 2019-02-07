@@ -17,6 +17,7 @@
 uint8_t gyorsasagi 				= 0;
 uint8_t state 					= 0;
 uint8_t statelab 				= 0;
+uint8_t stateeloz				= 0;
 uint8_t SCstate 				= 0;
 pont2D endlocation = { 0 , 0 };
 
@@ -66,7 +67,6 @@ void allapotgeplab(void)
 				break;
 
 			case 3:
-				SETflagsavvaltas(1);
 				savvaltas();
 				if(GETnullavonalszam() >= 80)			//amig el nem hagyjuk a vonalat
 				{
@@ -78,11 +78,73 @@ void allapotgeplab(void)
 			case 4:
 				if(GETegyvonalszam() >= 4)			//amíg meg nem jövünk a vonalra
 				{
-					SETflagsavvaltas(0);
 					lassu();
 					statelab = 0;
 				}
 				break;
+
+			default:
+				statelab = 0;
+				break;
+		}
+	SETflagallapotgep(0);
+	}
+}
+
+void allapotgepelozes(void)
+{
+	if (GETflagallapotgep() == 1)
+	{
+		switch(stateeloz)
+		{
+			case 0:
+				lassu();
+				SETstartposition(GETcounterpres());
+				stateeloz=1;
+
+				break;
+
+
+			case 1:
+				if( GETcounterpres() - GETstartposition() > 100000)
+				{
+					stateeloz=2;
+					SETszog(0.0f);
+					savvaltas();
+					SETstartposition(GETcounterpres());
+				}
+				break;
+
+			case 2:
+
+				if(GETcounterpres() - GETstartposition() > 180000)
+				{
+					stateeloz=3;
+					SETcurrentY(0.0f);
+					SETstartposition(GETcounterpres());
+				}
+				break;
+
+			case 3:
+				SETgiroszab(1);
+				gyors();
+				SETflagsavvalt(0);
+				if(GETcounterpres() - GETstartposition() > 600000)
+				{
+					stateeloz=4;
+					SETstartposition(GETcounterpres());
+				}
+				break;
+
+			case 4:
+				visszasavvaltas();
+				if(GETcounterpres() - GETstartposition() > 100000)
+						stateeloz=5;
+				break;
+
+			case 5:
+				lassu();
+					break;
 
 			default:
 				statelab = 0;

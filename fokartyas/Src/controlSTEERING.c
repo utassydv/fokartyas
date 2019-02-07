@@ -12,9 +12,10 @@
 #include "actuator.h"
 #include <stdlib.h>
 #include "tracking.h"
+#include "math.h"
 
 
-int32_t Ykivant = 	-65000;
+int32_t Ykivant = 	0;
 float p			=	2.5f;
 float d			=	10.0f;
 
@@ -22,8 +23,12 @@ float plassu	=	2.7f;
 float dlassu	=	8.0f;
 float scalelassu=	0.7f;
 
+//float pgyors		=	0.8f;
+//float dgyors		=	5.0f;
+//float scalegyors	=	1.0f;
+
 float pgyors		=	0.8f;
-float dgyors		=	5.0f;
+float dgyors		=	15.0f;
 float scalegyors	=	1.0f;
 
 //float pgyors	=	2.7f;
@@ -73,15 +78,15 @@ int32_t toerror(uint32_t dist)
 
 	if(giroszab == 1)
 	{
-		tavolsag =  Ykivant - GETcurrentY() ;
+		tavolsag =  Ykivant + GETcurrentY() + 54000*(float)sinf(GETszog()*0.01745329252f);
 	}
 	else if(kisorol == 1)
 	{
-		tavolsag = GETcurrentX()/100- GETcurrentY();
+		tavolsag = (GETcurrentX() + 54000*(float)cosf(GETszog()*0.01745329252f)) /100 - GETcurrentY() - 54000*(float)cosf(GETszog()*0.01745329252f);
 	}
 	else if(besorol == 1)
 	{
-		tavolsag = -GETcurrentX() + GETcurrentY();
+		tavolsag = -GETcurrentX() + 54000*(float)sinf(GETszog()*0.01745329252f) + GETcurrentY() - 54000*(float)cosf(GETszog()*0.01745329252f);
 	}
 	else tavolsag=tavolsag-12799;
 
