@@ -25,6 +25,7 @@ uint8_t stateeloz				= 0;
 uint8_t SCstate 				= 0;
 pont2D endlocation 				= { 0 , 0 };
 uint8_t racsestate				= 0;
+uint8_t melyikkanyar			= 0;
 
 uint32_t elsogyorsig = 430000; //430000
 uint32_t elsogyorsfekig = 1417000;  //1417000
@@ -42,6 +43,7 @@ uint8_t egyenescounter = 0;
 uint8_t biztonsag=0;
 uint32_t distance = 0;
 int32_t mennyit = 0;
+int32_t mennyitgyors = 0;
 int32_t visszahossz = 0;
 
 void racse(void)
@@ -952,6 +954,126 @@ void allapotgepinkr(void)
 						state = 3;
 					}
 					break;
+
+				case 3:
+					if(GETcount() == 3)													//ha haromvonal, nezzok az elejet
+					{
+						SETstartposition(GETcounterpres());
+						state = 4;
+					}
+					break;
+
+				case 4:
+					if(GETcounterpres() - GETstartposition() > 42000) //  ha 30cm-en belül
+					{
+						if (GETharomvonalszam() >= 6)					// min.6x volt 3 vonal
+						{
+							state = 5;
+						}
+						else											//különben hiba volt, vissza
+						{
+							SETharomvonalszam(0);
+							state = 3;
+						}
+					}
+					break;
+
+				case 5:
+					if(GETcounterpres() - GETstartposition() > 280000)//2m kesobbb lassií
+					{
+						lassu() ;
+						SETegyvonalszam(0);
+						state = 6;
+					}
+					break;
+				case 6:
+					if(GETcount() == 1)									//ha 1 vonal
+					{
+						SETstartposition(GETcounterpres());
+						state = 7;
+					}
+					break;
+				case 7:
+					if(GETcounterpres() - GETstartposition() > 28000) // 20cm-en belül
+					{
+						if (GETegyvonalszam() >= 4)					//4x van 1 vonal, akkor lassu szakasz, indul elolrol az allapotgep
+						{
+							SEThossz(0);
+							state = 9;
+						}
+						else										//hiba volt, vissza
+						{
+							SETegyvonalszam(0);
+							state = 6;
+						}
+					}
+					break;
+
+				default:
+					state = 9;
+					break;
+		}
+		SETflagallapotgep(0);
+		}
+	}
+}
+
+void allapotgepinkrement(void)
+{
+
+	if (GETflagSCkovet() == 0)
+	{
+		if (GETflagallapotgep() == 1)
+		{
+			switch(state)
+			{
+				case 9:
+					mennyit = GETcounterpres();
+					state = 0;
+					break;
+
+				case 0:
+					lassu();
+
+					if (melyikkanyar == 0 || melyikkanyar == 1)
+					{
+						if (GETcounterpres() - mennyit > 350000) //ha 7m-ig nincs gyorsito, racse
+						{
+							SETharomvonalszam(0);
+							state = 2;
+							mennyitgyors = GETcounterpres();
+							gyors();
+							melyikkanyar++;
+						}
+					}
+					if (melyikkanyar == 2 || melyikkanyar == 3)
+					{
+						if (GETcounterpres() - mennyit > 780000) //ha 7m-ig nincs gyorsito, racse
+						{
+							SETharomvonalszam(0);
+							state = 2;
+							mennyitgyors = GETcounterpres();
+							gyors();
+							if(melyikkanyar == 2) melyikkanyar++;
+							else if(melyikkanyar == 3) melyikkanyar = 0;
+						}
+					}
+
+					break;
+				case 2:
+						if(melyikkanyar == 2 || melyikkanyar == 0)													//ha haromvonal, nezzok az elejet
+						{
+							if (GETcounterpres() - mennyitgyors > 900000) state = 3;
+						}
+						if(melyikkanyar == 1)													//ha haromvonal, nezzok az elejet
+						{
+							if (GETcounterpres() - mennyitgyors > 630000) state = 3;
+						}
+						if(melyikkanyar == 3)													//ha haromvonal, nezzok az elejet
+						{
+							if (GETcounterpres() - mennyitgyors > 920000 ) state = 3;
+						}
+						break;
 
 				case 3:
 					if(GETcount() == 3)													//ha haromvonal, nezzok az elejet

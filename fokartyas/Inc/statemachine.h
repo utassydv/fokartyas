@@ -14,6 +14,7 @@ void SCallapotgep(void);
 void allapotgeplab(void);
 void allapotgep(void);
 void allapotgepinkr(void);
+void allapotgepinkrement(void);
 uint8_t GETstatelab(void);
 uint8_t GETstate(void);
 uint8_t GETSCstate(void);

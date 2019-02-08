@@ -188,7 +188,7 @@ while (1)
 	if (GETgyorsasagi() == 1)
 	{
 		SCallapotgep();
-		allapotgepinkr();
+		allapotgepinkrement();
 	}
 	else
 	randomlab();

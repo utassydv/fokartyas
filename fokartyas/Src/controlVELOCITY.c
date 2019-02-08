@@ -23,8 +23,8 @@
 #define VKOVMIN	(0.0f)
 
 float v 		= 	0.0f;
-float vlassu	=	1.8f;  // 1.8
-float vgyors	=	3.1f;  // 3.3  // 3.0-val stabil 28-as kor
+float vlassu	=	1.6f;  // 1.8
+float vgyors	=	3.3f;  // 3.3  // 3.0-val stabil 28-as kor
 float vfek		=	0.0f;
 float vsavvalt 	=	1.0f;
 float vkovet	=   0.0f;
