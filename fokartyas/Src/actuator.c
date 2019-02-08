@@ -27,11 +27,13 @@ __IO uint32_t  SCtavolsag = 0;
 
 uint8_t flagsavvalt	= 0;
 uint8_t flagvisszasavvalt	= 0;
+uint8_t flagvisszafordul	= 0;
 uint8_t flaggyors	= 0;
 uint8_t flaglassu	= 0;
 uint8_t flagfekez	= 0;
 uint8_t flagSCkovet	= 1;
 uint8_t flageloz=0;
+
 
 
 uint8_t flagSTART 		= 0;
@@ -40,6 +42,9 @@ const int16_t posvalth = 2000;
 
 const int16_t posvisszavalte = 1000;
 const int16_t posvisszavalth = 1000;
+
+const int16_t posvisszafordule = 1850;
+const int16_t posvisszafordulh = 1000;
 
 const int16_t posbale = 1700;
 const int16_t posjobbe = 1300;
@@ -96,6 +101,12 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 		{
 			htim13.Instance->CCR1 	= posvisszavalte; 		//elso szervo
 			htim14.Instance->CCR1 	= posvisszavalth; 	//hatso szervo
+			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
+		}
+		else if (flagvisszafordul==1)
+		{
+			htim13.Instance->CCR1 	= posvisszafordule; 		//elso szervo
+			htim14.Instance->CCR1 	= posvisszafordulh; 	//hatso szervo
 			htim10.Instance->CCR1 	= 1500; 			//szenzor szervo
 		}
 		else if(balra == 1)
@@ -156,6 +167,7 @@ void gyors(void)
 	SETflagsavvalt(0);
 	SETflagvisszasavvalt(0);
 	SETflageloz(0);
+	SETflagvisszafordul(0);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
@@ -167,6 +179,7 @@ void eloz(void)
 	SETflagsavvalt(0);
 	SETflagvisszasavvalt(0);
 	SETflageloz(1);
+	SETflagvisszafordul(0);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
@@ -183,6 +196,7 @@ void lassu(void)
 	SETflagsavvalt(0);
 	SETflagvisszasavvalt(0);
 	SETflageloz(0);
+	SETflagvisszafordul(0);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -194,6 +208,7 @@ void savvaltas()
 	SETflagsavvalt(1);
 	SETflagvisszasavvalt(0);
 	SETflageloz(0);
+	SETflagvisszafordul(0);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -205,6 +220,7 @@ void visszasavvaltas()
 	SETflagsavvalt(0);
 	SETflagvisszasavvalt(1);
 	SETflageloz(0);
+	SETflagvisszafordul(0);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -216,6 +232,7 @@ void fekez()
 	SETflagsavvalt(0);
 	SETflagvisszasavvalt(0);
 	SETflageloz(0);
+	SETflagvisszafordul(0);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -228,6 +245,20 @@ void SCkovet()
 	SETflagsavvalt(0);
 	SETflagvisszasavvalt(0);
 	SETflageloz(0);
+	SETflagvisszafordul(0);
+	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
+
+void visszafordul()
+{
+	SETflaglassu(0);
+	SETflaggyors(0);
+	SETflagSCkovet(0);
+	SETflagfekez(0);
+	SETflagsavvalt(0);
+	SETflagvisszasavvalt(0);
+	SETflageloz(0);
+	SETflagvisszafordul(1);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
 }
 
@@ -345,7 +376,7 @@ uint8_t GETflageloz()
 	return flageloz;
 }
 
-uint8_t GETvisszaflagsavvalt(void)
+uint8_t GETflagvisszasavvalt(void)
 {
 	return flagvisszasavvalt;
 }
@@ -353,6 +384,16 @@ uint8_t GETvisszaflagsavvalt(void)
 void SETflagvisszasavvalt(uint8_t ertek)
 {
 	flagvisszasavvalt = ertek;
+}
+
+int8_t GETflagvisszafordul(void)
+{
+	return flagvisszafordul;
+}
+
+void SETflagvisszafordul(uint8_t ertek)
+{
+	flagvisszafordul = ertek;
 }
 
 uint8_t GETflagSCkovet(void)

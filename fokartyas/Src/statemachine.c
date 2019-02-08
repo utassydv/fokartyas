@@ -54,13 +54,13 @@ void randomlab (void)
 
 			case 1:
 				egyutankettohossz();
-				if(GEThossz() > 13000 && GEThossz() < 30000 ) //leghosszabb sávváltót lát
+				if(GEThossz() > 15000 && GEThossz() < 30000 ) //leghosszabb sávváltót lát
 				{
 					staterandom = 3;
 					distance=GETcounterpres();
 					SEThossz(0);
 				}
-				else if( GEThossz() > 4000 && GEThossz() < 13000 ) //legrovidebb
+				else if( GEThossz() > 3000 && GEThossz() < 15000 ) //legrovidebb
 				{
 					staterandom = 7;
 					distance=GETcounterpres();
@@ -122,7 +122,7 @@ void randomlab (void)
 				break;
 			case 7:
 				kettoutanegyhossz();
-				if(GEThossz() > 4000 && GEThossz() < 13000) //legrovidebb savvalto lyukat lat
+				if(GEThossz() > 3000 && GEThossz() < 15000) //legrovidebb savvalto lyukat lat
 				{
 
 					staterandom = 8;
@@ -134,15 +134,20 @@ void randomlab (void)
 				}
 				break;
 			case 8:
-				savvaltas();
+				distance=GETcounterpres();
+				visszafordul();
 				if(GETnullavonalszam() >= 80)			//amig el nem hagyjuk a vonalat
 				{
 					SETegyvonalszam(0);
-					staterandom = 5;
+					staterandom = 9;
 				}
 				break;
 			case 9:
-				if(GETegyvonalszam() >= 4)			//amíg meg nem jövünk a vonalra
+				if(GETcounterpres() - distance > 140000)
+					staterandom=10;
+				break;
+			case 10:
+				if(GETegyvonalszam() >= 3)			//amíg meg nem jövünk a vonalra
 				{
 					lassu();
 					//staterandom = ?;   				safetycar állapotgép kezdete

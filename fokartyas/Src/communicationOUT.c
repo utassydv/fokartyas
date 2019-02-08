@@ -126,7 +126,8 @@ void bluetoothDRIVE(void)
 		//snprintf(TxData, 100, "%d, %d,%d,%d,%d,%d,%d,%d,%d\n",GETflaglassu(), GETflaggyors(), GETflagsavvalt(), GETflagfekez() , GETflagSCkovet());
 		//snprintf(TxData, 100, "%d,%d,%d\n",currentXki ,currentYki,szogki);
 		//snprintf(TxData, 100, "%d\n",GETuwDutyCycle());
-		snprintf(TxData, 100, "%d, %d\n",GETstaterandom(),GETkettohossz());
+		//snprintf(TxData, 100, "%d, %d\n",GETstaterandom(),GETkettohossz());
+		snprintf(TxData, 100, "%d\n",GETcounterpres());
 
 
 

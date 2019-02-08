@@ -19,6 +19,7 @@ void labyrinth(void);
 void savvaltas(void);
 void visszasavvaltas();
 void SCkovet(void);
+void visszafordul(void);
 
 void control(void);
 void motorvezerles(float sebesseg);
@@ -42,8 +43,12 @@ void SETflagsavvalt(uint8_t ertek);
 uint8_t GETflagSCkovet(void);
 uint8_t GETflagsavvalt(void);
 void SETflagsavvalt(uint8_t ertek);
+uint8_t GETflagvisszasavvalt(void);
+void SETflagvisszasavvalt(uint8_t ertek);
 uint8_t GETflageloz(void);
 void SETflageloz(uint8_t ertek);
+int8_t GETflagvisszafordul(void);
+void SETflagvisszafordul(uint8_t ertek);
 
 
 void SETflagSCkovet(uint8_t ertek);
