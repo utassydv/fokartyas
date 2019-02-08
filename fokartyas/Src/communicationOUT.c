@@ -127,12 +127,13 @@ void bluetoothDRIVE(void)
 		//snprintf(TxData, 100, "%u\n",GETstartjel());
 		//snprintf(TxData, 100, "%d\n",szogki);
 		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",(int)speed,(int)epres,(int)u2,(int)u2prev,(int)u,(int)uprev);
-		//snprintf(TxData, 100, "%d,%d,%d,%d,%d,%d\n",GETstatevonalvaltas(),GETcount(), GETkettohossz(), GETtav(),GETtav2(),GETtavolsag());
-		//snprintf(TxData, 100, "%d, %d,%d,%d,%d,%d,%d,%d,%d\n",GETflaglassu(), GETflaggyors(), GETflagsavvalt(), GETflagfekez() , GETflagSCkovet());
+		//snprintf(TxData, 100, "%d,%d,%d\n",GETcount(), GETtav(),GETtav2());
+		snprintf(TxData, 100, "%d,%d,"
+				"%d,%d,%d\n",GETflagSCkovet(), GETSCstate(), GETflaglassu(), GETflaggyors(), GETflagsavvalt());
 		//snprintf(TxData, 100, "%d,%d,%d\n",currentXki ,currentYki,szogki);
 		//snprintf(TxData, 100, "%d\n",GETuwDutyCycle());
 		//snprintf(TxData, 100, "%d, %d\n",GETstaterandom(),GETkettohossz());
-		snprintf(TxData, 100, "%d , %d ,%d\n",(int)idomero,(int)GETupres(),GETgyorsasagi());
+		//snprintf(TxData, 100, "%d , %d ,%d\n",(int)idomero,(int)GETupres(),GETgyorsasagi());
 
 
 
@@ -152,7 +153,8 @@ uint8_t GETstartjel(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+	SETgyorsasagi(1);
+	SETflagSCkovet(1);
 }
 
 uint32_t GETidomero(void)

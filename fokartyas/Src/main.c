@@ -188,7 +188,6 @@ while (1)
 	{
 		SCallapotgep();
 		allapotgep();
-		SETflagSCkovet(1);
 	}
 	else
 	randomlab();

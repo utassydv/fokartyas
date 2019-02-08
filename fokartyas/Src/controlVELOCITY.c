@@ -16,7 +16,7 @@
 
 
 
-#define KC		(4.0f)
+#define KC		(2.0f)
 #define ZD		(0.98f)
 #define UMAX	(9500)
 #define VKOVMAX	(1.5f)
@@ -128,6 +128,7 @@ void velocitySETTER(void)
 		{
 			SETv(vsavvalt);
 		}
+
 
 	}
 }
