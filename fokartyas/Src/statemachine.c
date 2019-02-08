@@ -151,6 +151,7 @@ void randomlab (void)
 				if(GETegyvonalszam() >= 3)			//amíg meg nem jövünk a vonalra
 				{
 					lassu();
+					gyorsasagi=1;
 					//staterandom = ?;   				safetycar állapotgép kezdete
 				}
 				break;
@@ -569,6 +570,16 @@ void allapotgep(void)
 uint8_t GETstatelab(void)
 {
 	return statelab;
+}
+
+uint8_t GETgyorsasagi(void)
+{
+	return gyorsasagi;
+}
+
+void SETgyorsasagi(uint8_t ertek)
+{
+	gyorsasagi=ertek;
 }
 
 uint8_t GETstaterandom(void)

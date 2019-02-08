@@ -19,5 +19,7 @@ uint8_t GETSCstate(void);
 uint8_t GETegyenescounter(void);
 void randomlab (void);
 uint8_t GETstaterandom(void);
+uint8_t GETgyorsasagi(void);
+void SETgyorsasagi(uint8_t ertek);
 
 #endif /* STATEMACHINE_H_ */

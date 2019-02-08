@@ -132,7 +132,7 @@ void bluetoothDRIVE(void)
 		//snprintf(TxData, 100, "%d,%d,%d\n",currentXki ,currentYki,szogki);
 		//snprintf(TxData, 100, "%d\n",GETuwDutyCycle());
 		//snprintf(TxData, 100, "%d, %d\n",GETstaterandom(),GETkettohossz());
-		snprintf(TxData, 100, "%d\n",idomero);
+		snprintf(TxData, 100, "%d , %d ,%d\n",(int)idomero,(int)GETupres(),GETgyorsasagi());
 
 
 

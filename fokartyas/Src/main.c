@@ -184,6 +184,13 @@ while (1)
 	//allapotgeplab();
 	//vonalvaltas();
 	//allapotgepelozes();
+	if (GETgyorsasagi() == 1)
+	{
+		SCallapotgep();
+		allapotgep();
+		SETflagSCkovet(1);
+	}
+	else
 	randomlab();
 
 	regulator();
