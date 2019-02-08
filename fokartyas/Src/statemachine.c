@@ -12,6 +12,7 @@
 #include "linetracking.h"
 #include "tracking.h"
 #include "communicationvsz.h"
+#include "communicationOUT.h"
 #include "controlSTEERING.h"
 #include "navigation.h"
 
@@ -54,13 +55,13 @@ void randomlab (void)
 
 			case 1:
 				egyutankettohossz();
-				if(GEThossz() > 15000 && GEThossz() < 30000 ) //leghosszabb sávváltót lát
+				if(GEThossz() > 15000 && GEThossz() < 30000 && GETidomero() > 600) //leghosszabb sávváltót lát
 				{
 					staterandom = 3;
 					distance=GETcounterpres();
 					SEThossz(0);
 				}
-				else if( GEThossz() > 3000 && GEThossz() < 15000 ) //legrovidebb
+				else if( GEThossz() > 3000 && GEThossz() < 15000 && GETidomero() > 600) //legrovidebb
 				{
 					staterandom = 7;
 					distance=GETcounterpres();

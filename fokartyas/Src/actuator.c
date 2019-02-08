@@ -36,7 +36,7 @@ uint8_t flageloz=0;
 
 
 
-uint8_t flagSTART 		= 0;
+uint8_t flagSTART 		= 1;
 const int16_t posvalte = 1850;
 const int16_t posvalth = 2000;
 

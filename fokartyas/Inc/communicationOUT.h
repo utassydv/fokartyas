@@ -16,5 +16,6 @@ void communicationOUTInit(void);
 void radioRx(void);
 uint8_t GETstartjel(void);
 void trackRADIO(void);
+uint32_t GETidomero(void);
 
 #endif /* COMMUNICATIONOUT_H_ */

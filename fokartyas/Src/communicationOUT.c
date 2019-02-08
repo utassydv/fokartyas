@@ -20,6 +20,7 @@
 #include "math.h"
 
 uint8_t startjel;
+uint32_t idomero = 0;
 
 
 extern UART_HandleTypeDef huart2;
@@ -42,6 +43,10 @@ void trackRADIO(void)
 			if(startjel == '0')
 			{
 				SETflagSTART(1);
+			}
+			if(GETflagSTART() == 1)
+			{
+				idomero++;
 			}
 		SETflagradio(0);
 		}
@@ -127,7 +132,7 @@ void bluetoothDRIVE(void)
 		//snprintf(TxData, 100, "%d,%d,%d\n",currentXki ,currentYki,szogki);
 		//snprintf(TxData, 100, "%d\n",GETuwDutyCycle());
 		//snprintf(TxData, 100, "%d, %d\n",GETstaterandom(),GETkettohossz());
-		snprintf(TxData, 100, "%d\n",GETcounterpres());
+		snprintf(TxData, 100, "%d\n",idomero);
 
 
 
@@ -148,5 +153,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+}
+
+uint32_t GETidomero(void)
+{
+	return idomero;
 }
 

@@ -98,7 +98,7 @@ void SETv(float ertek)
 
 void velocitySETTER(void)
 {
-	if( GETuwDutyCycle() < 1600    /*|| GETflagSTART()  != 1*/)
+	if( GETuwDutyCycle() < 1600  || GETflagSTART()  != 1)
 	{
 		SETv(0.0f);
 	}
