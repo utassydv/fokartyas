@@ -182,8 +182,9 @@ while (1)
 	//SCallapotgep();
 	//allapotgep();
 	//allapotgeplab();
-	vonalvaltas();
+	//vonalvaltas();
 	//allapotgepelozes();
+	randomlab();
 
 	regulator();
 	control();

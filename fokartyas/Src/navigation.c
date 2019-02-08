@@ -61,6 +61,7 @@ void vonalvaltas(void)
 				{
 					SETkettohossz(0);
 					statevonalvaltas=2;
+
 				}
 				break;
 

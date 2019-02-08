@@ -38,7 +38,8 @@ Src/statemachine.o: ../Src/statemachine.c \
  C:/fokartyasz/fokartyas/Inc/linetracking.h \
  C:/fokartyasz/fokartyas/Inc/tracking.h \
  C:/fokartyasz/fokartyas/Inc/communicationvsz.h \
- C:/fokartyasz/fokartyas/Inc/controlSTEERING.h
+ C:/fokartyasz/fokartyas/Inc/controlSTEERING.h \
+ C:/fokartyasz/fokartyas/Inc/navigation.h
 
 C:/fokartyasz/fokartyas/Inc/statemachine.h:
 
@@ -119,3 +120,5 @@ C:/fokartyasz/fokartyas/Inc/tracking.h:
 C:/fokartyasz/fokartyas/Inc/communicationvsz.h:
 
 C:/fokartyasz/fokartyas/Inc/controlSTEERING.h:
+
+C:/fokartyasz/fokartyas/Inc/navigation.h:

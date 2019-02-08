@@ -13,10 +13,12 @@
 #include "tracking.h"
 #include "communicationvsz.h"
 #include "controlSTEERING.h"
+#include "navigation.h"
 
 uint8_t gyorsasagi 				= 0;
 uint8_t state 					= 0;
 uint8_t statelab 				= 0;
+uint8_t staterandom				= 0;
 uint8_t stateeloz				= 0;
 uint8_t SCstate 				= 0;
 pont2D endlocation 				= { 0 , 0 };
@@ -25,6 +27,136 @@ uint8_t elozesflag=0;
 
 uint8_t egyenescounter = 0;
 uint8_t biztonsag=0;
+uint32_t distance = 0;
+
+
+void randomlab (void)
+{
+	if (GETflagallapotgep() == 1)
+		{
+		switch(staterandom)
+		{
+			case 0:
+				labyrinth();
+				if(GETcount() == 2 && GETtavolsag() < 5500)
+				{
+					SETflagketto(0);
+					distance=GETcounterpres();
+					staterandom = 1;
+				}
+				else if(GETcount() == 2 && GETtavolsag() > 5500 )
+				{
+					staterandom = 2;
+				}
+
+				break;
+
+
+			case 1:
+				egyutankettohossz();
+				if(GEThossz() > 13000 && GEThossz() < 30000 ) //leghosszabb sávváltót lát
+				{
+					staterandom = 3;
+					distance=GETcounterpres();
+					SEThossz(0);
+				}
+				else if( GEThossz() > 4000 && GEThossz() < 13000 ) //legrovidebb
+				{
+					staterandom = 7;
+					distance=GETcounterpres();
+					SEThossz(0);
+				}
+				else if(GETcounterpres() - distance > 33000)
+				{
+					staterandom=6;
+					SEThossz(0);
+				}
+				break;
+
+			case 2:
+				if(GETcount() == 1)
+				{
+					SETkettohossz(0);
+					SETflagketto(0);
+					staterandom = 0;
+				}
+				break;
+
+			case 3:
+				kettoutanegyhossz();
+				if( GEThossz() > 13000 && GEThossz() < 30000) //leghosszabb savvalto lyukat lat
+				{
+					SEThossz(0);
+					SETnullavonalszam(0);
+					staterandom = 4;
+				}
+				else if(GETcounterpres() - distance > 33000)
+				{
+					staterandom=0;
+					SEThossz(0);
+				}
+				break;
+
+			case 4:
+				visszasavvaltas();
+				if(GETnullavonalszam() >= 80)			//amig el nem hagyjuk a vonalat
+				{
+					SETegyvonalszam(0);
+					staterandom = 5;
+				}
+				break;
+			case 5:
+				if(GETegyvonalszam() >= 4)			//amíg meg nem jövünk a vonalra
+				{
+					lassu();
+					//staterandom = ?;   				safetycar állapotgép kezdete
+				}
+				break;
+
+
+			case 6:
+
+					SETvaltaslehetoseg(1);
+					staterandom = 2;
+
+				break;
+			case 7:
+				kettoutanegyhossz();
+				if(GEThossz() > 4000 && GEThossz() < 13000) //legrovidebb savvalto lyukat lat
+				{
+
+					staterandom = 8;
+				}
+				else if(GETcounterpres() - distance > 33000)
+				{
+					staterandom=0;
+					SEThossz(0);
+				}
+				break;
+			case 8:
+				savvaltas();
+				if(GETnullavonalszam() >= 80)			//amig el nem hagyjuk a vonalat
+				{
+					SETegyvonalszam(0);
+					staterandom = 5;
+				}
+				break;
+			case 9:
+				if(GETegyvonalszam() >= 4)			//amíg meg nem jövünk a vonalra
+				{
+					lassu();
+					//staterandom = ?;   				safetycar állapotgép kezdete
+				}
+				break;
+
+			default:
+				statelab = 0;
+				break;
+		}
+		SETflagallapotgep(0);
+		}
+}
+
 
 
 void allapotgeplab(void)
@@ -36,6 +168,7 @@ void allapotgeplab(void)
 			case 0:
 				labyrinth();
 				egyutankettohossz();
+
 				if(GEThossz() > 13000 && GEThossz() < 30000 ) //leghosszabb sávváltót lát
 				{
 					statelab = 1;
@@ -46,6 +179,7 @@ void allapotgeplab(void)
 					statelab = 2;
 					SEThossz(0);
 				}
+
 
 				break;
 
@@ -430,6 +564,12 @@ uint8_t GETstatelab(void)
 {
 	return statelab;
 }
+
+uint8_t GETstaterandom(void)
+{
+	return staterandom;
+}
+
 
 uint8_t GETstate(void)
 {

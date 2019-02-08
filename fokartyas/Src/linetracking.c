@@ -18,10 +18,12 @@ uint32_t haromvonalszam = 0;
 uint8_t flagharom = 0;
 uint8_t flagketto = 0;
 uint32_t hossz = 0;
+uint8_t linetrackingbiztonsag = 0;
 
 int32_t kettohossz = 0;
 
 int32_t startposition;
+int32_t startpositionketto;
 
 
 
@@ -60,11 +62,19 @@ uint32_t egyutankettohossz(void)
 			startposition = GETcounterpres();
 			flagketto = 1;
 		}
-
-		if (GETcount()==1 && startposition != 0)
+		if(GETcount()==1)
+		{
+			linetrackingbiztonsag++;
+		}
+		if(GETcount()==2)
+		{
+			linetrackingbiztonsag = 0;
+		}
+		if (linetrackingbiztonsag > 4 && startposition != 0)
 		{
 			hossz = GETcounterpres() - startposition;
 			startposition = 0;
+			linetrackingbiztonsag = 0;
 			return hossz;
 		}
 		return 0;
@@ -107,13 +117,13 @@ void kettohosszfv(void)
 {
 		if(GETcount() == 2 && flagketto == 0)
 		{
-			startposition = GETcounterpres();
+			startpositionketto = GETcounterpres();
 			flagketto = 1;
 		}
 
-		if (GETcount()==2 && startposition != 0)
+		if (GETcount()==2 && startpositionketto != 0)
 		{
-			kettohossz = GETcounterpres() - startposition;
+			kettohossz = GETcounterpres() - startpositionketto;
 		}
 }
 
