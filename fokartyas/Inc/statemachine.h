@@ -22,5 +22,7 @@ void randomlab (void);
 uint8_t GETstaterandom(void);
 uint8_t GETgyorsasagi(void);
 void SETgyorsasagi(uint8_t ertek);
+void racse(void);
+uint8_t GETstateeloz(void);
 
 #endif /* STATEMACHINE_H_ */

@@ -23,8 +23,8 @@
 #define VKOVMIN	(0.0f)
 
 float v 		= 	0.0f;
-float vlassu	=	1.5f;
-float vgyors	=	2.5f;
+float vlassu	=	1.8f;  // 1.8
+float vgyors	=	3.1f;  // 3.3  // 3.0-val stabil 28-as kor
 float vfek		=	0.0f;
 float vsavvalt 	=	1.0f;
 float vkovet	=   0.0f;
@@ -128,6 +128,10 @@ void velocitySETTER(void)
 		{
 			SETv(vsavvalt);
 		}
+		if (GETflagvisszasavvalt() == 1)
+		{
+			SETv(vsavvalt);
+		}
 
 
 	}
@@ -209,6 +213,11 @@ void SETuprev(float ertek)
 void SETupres(float ertek)
 {
 	upres=ertek;
+}
+
+void SETvgyors(float ertek)
+{
+	vgyors=ertek;
 }
 
 void SETu2prev(float ertek)

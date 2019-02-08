@@ -19,17 +19,17 @@ int32_t Ykivant = 	0;
 float p			=	2.5f;
 float d			=	10.0f;
 
-float plassu	=	2.7f;  //2.7
-float dlassu	=	8.0f;  //8.0
-float scalelassu=	0.7f;
+float plassu	=	1.8f;  //2.7 // mielőtt elkezdtem 2.3  // 2.0-val 28s
+float dlassu	=	8.0f;  //8.0  // 8.0
+float scalelassu=	0.5f;
 
 //float pgyors		=	0.8f;
 //float dgyors		=	5.0f;
 //float scalegyors	=	1.0f;
 
-float pgyors		=	0.8f;   //0.8
+float pgyors		=	0.6f;   //0.8  Ez maradt
 float dgyors		=	15.0f;  //15.0
-float scalegyors	=	1.0f;
+float scalegyors	=	0.0f;
 
 float peloz		=	0.8f;
 float deloz	=	15.0f;
@@ -122,13 +122,13 @@ int16_t toPWM(int32_t jel)
 	int16_t pwmh;
 	if (GETflaglassu() == 1)
 	{
-		pwmh=pwmmidh+scalelassu*jel*(rangeh*100000/12799)/100000; //KORM�?NY
+		pwmh=pwmmidh-scalelassu*jel*(rangeh*100000/12799)/100000; //KORM�?NY
 		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
 		if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
 	}
 	if (GETflaggyors() == 1)
 	{
-		pwmh=pwmmidh-scalegyors*jel*(rangeh*1000000/12799)/100000; //KORM�?NY
+		pwmh=pwmmidh+scalegyors*jel*(rangeh*1000000/12799)/100000; //KORM�?NY
 		if(pwmh<pwmmidh-rangeh) pwmh=pwmmidh-rangeh;
 		if(pwmh>pwmmidh+rangeh) pwmh=pwmmidh+rangeh;
 	}

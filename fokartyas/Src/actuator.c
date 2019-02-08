@@ -124,6 +124,7 @@ void szervovezerles(int16_t elsoszervo, int16_t hatsoszervo)
 		else
 		{
 			htim13.Instance->CCR1 	= elsoszervo; 		//elso szervo
+			//htim14.Instance->CCR1 	= hatsoszervo; 	//hatso szervo
 			htim14.Instance->CCR1 	= GETpwmmidh(); 	//hatso szervo
 			htim10.Instance->CCR1 	= -(1500-elsoszervo)*1+1500; 			//szenzor szervo
 
